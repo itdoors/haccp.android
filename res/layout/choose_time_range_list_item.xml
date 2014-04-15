@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/abs__tab_indicator_ab_holo"
+    >
+
+    <TextView 
+        android:id = "@+id/choose_time_range_str"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="35sp"
+        android:textColor="@android:color/black"
+        android:textStyle="normal"
+        android:singleLine="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"
+        android:layout_gravity="center_vertical|left"
+        android:gravity="center_vertical"
+        
+        />
+	<View 
+    	android:layout_width="fill_parent"
+    	android:layout_marginRight="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_height="1dp"
+        android:background="@drawable/abs__ab_stacked_solid_light_holo"
+    />
+</LinearLayout>

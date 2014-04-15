@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="read_data">Read data</string>
+    <string name="start_scanner">START SCANNER</string>
+    <string name="scanner_error">Error occured while scanning! Wrong id format!</string>
+    
+ 
+    <string name="no_more_items_to_load">No more items to load</string>
+    <string name="your_device_has_no_camera">Your device has no camera available!</string>
+ 	
+ 	<string name="no_time_range_has_been_selected">No time range has been selected &#8230;</string>
+ 	<string name="no_statistic_items">No statistics on this period avalible&#8230;</string>
+ 	<string name="failed_to_load_data">Failed to load data. Check your internet settings.</string>
+ 	
+ 	<string name="failed_to_load_more">Failed to load more items</string>
+    <string name="failed_to_load">Failed to load content</string>
+    <string name="failed_to_change_status">Failed to change status. Check your internet settings.</string>
+ 	<string name="status_successfully_changed">Status successfully changed.</string>
+ 	
+</resources>

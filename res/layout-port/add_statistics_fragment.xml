@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/abs__ab_bottom_solid_light_holo">
+ 
+    				<ScrollView 
+    				    android:layout_width="fill_parent"
+    				    android:layout_height="fill_parent"
+    				    android:layout_above="@+id/add_st_done_holder"
+    				    >
+    			    
+	   					 <RelativeLayout 
+	   					     android:layout_width="fill_parent"
+	   					     android:layout_height="wrap_content"
+	   					     >
+			    		     	<!-- CP number -->
+						   		<LinearLayout 
+						    		    android:id="@+id/add_st_char_title_holder"
+									    android:layout_width="fill_parent"
+									    android:layout_height="wrap_content"
+									    android:orientation="horizontal"
+									    android:layout_marginLeft="20dp"
+								      	android:layout_marginRight="20dp"
+								      	android:layout_marginTop="10dp"
+								      	android:layout_alignParentTop="true"
+								        >
+								      	<TextView 
+										    android:layout_width="wrap_content"
+										    android:layout_height="wrap_content"
+									        android:textSize="22sp"
+									        android:singleLine="true"
+									        android:textColor="@android:color/black"
+									        android:text="@string/point_number"
+									       	android:layout_marginBottom="5dp"
+									        />
+									    <TextView 
+									        android:id="@+id/add_st_char_point_number"
+									        android:layout_width="wrap_content"
+									        android:layout_height="wrap_content"
+									        android:singleLine="false"
+									        android:textColor="@android:color/black"
+									        android:textSize="22sp"
+									        android:paddingLeft="5dp"
+									        android:paddingRight="5dp"
+									        android:paddingTop="2dp"
+									        android:paddingBottom="2dp"
+									        />
+							   </LinearLayout>
+									
+								<View 
+								    android:layout_below="@+id/add_st_char_title_holder"
+								    android:id="@+id/add_st_char_title_bottom_line"
+								    android:layout_width="fill_parent"
+								    android:layout_height="2dp"
+								    android:background="@color/black"
+								    android:layout_marginTop="5dp"
+								    android:layout_marginBottom="10dp"
+								   	android:layout_marginLeft="20dp"
+									android:layout_marginRight="20dp"
+							    />
+						    
+				    			<LinearLayout 
+				    				android:id="@+id/add_st_char_fields_holder"
+									android:layout_width="fill_parent"
+									android:layout_height="wrap_content"
+									android:orientation="vertical" 
+								 	android:layout_centerInParent="true"
+								 	android:gravity="center_vertical"
+								 	android:layout_below="@+id/add_st_char_title_bottom_line"
+								 />
+			    				
+			    			
+			    			<RadioGroup 
+						        android:id="@+id/add_st_statuses_radio_group"
+						        android:layout_width="fill_parent"
+						        android:layout_height="wrap_content"
+						        android:orientation="vertical"
+						        android:paddingLeft="20dp"
+				    			android:paddingRight="20dp"
+				    			android:layout_below="@+id/add_st_char_fields_holder"
+						       
+						       />
+	    			
+	    			</RelativeLayout>
+    			
+   				</ScrollView>
+   			
+				<RelativeLayout 
+				    android:id="@+id/add_st_done_holder"
+				    android:layout_width="fill_parent"
+				    android:layout_height="wrap_content"
+				    android:layout_alignParentBottom="true"
+				    android:background="@drawable/abs__ab_bottom_transparent_light_holo"
+				    >
+				    <Button 
+				        android:id="@+id/add_st_done_btn"
+				        android:layout_width="fill_parent"
+				        android:layout_height="wrap_content"
+				        android:text="@string/add"
+				        android:textSize="20sp"
+				        android:layout_marginLeft="30dp"
+				    	android:layout_marginRight="30dp"
+				    	android:layout_marginTop="20dp"
+				    	android:layout_centerInParent="true"
+				        />
+				</RelativeLayout>
+</RelativeLayout>

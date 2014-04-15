@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/abs__ab_bottom_solid_light_holo">
+ 
+    			<ScrollView 
+    			    android:paddingTop="10dp"
+    			    android:layout_width="fill_parent"
+    			    android:layout_height="fill_parent"
+    			    android:layout_above="@+id/add_st_done_holder"
+    			    >
+    			    <LinearLayout 
+    			        android:layout_width="fill_parent"
+    			        android:layout_height="wrap_content"
+    			        android:orientation="vertical"
+    			        >
+	    				<LinearLayout 
+						    android:id="@+id/add_st_char_fields_holder"
+						    android:layout_width="fill_parent"
+						    android:layout_height="wrap_content"
+						    android:orientation="vertical" 
+					    	android:layout_gravity="center_horizontal|bottom"
+					    />
+	    				<RadioGroup 
+					        android:id="@+id/add_st_statuses_radio_group"
+					        android:layout_width="fill_parent"
+					        android:layout_height="wrap_content"
+					        android:orientation="vertical"
+					        android:paddingLeft="20dp"
+			    			android:paddingRight="20dp"
+			    		/>
+    				</LinearLayout>
+				</ScrollView>
+    			
+				<RelativeLayout 
+				    android:id="@+id/add_st_done_holder"
+				    android:layout_width="fill_parent"
+				    android:layout_height="wrap_content"
+				    android:layout_alignParentBottom="true"
+				    android:background="@drawable/abs__ab_bottom_transparent_light_holo"
+				    >
+				    <Button 
+				        android:id="@+id/add_st_done_btn"
+				        android:layout_width="fill_parent"
+				        android:layout_height="wrap_content"
+				        android:text="@string/add"
+				        android:textSize="20sp"
+				        android:layout_marginLeft="30dp"
+				    	android:layout_marginRight="30dp"
+				    	android:layout_marginTop="20dp"
+				    	android:layout_centerInParent="true"
+				        />
+				</RelativeLayout>
+</RelativeLayout>
