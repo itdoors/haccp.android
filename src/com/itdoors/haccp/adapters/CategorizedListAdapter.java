@@ -1,7 +1,9 @@
 package com.itdoors.haccp.adapters;
 import java.util.HashMap;
+import android.annotation.SuppressLint;
 import android.widget.BaseAdapter;
 
+@SuppressLint("UseSparseArrays")
 public abstract class CategorizedListAdapter<T, V> extends BaseAdapter{
 	
 	public static final int TYPE_ITEM = 0;
@@ -11,6 +13,7 @@ public abstract class CategorizedListAdapter<T, V> extends BaseAdapter{
 	
 	private HashMap<Integer, T> items;
 	private HashMap<Integer, V> sections;
+	
 	
 	
 	{

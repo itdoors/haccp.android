@@ -9,7 +9,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.itdoors.haccp.R;
 import com.itdoors.haccp.fragments.PointsListFragment;
-import com.itdoors.haccp.model.Point;
 
 public class PointsListActivity extends SherlockFragmentActivity implements PointsListFragment.OnPointPressedListener{
 	

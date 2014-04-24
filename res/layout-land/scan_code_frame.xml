@@ -2,69 +2,61 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal" 
-    android:background="@drawable/abs__ab_solid_light_holo" 
-    
-    >
+    android:background="@drawable/abs__ab_solid_light_holo"
+    android:orientation="horizontal" >
 
-    <LinearLayout 
-	    android:layout_width="0dp"
-	    android:layout_weight="1"
-	    android:layout_height="match_parent"
-	    android:orientation="vertical" 
-	    android:layout_gravity="center"
-	    android:gravity="center"
-	    android:background="@drawable/abs__ab_solid_light_holo" 
-    >
-    
-     <TextView 
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:text="@string/start_scanner"
-         android:textColor="@android:color/background_dark"
-		 android:textSize="20sp"
-		 android:layout_gravity="center"
-		 android:layout_marginTop="5dp"
-	     android:layout_marginLeft="40dp"
-	     android:layout_marginRight="40dp"
-	     />
-     
-    
-     <ImageView 
-         
-         android:id="@+id/qr_btn"
-         android:layout_width="200dp"
-         android:layout_height="200dp"
-         android:layout_marginLeft="30dp"
-         android:layout_marginRight="30dp"
-         android:src="@drawable/quick_scan"
-         android:padding="5dp"
-         android:background="@drawable/abs__tab_indicator_ab_holo"
-         android:scaleType="fitXY"
-         />
-  	</LinearLayout>
-  	<RelativeLayout 
-  	    android:id="@+id/rq_result_holder"
-  	    android:layout_width="0dp"
-  	    android:layout_weight="1"
-  	    android:layout_height="match_parent"
-  	    android:layout_gravity="center"
-  	    android:gravity="center"
-  	    android:visibility="gone"
-  	    >
-  		<EditText 
-		    android:id="@+id/qr_result"
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:background="@drawable/abs__ab_solid_light_holo"
+        android:gravity="center"
+        android:orientation="vertical" >
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-			android:inputType="text"
-			android:singleLine="true"
-			android:textColor="@android:color/black"
-			android:textSize="15sp" 
-			android:layout_marginRight="5dp"
-			android:background="@drawable/textfield_default"
-		
-			/>
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginTop="5dp"
+            android:text="@string/start_scanner"
+            android:textColor="@android:color/background_dark"
+            android:textSize="20sp" />
+
+        <ImageView
+            android:id="@+id/qr_btn"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:background="@drawable/abs__tab_indicator_ab_holo"
+            android:padding="5dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/quick_scan" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/rq_result_holder"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:visibility="gone" >
+
+        <EditText
+            android:id="@+id/qr_result"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/textfield_default"
+            android:inputType="text"
+            android:singleLine="true"
+            android:textColor="@android:color/black"
+            android:textSize="15sp" />
     </RelativeLayout>
-  
+
 </LinearLayout>

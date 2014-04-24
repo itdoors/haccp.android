@@ -1,15 +1,18 @@
 package com.itdoors.haccp.activities;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.MenuItem;
 import com.itdoors.haccp.R;
+import com.itdoors.haccp.sync.SyncUtils;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
 
-public abstract class BaseActivity extends SherlockFragmentActivity{
+public abstract class BaseSherlockFragmentActivity extends SherlockFragmentActivity{
 	private Fragment mContentFragment;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +37,12 @@ public abstract class BaseActivity extends SherlockFragmentActivity{
 			.commit();
 
 		}
+		
 	}
 	
 	public abstract void initFragment();
+	
+	
 	
 	public void addNewItemFragmentToStack(Fragment newFragment){
 		
@@ -60,13 +66,4 @@ public abstract class BaseActivity extends SherlockFragmentActivity{
 		getSupportFragmentManager().putFragment(outState, "mContent", mContentFragment);
 	}
 	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case android.R.id.home:
-			finish();
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
 }

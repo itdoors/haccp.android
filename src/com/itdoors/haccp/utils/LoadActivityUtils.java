@@ -65,6 +65,14 @@ public class LoadActivityUtils {
 		((ViewGroup)getView(activity)).addView(loading);
 		
 	}
+	
+	public static void addLoadingView(Activity activity, int stringResources){
+		
+		View loading = getLoadingView(activity);
+		((TextView)loading.findViewById(R.id.loading_tv)).setText(stringResources);
+		((ViewGroup)getView(activity)).addView(loading);
+		
+	}
 	public static void addErrorView(Activity activity, View.OnClickListener retry){
 		
 		View error = getErrorView(activity,retry);

@@ -1,79 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/abs__ab_solid_light_holo"
-    
-    >
-<LinearLayout 
-    android:layout_gravity="center"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical" 
-    android:layout_marginLeft="20dp"
-	android:layout_marginRight="20dp"
-    >
-    
-    <ImageView 
+    android:background="@drawable/abs__ab_solid_light_holo" >
+
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/logo_color"
-        />
-	<TextView 
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:paddingLeft="20dp"
-	    android:paddingRight="20dp"
-	    android:paddingTop="4dp"
-	    android:paddingBottom="4dp"
-	    android:layout_gravity="center_horizontal"
-	    android:layout_marginTop="5dp"
-	    android:gravity="center"
-	    android:text="@string/welcome"
-	    android:textColor="@android:color/black"
-	    android:textSize="18sp"
-	    android:background="@drawable/register_button"
-	    />
-	<LinearLayout 
-	    android:layout_gravity="center_horizontal"
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:background="@android:color/white"
-	    android:layout_marginTop="10dp"
-	    android:layout_marginBottom="10dp"
-	    android:orientation="vertical"
-	    >
-	    <EditText 
-	        android:id="@+id/user_email"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:hint="@string/email"
-	        android:inputType="textEmailAddress"
-	        
-	        />
-	    <EditText 
-	        android:id="@+id/user_pass"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:hint="@string/password"
-	        android:inputType="textPassword"
-	        />
-	</LinearLayout>
-	<Button 
-	    android:id="@+id/login_bnt"
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_marginTop="10dp"
-	    android:layout_marginBottom="10dp"
-	    android:text="@string/login"
-	    />
-	<ImageView 
-	    android:layout_width="fill_parent"
-	    android:layout_height="1dp"
-	    android:background="@android:color/darker_gray"
-	    />
-	
-</LinearLayout>
+        android:layout_gravity="center"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:orientation="vertical" >
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logo_color" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/register_button"
+            android:gravity="center"
+            android:paddingBottom="4dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="4dp"
+            android:text="@string/welcome"
+            android:textColor="@android:color/black"
+            android:textSize="18sp" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@android:color/white"
+            android:orientation="vertical" >
+
+            <EditText
+                android:id="@+id/user_email"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/email"
+                android:inputType="textEmailAddress" />
+
+            <EditText
+                android:id="@+id/user_pass"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/password"
+                android:inputType="textPassword" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/login_bnt"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/login" />
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+    </LinearLayout>
 
 </FrameLayout>

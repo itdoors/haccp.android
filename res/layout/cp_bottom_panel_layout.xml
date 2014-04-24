@@ -1,90 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="40dp"
-    android:orientation="horizontal" 
+    android:background="@drawable/abs__ab_solid_light_holo"
+    android:orientation="horizontal"
     android:paddingLeft="5dp"
-    android:paddingRight="5dp"
-    android:background="@drawable/abs__ab_solid_light_holo" 
-    >
-    <LinearLayout 
-        
-         android:id="@+id/cp_bp_add_item"
-	     android:layout_weight="1"
-	     android:layout_width="0dp"
-	     android:layout_height="fill_parent"
-	     android:orientation="horizontal"
-	     android:paddingTop="5dp"
-    	 android:paddingBottom="5dp"
-	     android:background="@drawable/abs__tab_indicator_ab_holo"
-	    >
-	    <ImageView 
-	        android:id="@+id/cp_bottom_panel_add_img"
-	        android:layout_width="40dp"
-	        android:layout_height="fill_parent"
-	        android:src="@drawable/add_green"
-	        android:duplicateParentState="true"
-	        />
-	    <TextView 
-	        android:layout_width="fill_parent"
-	        android:layout_height="fill_parent"
-	        android:text="@string/add"
-	        android:gravity="center"
-	        android:duplicateParentState="true"
-	        />
+    android:paddingRight="5dp" >
+
+    <LinearLayout
+        android:id="@+id/cp_bp_add_item"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:background="@drawable/abs__tab_indicator_ab_holo"
+        android:orientation="horizontal"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp" >
+
+        <ImageView
+            android:id="@+id/cp_bottom_panel_add_img"
+            android:layout_width="40dp"
+            android:layout_height="fill_parent"
+            android:duplicateParentState="true"
+            android:src="@drawable/add_green" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:duplicateParentState="true"
+            android:gravity="center"
+            android:text="@string/add" />
     </LinearLayout>
-    <LinearLayout 
-        
-         android:id="@+id/cp_bp_params_item"
-	     android:layout_weight="1"
-	     android:layout_width="0dp"
-	     android:layout_height="fill_parent"
-	     android:orientation="horizontal"
-	     android:paddingTop="5dp"
-    	 android:paddingBottom="5dp"
-	     android:background="@drawable/abs__tab_indicator_ab_holo"
-	    
-	     >
-		<ImageView 
-	        android:id="@+id/cp_bottom_panel_params_img"
-	        android:layout_width="40dp"
-	        android:layout_height="fill_parent"
-	        android:src="@drawable/settings_purple"
-	        android:duplicateParentState="true"
-	        />
-		<TextView 
-	        android:layout_width="fill_parent"
-	        android:layout_height="fill_parent"
-	        android:text="@string/settings"
-	        android:gravity="center"
-	        android:duplicateParentState="true"
-	        />
-	</LinearLayout>
-	<LinearLayout
-	     android:id="@+id/cp_bp_calendar_item"
-	     android:layout_weight="1"
-	     android:layout_width="0dp"
-	     android:layout_height="fill_parent"
-	     android:orientation="horizontal"
-	     android:paddingTop="5dp"
-    	 android:paddingBottom="5dp"
-	     android:background="@drawable/abs__tab_indicator_ab_holo"
-	     >
-		<ImageView 
-	        android:id="@+id/cp_bottom_panel_calendar_img"
-	        android:layout_width="40dp"
-	        android:layout_height="fill_parent"
-	        android:src="@drawable/calendar_red_white"
-	        android:duplicateParentState="true"
-	        />
-		
-		<TextView 
-	        android:layout_width="fill_parent"
-	        android:layout_height="fill_parent"
-	        android:text="@string/timeslot"
-	        android:gravity="center"
-	        android:duplicateParentState="true"
-	        />
-	</LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/cp_bp_params_item"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:background="@drawable/abs__tab_indicator_ab_holo"
+        android:orientation="horizontal"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp" >
+
+        <ImageView
+            android:id="@+id/cp_bottom_panel_params_img"
+            android:layout_width="40dp"
+            android:layout_height="fill_parent"
+            android:duplicateParentState="true"
+            android:src="@drawable/settings_purple" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:duplicateParentState="true"
+            android:gravity="center"
+            android:text="@string/settings" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/cp_bp_calendar_item"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:background="@drawable/abs__tab_indicator_ab_holo"
+        android:orientation="horizontal"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp" >
+
+        <ImageView
+            android:id="@+id/cp_bottom_panel_calendar_img"
+            android:layout_width="40dp"
+            android:layout_height="fill_parent"
+            android:duplicateParentState="true"
+            android:src="@drawable/calendar_red_white" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:duplicateParentState="true"
+            android:gravity="center"
+            android:text="@string/timeslot" />
+    </LinearLayout>
+
 </LinearLayout>

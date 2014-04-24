@@ -2,24 +2,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal" 
-    android:gravity="center" 
     android:layout_gravity="center"
     android:background="@drawable/abs__ab_solid_light_holo"
-    >
-    <ProgressBar android:id="@android:id/progress"
+    android:gravity="center"
+    android:orientation="horizontal" >
+
+    <ProgressBar
+        android:id="@android:id/progress"
+        style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="8dp"
-       	android:layout_margin="5dp"
-        style="?android:attr/progressBarStyle" />
-      
-  	<TextView 
-  	android:layout_width="wrap_content"
-  	android:layout_height="wrap_content"
-  	android:text="@string/loading"
-  	android:textSize="15sp"
-  	
-  	/>
+        android:layout_margin="5dp"
+        android:layout_marginRight="8dp" />
+
+    <TextView
+        android:id="@+id/loading_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/loading"
+        android:textSize="15sp" />
 
 </LinearLayout>

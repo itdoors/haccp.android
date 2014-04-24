@@ -9,7 +9,7 @@ import android.os.Bundle;
 
 
 
-public class LoginActivity extends BaseActivity{
+public class LoginActivity extends BaseSherlockFragmentActivity{
 
 	public static Intent newInstance(Activity activity) {
 		Intent intent = new Intent(activity, LoginActivity.class);

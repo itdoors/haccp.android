@@ -2,42 +2,40 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/abs__ab_solid_light_holo"
     android:orientation="vertical"
-    android:background="@drawable/abs__ab_solid_light_holo" 
-    android:paddingTop="20dp"
     android:paddingBottom="20dp"
-    >
-<TextView 
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginLeft="20dp"
-    android:layout_marginRight="20dp"
-    android:textSize="40sp"
-    android:text="@string/app_name_haccp"
-    android:gravity="center"
-    android:padding="5dp"
-    />
+    android:paddingTop="20dp" >
 
-	<View 
-    	android:layout_marginTop="10dp"
-    	android:layout_width="fill_parent"
-    	android:layout_marginRight="20dp"
-        android:layout_marginLeft="10dp"
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:gravity="center"
+        android:padding="5dp"
+        android:text="@string/app_name_haccp"
+        android:textSize="40sp" />
+
+    <View
+        android:layout_width="fill_parent"
         android:layout_height="2dp"
-        android:background="@android:color/black"
-    	android:layout_marginBottom="10dp"
-    />
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:background="@android:color/black" />
 
-    <TextView 
-	    android:layout_gravity="center_horizontal"
-    	android:layout_marginLeft="20dp"
-   		android:layout_marginRight="20dp"
-      	android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:textSize="20sp"
-	    android:text="@string/app_link"
-	    android:background="@drawable/register_button"
-	    android:padding="5dp"
-	    android:autoLink="web"/>
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:autoLink="web"
+        android:background="@drawable/register_button"
+        android:padding="5dp"
+        android:text="@string/app_link"
+        android:textSize="20sp" />
 
 </LinearLayout>

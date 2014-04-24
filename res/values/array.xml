@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string-array name="menu_items">
         <item>@string/user_profile</item>
         <item>@string/scanner</item>
         <item>@string/points</item>
         <item>@string/about</item>
     </string-array>
-
     <string-array name="menu_items_img">
         <item>@drawable/main_menu_profile_img</item>
         <item>@drawable/main_menu_scan_img</item>
         <item>@drawable/main_menu_points_img</item>
         <item>@drawable/main_menu_about_program_img</item>
-   </string-array>
-   
-   <string-array name="choos_time_range">
-       <item>@string/today</item>
-       <item>@string/yesterday</item>
-       <item>@string/last_weak</item>
-       <item>@string/last_30_days</item>
-       <item>@string/this_month</item>
-       <item>@string/custom_range</item>
-   </string-array>
-      
+    </string-array>
+    <string-array name="choos_time_range">
+        <item>@string/today</item>
+        <item>@string/yesterday</item>
+        <item>@string/last_weak</item>
+        <item>@string/last_30_days</item>
+        <item>@string/this_month</item>
+        <item>@string/custom_range</item>
+    </string-array>
+
 </resources>

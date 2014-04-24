@@ -1,23 +1,23 @@
 <resources>
 
     <string name="app_name_haccp">HACCP</string>
-	<string name="profile">Profile</string>
-	<string name="user_profile">Profile</string>
-	<string name="about">About</string>
-	<string name="points">Points</string>
-	<string name="send">Send</string>
-	<string name="code">Code</string>
-	<string name="retry">Retry</string>
-	<string name="refresh">Refresh</string>
-	<string name="login">Login</string>
-	<string name="authorization">Authorization</string>
-	<string name="email">Email address</string>
-	<string name="password">Password</string>
-	<string name="loading">Loading&#8230;</string>
-	<string name="butt_reload">Reload</string>
-	<string name="share">Share</string>
+    <string name="profile">Profile</string>
+    <string name="user_profile">Profile</string>
+    <string name="about">About</string>
+    <string name="points">Points</string>
+    <string name="send">Send</string>
+    <string name="code">Code</string>
+    <string name="retry">Retry</string>
+    <string name="refresh">Refresh</string>
+    <string name="login">Login</string>
+    <string name="authorization">Authorization</string>
+    <string name="email">Email address</string>
+    <string name="password">Password</string>
+    <string name="loading">Loading&#8230;</string>
+    <string name="butt_reload">Reload</string>
+    <string name="share">Share</string>
     <string name="details">Details</string>
-	<string name="ok">OK</string>
+    <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="logout">Logout</string>
     <string name="continue_str">Continue</string>
@@ -25,7 +25,6 @@
     <string name="scan">Scan</string>
     <string name="scanner">Scanner</string>
     <string name="about_program">About program</string>
-    
     <string name="app_link">http://haccp.itdoors.com.ua/</string>
     <string name="statistics">Statistics</string>
     <string name="attributes">Attributes</string>
@@ -38,7 +37,7 @@
     <string name="coordinates">Coordinates</string>
     <string name="status">Status</string>
     <string name="point_number">Control point #</string>
-    
+
     <!-- CP TYPES -->
     <string name="cp_type_grounbait_box">Grounbait box</string>
     <string name="cp_type_trap">Trap</string>
@@ -47,37 +46,35 @@
     <string name="cp_type_thermometer">Thermometer</string>
     <string name="cp_type_monitoring_platform_flying">Flying monitoring platform</string>
     <string name="cp_type_monitoring_platform_crawling">Crawling monitoring platform</string>
-    
+
     <!-- CP STATISTICS TYPE -->
-	<string name="cp_statistics_type_warning">Warning</string>
-	<string name="cp_statistics_type_approved">Approved</string>
-	<string name="cp_statistics_type_danger">Danger</string>
-	
-	<string name="add">Add</string>
-	<string name="settings">Settings</string>
-	<string name="timeslot">Timeslot</string>
-	
-	<string name="edit">Edit</string>
-	<string name="delete">Delete</string>
-	
-	<string name="apply">Apply</string>
-	
-	<string name="choose_range">Choose range</string>
-	<string name="today">Today</string>
-	<string name="yesterday">Yesterday</string>
-	<string name="last_weak">Last weak</string>
-	<string name="last_30_days">Last 30 days</string>
-	<string name="this_month">This month</string>
-	<string name="custom_range">Custom range</string>
-	<string name="done">DONE</string>
-	<string name="from">From</string>
-	<string name="to">To</string>
-	<string name="action">Action</string>
-	
-	<string name="add_statistic_record">Add statistics record</string>
-	<string name="all_items_downloaded">All items downloaded</string>
-	
-	<string name="deratisation">Deratisation</string>
-	<string name="desinsectum">Desinsectum</string>
-	<string name="point_list">Points list</string>
+    <string name="cp_statistics_type_warning">Warning</string>
+    <string name="cp_statistics_type_approved">Approved</string>
+    <string name="cp_statistics_type_danger">Danger</string>
+    <string name="add">Add</string>
+    <string name="settings">Settings</string>
+    <string name="timeslot">Timeslot</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="apply">Apply</string>
+    <string name="choose_range">Choose range</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="last_weak">Last weak</string>
+    <string name="last_30_days">Last 30 days</string>
+    <string name="this_month">This month</string>
+    <string name="custom_range">Custom range</string>
+    <string name="done">DONE</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="action">Action</string>
+    <string name="add_statistic_record">Add statistics record</string>
+    <string name="all_items_downloaded">All items downloaded</string>
+    <string name="deratisation">Deratisation</string>
+    <string name="desinsectum">Desinsectum</string>
+    <string name="point_list">Points list</string>
+
+    <!-- Restful Provider -->
+    <string name="provider_name">Haccp provider</string>
+    <string name="synchronization">Synchronization&#8230;</string>
 </resources>

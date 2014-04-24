@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+
     <string name="read_data">Считать данные</string>
     <string name="start_scanner">START SCANNER</string>
     <string name="scanner_error">Ошибка при сканировании! Неверный формат!</string>
-    
- 
     <string name="no_more_items_to_load">Все елементы загружены</string>
     <string name="your_device_has_no_camera">На вашем девайсе отсутсвует камера!</string>
- 	
- 	<string name="no_time_range_has_been_selected">Временной интервал не был выбран &#8230;</string>
- 	<string name="no_statistic_items">Записей в заданном диапазоне нету&#8230;</string>
- 	<string name="failed_to_load_data">Не удалось сделать запрос. Проверьте установки интернета.</string>
- 	
- 	<string name="failed_to_load_more">Не удалось загрузить еще</string>
+    <string name="no_time_range_has_been_selected">Временной интервал не был выбран &#8230;</string>
+    <string name="no_statistic_items">Записей в заданном диапазоне нету&#8230;</string>
+    <string name="failed_to_load_data">Не удалось сделать запрос. Проверьте установки интернета.</string>
+    <string name="failed_to_load_more">Не удалось загрузить еще</string>
     <string name="failed_to_load">Не удалось загрузить контент</string>
     <string name="failed_to_change_status">Не удалось изменить статус. Попытайтесь снова. Проверьте установки интернета.</string>
     <string name="status_successfully_changed">Статус успешно изменен.</string>
+
 </resources>

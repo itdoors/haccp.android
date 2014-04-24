@@ -17,9 +17,9 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
-     <style name="MainMenuStyle" parent="Theme.Sherlock.Light.DarkActionBar">
+    <style name="MainMenuStyle" parent="Theme.Sherlock.Light.DarkActionBar">
         <item name="homeAsUpIndicator">@drawable/main_menu_home_as_up_indicator</item>
         <item name="android:homeAsUpIndicator">@drawable/main_menu_home_as_up_indicator</item>
     </style>
-    
+
 </resources>

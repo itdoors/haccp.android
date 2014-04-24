@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2011 Jake Wharton
+<!--
+     Copyright (C) 2011 Jake Wharton
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -15,12 +16,12 @@
 -->
 
 <resources>
+
     <style name="Theme.PageIndicatorDefaults" parent="android:Theme">
         <item name="vpiTabPageIndicatorStyle">@style/Widget.TabPageIndicator</item>
     </style>
 
-    <style name="Widget">
-    </style>
+    <style name="Widget"></style>
 
     <style name="Widget.TabPageIndicator" parent="Widget">
         <item name="android:gravity">center</item>
@@ -38,4 +39,5 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/vpi__dark_theme</item>
     </style>
+
 </resources>

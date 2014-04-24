@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tabsLayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/black"
+    android:orientation="vertical" >
 
-
-<LinearLayout 
-    	xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/tabsLayout" 
+    <TextView
+        android:id="@+id/tabsText"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent" 
-        android:background="@color/black"
-        android:orientation="vertical">
-
-        <TextView 
-            android:id="@+id/tabsText" 
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" 
-            android:textSize="15sp" 
-            android:textColor="@color/white"
-            android:padding="13dp"
-            android:gravity="center"
-            android:background="@drawable/abs__tab_indicator_ab_holo"
-            />
+        android:layout_height="fill_parent"
+        android:background="@drawable/abs__tab_indicator_ab_holo"
+        android:gravity="center"
+        android:padding="13dp"
+        android:textColor="@color/white"
+        android:textSize="15sp" />
 
 </LinearLayout>
