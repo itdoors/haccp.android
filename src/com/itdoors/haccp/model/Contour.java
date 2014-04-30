@@ -11,20 +11,22 @@ public class Contour implements Serializable{
 	private final int id;
 	private final String name;
 	private final int colour;
+	private final Service service;
 	
 	public Contour(int id, String name) {
-		
-		this.id = id;
-		this.name = name;
-		this.colour = 0;
-	
+		this(id,name,0);
 	}
 
 	public Contour(int id, String name, int colour) {
+		this(id,name,colour,null);
+	}
+	
+	public Contour(int id, String name, int colour, Service service) {
 		
 		this.id = id;
 		this.name = name;
 		this.colour = colour;
+		this.service = service;
 	
 	}
 	
@@ -40,6 +42,9 @@ public class Contour implements Serializable{
 		return id;
 	}
 	
+	public Service getService() {
+		return service;
+	}
 
 	@Override
 	public int hashCode() {
@@ -50,10 +55,21 @@ public class Contour implements Serializable{
 		hash = prime * hash + Integer.valueOf(id).hashCode();
 		hash = prime * hash + Integer.valueOf(colour).hashCode();
 		hash = prime * hash + (name == null ? 0 : name.hashCode());
+		hash = prime * hash + (service == null ? 0 : service.hashCode());
 		
 		return hash;
 	}
-	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("{")
+			.append("id: " + id +",")
+			.append("name: " + (name==null ? "null" : name) +",")
+			.append("color: " + colour +",")
+			.append("service: " + (service == null ? "null" : service.toString())) 
+		.append("}");
+		return sb.toString();
+	}
 	@Override
 	public boolean equals(Object o) {
 		
@@ -62,7 +78,8 @@ public class Contour implements Serializable{
 		Contour c = (Contour)o;
 		return c.id == id && 
 			   c.colour == colour && 
-			   (name == null ? c.name == null : name.equals(c.name));
+			   (name == null ? c.name == null : name.equals(c.name)) &&
+			   (service == c.service);
 	}
 	
 }

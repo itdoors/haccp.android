@@ -1,152 +1,282 @@
 package com.itdoors.haccp.provider;
 
-import com.itdoors.haccp.utils.Logger;
+import java.util.HashMap;
 
 import android.content.ContentProvider;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.text.TextUtils;
 
 public class RestContentProvider extends ContentProvider {
-
-	/** MIME types */
-	// ------------------------------------------------------------------------------------
-	/** The MIME type of a directory */
-	private static final String CONTENT_DIR_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE;
-
-	/** The MIME type of a single item */
-	private static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE;
-	// ------------------------------------------------------------------------------------
 
 	private static final int COMPANIES = 100;
 	private static final int COMPANIES_ID = 101;
 	private static final int COMPANIES_ID_COMPANY_OBJECTS = 103;
 	
 	private static final int COMPANY_OBJECTS_ID = 200;
-	private static final int COMPANY_OBJECTS_ID_PLANS = 201;
 	
-	//private static final int PLANS_ID = 300;
-	private static final int PLANS_ID_CONTOUR_ID_POINTS = 301;
+	private static final int SERVICES = 400;
+	private static final int CONTOURS = 500;
 	
-	private static final int CONTOURS = 400;
-	//private static final int CONTOURS_ID = 401;
+	private static final int POINTS_ID = 600;
+	private static final int POINTS_IN_COMPANY_OBJECT_BY_CONTOUR = 601;
+	private static final int POINTS_IN_COMPANY_OBJECT_BY_CONTOUR_SEARCH = 602;
 	
-	private static final int POINTS_ID = 500;
 	
-	// --------------------------------------------------------------------------------------
 	public static final String CONTENT_AUTHORITY = "com.itdoors.haccp.restcontentprovider";
 	public static final Uri BASE_CONTENT_URI = Uri.parse("content://"
 			+ CONTENT_AUTHORITY);
 
 	private static final UriMatcher uriMatcher = buildUriMatcher();
 
-	private PointsDatabase dbHelper;
+	private HaccpDatabase dbHelper;
 
 	private static UriMatcher buildUriMatcher() {
 
 		final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 		final String authority = CONTENT_AUTHORITY;
 
-		matcher.addURI(authority, "/companies", COMPANIES);
-		matcher.addURI(authority, "/companies/#", COMPANIES_ID);
-		matcher.addURI(authority, "/companies/#/company_objects", COMPANIES_ID_COMPANY_OBJECTS);
+		matcher.addURI(authority, "companies", COMPANIES);
+		matcher.addURI(authority, "companies/#", COMPANIES_ID);
+		matcher.addURI(authority, "companies/#/company_objects", COMPANIES_ID_COMPANY_OBJECTS);
 		
-		matcher.addURI(authority, "/company_objects/#", COMPANY_OBJECTS_ID);
-		matcher.addURI(authority, "/company_objects/#/plans", COMPANY_OBJECTS_ID_PLANS);
-
-		matcher.addURI(authority, "/plans/#/#/points", PLANS_ID_CONTOUR_ID_POINTS);
-		matcher.addURI(authority, "/contours", CONTOURS);
-		matcher.addURI(authority, "/points/#", POINTS_ID);
+		matcher.addURI(authority, "company_objects/#", COMPANY_OBJECTS_ID);
+		
+		matcher.addURI(authority, "services", SERVICES);
+		matcher.addURI(authority, "contours", CONTOURS);
+		matcher.addURI(authority, "company_objects/#/contours/#/points", POINTS_IN_COMPANY_OBJECT_BY_CONTOUR);
+		matcher.addURI(authority, "company_objects/#/contours/#/points/search/*", POINTS_IN_COMPANY_OBJECT_BY_CONTOUR_SEARCH);
+		
+		matcher.addURI(authority, "points/#", POINTS_ID);
 		
 		return matcher;
 	}
 
 	@Override
 	public boolean onCreate() {
-		this.dbHelper = new PointsDatabase(getContext());
+		this.dbHelper = new HaccpDatabase(getContext());
 		return true;
 	}
 	
 	@Override
 	public String getType(Uri uri) {
-		
 		switch (uriMatcher.match(uri)) {
-			
 			case COMPANIES:
-				return PointContract.Companies.CONTENT_TYPE;
-			case CONTOURS:
-				return PointContract.Contours.CONTENT_TYPE;
-			case COMPANIES_ID_COMPANY_OBJECTS:
-				return PointContract.CompanyObjects.CONTENT_TYPE;
-			case COMPANY_OBJECTS_ID_PLANS:
-				return PointContract.Plans.CONTENT_TYPE;
-			case PLANS_ID_CONTOUR_ID_POINTS:
-				return PointContract.Points.CONTENT_TYPE;
-			
+				return HaccpContract.Companies.CONTENT_TYPE;
 			case COMPANIES_ID:
-				return PointContract.Companies.CONTENT_ITEM_TYPE;
+				return HaccpContract.Companies.CONTENT_ITEM_TYPE;
+			case COMPANIES_ID_COMPANY_OBJECTS:
+				return HaccpContract.CompanyObjects.CONTENT_TYPE;
 			case COMPANY_OBJECTS_ID:
-				return PointContract.CompanyObjects.CONTENT_ITEM_TYPE;
+				return HaccpContract.CompanyObjects.CONTENT_ITEM_TYPE;
+			case SERVICES:
+				return HaccpContract.Services.CONTENT_TYPE;
+			case CONTOURS:
+				return HaccpContract.Contours.CONTENT_TYPE;
+			case POINTS_IN_COMPANY_OBJECT_BY_CONTOUR:
+				return HaccpContract.Points.CONTENT_TYPE;
+			case POINTS_IN_COMPANY_OBJECT_BY_CONTOUR_SEARCH:
+				return HaccpContract.Points.CONTENT_TYPE;
 			case POINTS_ID:
-				return PointContract.Points.CONTENT_ITEM_TYPE;
-				
+				return HaccpContract.Points.CONTENT_ITEM_TYPE;
+			
 			default:
-				Logger.Loge( getClass(), "Unknown uri[" + uri + "]" );
 				throw new IllegalArgumentException("Unknows uri[" + uri +"]");
 		}
-		
 	}
 	
 
+	private static HashMap<String, String> sContoursProjectionMap;
+	private static HashMap<String, String> sPointsInCObjByContProjMap;
+	
+	
+	static{
+		
+		sContoursProjectionMap = new HashMap<String, String>();
+		
+		sContoursProjectionMap.put(HaccpContract.Contours._ID, 
+				HaccpDatabase.Tables.CONTOURS + "." + HaccpContract.Contours._ID);
+		sContoursProjectionMap.put(HaccpContract.Contours.UID, 
+				HaccpDatabase.Tables.CONTOURS + "." + HaccpContract.Contours.UID);
+		sContoursProjectionMap.put(HaccpContract.Contours.NAME, 
+				HaccpDatabase.Tables.CONTOURS + "." + HaccpContract.Contours.NAME);
+		sContoursProjectionMap.put(HaccpContract.Contours.SERVICE_ID, 
+				HaccpDatabase.Tables.CONTOURS + "." + HaccpContract.Contours.SERVICE_ID);
+		sContoursProjectionMap.put(HaccpContract.Contours.COLOR, 
+				HaccpDatabase.Tables.CONTOURS + "." + HaccpContract.Contours.COLOR);
+		
+		sContoursProjectionMap.put(HaccpContract.Contours.SERVICE_ID_PROJECTION, 
+				HaccpContract.Services._ID_FULL +" AS " + HaccpContract.Contours.SERVICE_ID_PROJECTION);
+		sContoursProjectionMap.put(HaccpContract.Contours.SERVICE_UID_PROJECTION, 
+				HaccpContract.Services.UID_FULL +" AS " + HaccpContract.Contours.SERVICE_UID_PROJECTION);
+		sContoursProjectionMap.put(HaccpContract.Contours.SERVICE_NAME_PROJECTION, 
+				HaccpContract.Services.NAME_FULL +" AS " + HaccpContract.Contours.SERVICE_NAME_PROJECTION);
+		
+		
+		sPointsInCObjByContProjMap = new HashMap<String, String>();
+		
+		sPointsInCObjByContProjMap.put(HaccpContract.Points._ID, 
+				HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points._ID);
+		sPointsInCObjByContProjMap.put(HaccpContract.Points.UID, 
+				HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.UID);
+		sPointsInCObjByContProjMap.put(HaccpContract.Points.NAME, 
+				HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.NAME);
+		sPointsInCObjByContProjMap.put(HaccpContract.Points.PLAN_ID, 
+				HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.PLAN_ID);
+		sPointsInCObjByContProjMap.put(HaccpContract.Points.CONTOUR_ID, 
+				HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.CONTOUR_ID);
+		sPointsInCObjByContProjMap.put(HaccpContract.Points.STATUS_ID, 
+				HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.STATUS_ID);
+		sPointsInCObjByContProjMap.put(HaccpContract.Points.POINT_GROUP_ID, 
+				HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.POINT_GROUP_ID);
+		sPointsInCObjByContProjMap.put(HaccpContract.Points.INSTALATION_DATE, 
+				HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.INSTALATION_DATE);
+		sPointsInCObjByContProjMap.put(HaccpContract.Points.IMG_LATITUDE, 
+				HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.IMG_LATITUDE);
+		sPointsInCObjByContProjMap.put(HaccpContract.Points.IMG_LONGTITUDE, 
+				HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.IMG_LONGTITUDE);
+		sPointsInCObjByContProjMap.put(HaccpContract.Points.MAP_LATITUDE, 
+				HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.MAP_LATITUDE);
+		sPointsInCObjByContProjMap.put(HaccpContract.Points.MAP_LONGTITUDE, 
+				HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.MAP_LONGTITUDE);
+		
+		sPointsInCObjByContProjMap.put(HaccpContract.Points.PLANS_ID_PROJECTION, 
+				HaccpContract.Plans._ID_FULL +" AS " + HaccpContract.Points.PLANS_ID_PROJECTION);
+		sPointsInCObjByContProjMap.put(HaccpContract.Points.PLANS_UID_PROJECTION, 
+				HaccpContract.Plans.UID_FULL +" AS " + HaccpContract.Points.PLANS_UID_PROJECTION);
+		sPointsInCObjByContProjMap.put(HaccpContract.Points.PLANS_NAME_PROJECTION, 
+				HaccpContract.Plans.NAME_FULL +" AS " + HaccpContract.Points.PLANS_NAME_PROJECTION);
+	
+		
+	}
+	
+	
+	
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sortOrder) {
 		
-		SQLiteQueryBuilder sb = new SQLiteQueryBuilder();
-		
+		SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
+		final SQLiteDatabase db = dbHelper.getReadableDatabase();
+	 
 		switch (uriMatcher.match(uri)) {
 			
+			case SERVICES:
+				{
+					if(TextUtils.isEmpty(sortOrder))
+						sortOrder = HaccpContract.Services.DEFAULT_SORT;
+					qBuilder.setTables(HaccpDatabase.Tables.SERVICES);
+					Cursor cursor = qBuilder.query(db, projection, selection, selectionArgs, null, null, sortOrder);
+					cursor.setNotificationUri(getContext().getContentResolver(), uri);
+					return cursor;
+				}
 			case COMPANIES:
-				
-				// String sql = "SELECT * FROM " + PointsDatabase.Tables.COMPANIES;
-				sb.setTables(PointsDatabase.Tables.COMPANIES);
-				
-				break;
-			
+				{
+					if(TextUtils.isEmpty(sortOrder))
+						sortOrder = HaccpContract.Companies.DEFAULT_SORT;
+					
+					qBuilder.setTables(HaccpDatabase.Tables.COMPANIES);
+					Cursor cursor = qBuilder.query(db, projection, selection, selectionArgs, null, null, sortOrder);
+					cursor.setNotificationUri(getContext().getContentResolver(), uri);
+					
+					return cursor;
+				}
 			case CONTOURS:
-				sb.setTables(PointsDatabase.Tables.CONTOURS);
+				{
+					if(TextUtils.isEmpty(sortOrder))
+						sortOrder = HaccpContract.Contours.DEFAULT_SORT;
+					
+					qBuilder.setTables(
+							HaccpDatabase.Tables.CONTOURS + " INNER JOIN " +  HaccpDatabase.Tables.SERVICES + 
+							" ON " +  "(" + HaccpDatabase.Tables.CONTOURS + "." + HaccpContract.Contours.SERVICE_ID  + " = " +
+										    HaccpDatabase.Tables.SERVICES + "." + HaccpContract.Services.UID + 
+									   ")"
+					);
+					qBuilder.setProjectionMap(sContoursProjectionMap);
+					Cursor cursor = qBuilder.query(db, projection, selection, selectionArgs, null, null, sortOrder);
+					cursor.setNotificationUri(getContext().getContentResolver(), uri);
+					return cursor;
+				}
 				
-				break;
 			
 			case COMPANIES_ID_COMPANY_OBJECTS:
+				{
+					if(TextUtils.isEmpty(sortOrder))
+						sortOrder = HaccpContract.CompanyObjects.DEFAULT_SORT;
+				
+					qBuilder.setTables(HaccpDatabase.Tables.COMPANY_OBJECTS);
+					qBuilder.appendWhere(HaccpContract.CompanyObjects.UID);
+					qBuilder.appendWhere("=");
+					qBuilder.appendWhereEscapeString(HaccpContract.CompanyObjects.getCompanyId(uri));
+					
+					Cursor cursor = qBuilder.query(db, projection, selection, selectionArgs, null, null, sortOrder);
+					cursor.setNotificationUri(getContext().getContentResolver(), uri);
+					return cursor;
+				}
+				
+			case POINTS_IN_COMPANY_OBJECT_BY_CONTOUR:
+			{
+				
+				if(TextUtils.isEmpty(sortOrder))
+					sortOrder = HaccpDatabase.Tables.PLANS + "." + HaccpContract.Plans.UID + "," +HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.UID;
+				
+				qBuilder.setTables(
+						HaccpDatabase.Tables.PLANS + " INNER JOIN " +  HaccpDatabase.Tables.POINTS + 
+						" ON " +  "(" + HaccpDatabase.Tables.PLANS + "." + HaccpContract.Plans.UID  + " = " +
+									    HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.PLAN_ID + 
+								   ")"
+				);
+				
+				qBuilder.appendWhere(HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.CONTOUR_ID + "=" + HaccpContract.Points.getContourId(uri));
+				qBuilder.appendWhere(" AND ");
+				qBuilder.appendWhere(HaccpDatabase.Tables.PLANS + "." + HaccpContract.Plans.CONPANY_OBJECT_ID + "=" + HaccpContract.Points.getCompanyObjectId(uri));
+				
+				qBuilder.setProjectionMap(sPointsInCObjByContProjMap);
 				
 				
-				break;
-			case COMPANY_OBJECTS_ID_PLANS:
+				Cursor cursor = qBuilder.query(db, projection, selection, selectionArgs, null, null, sortOrder);
+				cursor.setNotificationUri(getContext().getContentResolver(), uri);
+				return cursor;
+			}
+			
+			case POINTS_IN_COMPANY_OBJECT_BY_CONTOUR_SEARCH:
+			{
 				
-				break;
-			case PLANS_ID_CONTOUR_ID_POINTS:
+				if(TextUtils.isEmpty(sortOrder))
+					sortOrder = HaccpDatabase.Tables.PLANS + "." + HaccpContract.Plans.UID + "," +HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.UID;
 				
-				break;
-			//---------------------------------------------------------		
+				qBuilder.setTables(
+						HaccpDatabase.Tables.PLANS + " INNER JOIN " +  HaccpDatabase.Tables.POINTS + 
+						" ON " +  "(" + HaccpDatabase.Tables.PLANS + "." + HaccpContract.Plans.UID  + " = " +
+									    HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.PLAN_ID + 
+								   ")"
+				);
+				
+				qBuilder.appendWhere(HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.CONTOUR_ID + "=" + HaccpContract.Points.getContourId(uri));
+				qBuilder.appendWhere(" AND ");
+				qBuilder.appendWhere(HaccpDatabase.Tables.PLANS + "." + HaccpContract.Plans.CONPANY_OBJECT_ID + "=" + HaccpContract.Points.getCompanyObjectId(uri));
+				qBuilder.appendWhere(" AND ");
+				qBuilder.appendWhere(HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.NAME + " LIKE '%" + HaccpContract.Points.getSearchStatement(uri) +"%'");
+				
+				qBuilder.setProjectionMap(sPointsInCObjByContProjMap);
+				
+				Cursor cursor = qBuilder.query(db, projection, selection, selectionArgs, null, null, sortOrder);
+				cursor.setNotificationUri(getContext().getContentResolver(), uri);
+				return cursor;
+			}
 			
 			case COMPANIES_ID:
-				
-				break;
 			case COMPANY_OBJECTS_ID:
-				
-				break;
 			case POINTS_ID:
-				
-				break;
+				return null;
 			default:
-				 Logger.Loge( getClass(), "Unknown uri[" + uri + "]" );
-	             throw new IllegalArgumentException("Unknown URI " + uri);
+			     throw new IllegalArgumentException("Unknown URI " + uri);
 		}
-		return null;
+		
 	}
 
 

@@ -10,6 +10,7 @@ import com.itdoors.haccp.model.GroupCharacteristic;
 import com.itdoors.haccp.model.StatisticsRecord;
 
 public class AddStatisticResponceParser implements Parser{
+	
 	public class Content implements Serializable{
 		/**
 		 * 

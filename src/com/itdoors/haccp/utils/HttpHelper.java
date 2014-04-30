@@ -85,6 +85,7 @@ public final class HttpHelper {
 	        switch (responseCode) {
 	          case HttpURLConnection.HTTP_OK:
 	        	  
+	        	  @SuppressWarnings("unused")
 	        	  int fileLength = connection.getContentLength();
 	        	  downloadConnectionToStream(connection, new FileOutputStream(file));
 	        	  return;

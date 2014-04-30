@@ -2,7 +2,7 @@ package com.itdoors.haccp.model;
 
 import java.io.Serializable;
 
-public class Service implements Serializable{
+public class Company implements Serializable{
 
 	/**
 	 * 
@@ -11,7 +11,7 @@ public class Service implements Serializable{
 	private final int id;
 	private final String name;
 	
-	public Service(int id, String name) {
+	public Company(int id, String name) {
 		
 		this.id = id;
 		this.name = name;
@@ -44,9 +44,9 @@ public class Service implements Serializable{
 		
 		if(this == o) return true;
 		if(!(o instanceof Company)) return false;
-		Service service = (Service)o;
-		return service.id == id && 
-			   (name == null ? service.name == null : name.equals(service.name));
+		Company c = (Company)o;
+		return c.id == id && 
+			   (name == null ? c.name == null : name.equals(c.name));
 	}
 	
 	@Override
@@ -58,5 +58,4 @@ public class Service implements Serializable{
 		sb.append("}");
 		return sb.toString();
 	}
-
 }

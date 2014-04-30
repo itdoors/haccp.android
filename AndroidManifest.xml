@@ -36,22 +36,39 @@
         android:label="@string/app_name_haccp"
         android:theme="@style/Theme.Sherlock.Light.DarkActionBar" >
         <activity
-            android:name=".activities.MainActivity"
+            android:name="com.itdoors.haccp.ui.activities.MainActivity"
             android:label="@string/app_name_haccp"
             android:theme="@style/MainMenuStyle"
             android:uiOptions="splitActionBarWhenNarrow" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.PointDetailsActivity" />
-        <activity android:name=".activities.CalendarActivity" />
-        <activity android:name=".activities.LoginActivity" />
-        <activity android:name=".activities.AddStatisticsActivity" />
-        <activity android:name=".activities.PointsListActivity" />
-        <activity android:name=".activities.InitActivity"/>
+        <activity android:name="com.itdoors.haccp.ui.activities.PointDetailsActivityV0" />
+        <activity android:name="com.itdoors.haccp.ui.activities.CalendarActivity" />
+        <activity android:name="com.itdoors.haccp.ui.activities.LoginActivity" />
+        <activity android:name="com.itdoors.haccp.ui.activities.AddStatisticsActivity" />
+        <activity android:name="com.itdoors.haccp.ui.activities.PointsListActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data android:name="android.app.default_searchable"
+                       android:value=".activities.SearchActivity" />
+        </activity>
+        <activity android:name="com.itdoors.haccp.ui.activities.ServicesAndContoursActivity" />
+        <activity
+            android:name="com.itdoors.haccp.ui.activities.SearchActivity"
+            android:label="@string/title_search"
+            android:launchMode="singleTop"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data android:name="android.app.searchable" android:resource="@xml/searchable" />
+        </activity>
+        <activity android:name="com.itdoors.haccp.ui.activities.InitActivity"/>
         <activity
             android:name="com.google.zxing.client.android.CaptureActivity"
             android:clearTaskOnLaunch="true"
@@ -62,88 +79,12 @@
             android:windowSoftInputMode="stateAlwaysHidden" >
             <intent-filter>
                 <action android:name="com.itdoors.haccp.SCAN" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <!-- Allow web apps to launch Barcode Scanner by linking to http://zxing.appspot.com/scan. -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="zxing.appspot.com"
-                    android:path="/scan"
-                    android:scheme="http" />
-            </intent-filter>
-            <!-- We also support a Google Product Search URL. -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="www.google.com"
-                    android:path="/m/products/scan"
-                    android:scheme="http" />
-            </intent-filter>
-            <!-- And the UK version. -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="www.google.co.uk"
-                    android:path="/m/products/scan"
-                    android:scheme="http" />
-            </intent-filter>
-            <!-- Support zxing://scan/?... like iPhone app -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="scan"
-                    android:path="/"
-                    android:scheme="zxing" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.google.zxing.client.android.encode.EncodeActivity"
-            android:stateNotNeeded="true" >
-            <intent-filter>
-                <action android:name="com.itdoors.haccp.ENCODE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <!-- This allows us to handle the Share button in Contacts. -->
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="text/x-vcard" />
-            </intent-filter>
-            <!-- This allows us to handle sharing any plain text . -->
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="text/plain" />
-            </intent-filter>
-        </activity>
-        
-        
-        
+               
         <!-- Generic stub acount service -->
-        <service android:name=".sync.accounts.GenericAccountService">
+        <service android:name=".sync.accounts.GenericAccountService" android:exported="false">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
@@ -160,7 +101,7 @@
         <!-- Sync adapter related service -->
         <service
                 android:name=".sync.SyncService"
-                android:exported="true">
+                android:exported="false">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
@@ -168,6 +109,7 @@
                     android:name="android.content.SyncAdapter"
                     android:resource="@xml/syncadapter" />
         </service>
+    
         
     </application>
 

@@ -37,6 +37,7 @@
     <string name="coordinates">Координаты</string>
     <string name="status">Статус</string>
     <string name="point_number">Контрольная точка №</string>
+     <string name="contours">Контуры</string>
 
     <!-- CP TYPES -->
     <string name="cp_type_grounbait_box">Grounbait box</string>
@@ -74,5 +75,12 @@
     <string name="desinsectum">Дезинсекция</string>
     <string name="point_list">Список точек</string>
     <string name="synchronization">Синхронизация&#8230;</string>
+  	<string name="no_matches">Нет совпадений&#8230;</string>
+    
+    <string name="title_search">Поиск</string>
+    
+    <string name="search_point_label">Haccp точки</string>
+    <string name="search_point_hint">Имя точки&#8230;</string>
+    
 
 </resources>

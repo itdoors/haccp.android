@@ -4,9 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
@@ -21,7 +19,6 @@ import org.codehaus.jackson.JsonToken;
 import com.itdoors.haccp.utils.Logger;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 
@@ -51,8 +48,7 @@ public class DatabaseUtils {
 		values.put("name", name);
 		
 		db.insertOrThrow("companies", null, values);
-		Logger.Logi(DatabaseUtils.class, "company:" + values.toString() );
-    	
+		
     }
 
 	public static void readCompanyObject(JsonParser parser, SQLiteDatabase db)  throws JsonParseException, SQLiteException, IOException{
@@ -122,12 +118,10 @@ public class DatabaseUtils {
 		String serviceId = null;
 		String slug = null;
 		String level = null;
-    
     	
     	parser.nextToken();
     	
     	while(parser.nextToken() != JsonToken.END_OBJECT){
-    		
     		String fieldName = parser.getCurrentName();
     		
     		if("id".equals(fieldName)){
@@ -143,18 +137,16 @@ public class DatabaseUtils {
     		}else if("level".equals(fieldName)){
     			level = parser.getText();
     		}
-    	
     	}
     
-    	String table = "contours";
-		ContentValues values = new ContentValues(); 
+    	ContentValues values = new ContentValues(); 
 		values.put("uid", id);
 		values.put("name", name);
 		values.put("color", color);
 		values.put("service_id", serviceId);
 		values.put("slug", slug);
 		values.put("level", level);
-		db.insertOrThrow(table, null, values);
+		db.insertOrThrow("contours", null, values);
 		
 	}
 	
@@ -477,8 +469,10 @@ public class DatabaseUtils {
 		 try {
 		
 			gzip = new GZIPInputStream(new BufferedInputStream(new FileInputStream(file)));
-			
 			jParser = jFactory.createJsonParser(gzip);
+			
+			int points = 0;
+			int statistics = 0;
 			
 			while(jParser.nextToken() != JsonToken.END_OBJECT){
 				
@@ -529,14 +523,18 @@ public class DatabaseUtils {
 					jParser.nextToken();
 			    	while(jParser.nextToken() != JsonToken.END_ARRAY){
 			    		DatabaseUtils.readPoint(jParser, db);
+			    		points ++;
 			    	}
 				}else if("point_statistics".equals(fieldName)){
 					jParser.nextToken();
 			    	while(jParser.nextToken() != JsonToken.END_ARRAY){
 			    		DatabaseUtils.readStatistics(jParser, db);
+			    		statistics ++;
 			    	}
 				}
 			}
+			Logger.Logi(DatabaseUtils.class, " Total parsing: points - " + points +", statistics - " + statistics);
+			
 		 } 
 		
 		 finally{

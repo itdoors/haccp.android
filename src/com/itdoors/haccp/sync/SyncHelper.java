@@ -16,9 +16,9 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.itdoors.haccp.Intents;
-import com.itdoors.haccp.provider.PointContract;
+import com.itdoors.haccp.provider.HaccpContract;
 import com.itdoors.haccp.provider.DatabaseUtils;
-import com.itdoors.haccp.provider.PointsDatabase;
+import com.itdoors.haccp.provider.HaccpDatabase;
 import com.itdoors.haccp.utils.EnviromentUtils;
 import com.itdoors.haccp.utils.HttpHelper;
 import com.itdoors.haccp.utils.Logger;
@@ -52,7 +52,7 @@ public class SyncHelper {
         b.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
         ContentResolver.requestSync(
                 mChosenAccount,
-                PointContract.CONTENT_AUTHORITY, b);
+                HaccpContract.CONTENT_AUTHORITY, b);
     }
 
     /**
@@ -80,7 +80,7 @@ public class SyncHelper {
         		Logger.Logi(getClass(), "Perform initial loading ...");
         		
 	        	final long startLocal = System.currentTimeMillis();
-	            PointsDatabase dbHelper = new PointsDatabase(mContext);
+	            HaccpDatabase dbHelper = new HaccpDatabase(mContext);
 	        	SQLiteDatabase db = dbHelper.getWritableDatabase();
 	        	
 	        	boolean sucess = false;
@@ -133,10 +133,11 @@ public class SyncHelper {
 	        	}
 	        	finally {
 	        		String path = tempDBFile.getAbsolutePath();
-	        		boolean exeption = !tempDBFile.delete();
-	        		Logger.Logi(getClass(), "Removing temp file :" + path + ", with exeption  - "  + (exeption ? "yes" : "no" ));
+	        			boolean exeption = !tempDBFile.delete();
+	        			Logger.Logi(getClass(), "Removing temp file :" + path + ", with exeption  - "  + (exeption ? "yes" : "no" ));
 	        	}
 	        	
+        		
 	            Logger.Logi(TAG, "Local sync took " + (System.currentTimeMillis() - startLocal) + "ms");
 	            if(sucess){
 	            	

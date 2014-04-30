@@ -16,9 +16,10 @@
 
 package com.itdoors.haccp.sync;
 
-import com.itdoors.haccp.activities.InitActivity;
-import com.itdoors.haccp.provider.PointContract;
+import com.itdoors.haccp.provider.HaccpContract;
 import com.itdoors.haccp.sync.accounts.GenericAccountService;
+import com.itdoors.haccp.ui.activities.InitActivity;
+import com.itdoors.haccp.utils.Logger;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -34,7 +35,7 @@ import android.preference.PreferenceManager;
  */
 public class SyncUtils {
     private static final long SYNC_FREQUENCY = 60 * 60;  // 1 hour (in seconds)
-    private static final String CONTENT_AUTHORITY = PointContract.CONTENT_AUTHORITY;
+    private static final String CONTENT_AUTHORITY = HaccpContract.CONTENT_AUTHORITY;
     
     public static final String PREF_SETUP_COMPLETE = "setup_complete";
 
@@ -95,13 +96,14 @@ public class SyncUtils {
      * the OS additional freedom in scheduling your sync request.
      */
     public static void TriggerRefresh() {
+    	Logger.Logi(SyncUtils.class, "TriggerRefresh");
         Bundle b = new Bundle();
         // Disable sync backoff and ignore sync preferences. In other words...perform sync NOW!
         b.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
         b.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         ContentResolver.requestSync(
                 GenericAccountService.GetAccount(),      // Sync account
-                PointContract.CONTENT_AUTHORITY, // Content authority
+                HaccpContract.CONTENT_AUTHORITY, // Content authority
                 b);                                      // Extras
     }
 }

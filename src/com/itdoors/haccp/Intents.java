@@ -1,5 +1,9 @@
 package com.itdoors.haccp;
 
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+
 public final class Intents {
 	
 	public static final class CalendarTimeRange{
@@ -20,4 +24,56 @@ public final class Intents {
 		public static final String LOCAL_SYNC_COMPELTED_SUCCESFULLY = "com.itdoors.haccp.Intents.LOCAL_SYNC_COMPELTED_SUCCESFULLY";
 		
 	}
+	public static final class CompanyObject{
+		public static final String UID = "com.itdoors.haccp.Intents.CompanyObject.UID";
+		public static final String COMPANY_OBJECT = "com.itdoors.haccp.Intents.CompanyObject.COMPANY_OBJECT";
+	}
+	public static final class Contour{
+		public static final String UID = "com.itdoors.haccp.Intents.Contour.UID";
+		public static final String CONTOUR = "com.itdoors.haccp.Intents.Contour.CONTOUR";
+		
+	}
+	
+	
+	/**
+     * Converts an intent into a {@link Bundle} suitable for use as fragment arguments.
+     */
+	public static Bundle intentToFragmentArguments(Intent intent) {
+        Bundle arguments = new Bundle();
+        if (intent == null) {
+            return arguments;
+        }
+
+        final Uri data = intent.getData();
+        if (data != null) {
+            arguments.putParcelable("_uri", data);
+        }
+
+        final Bundle extras = intent.getExtras();
+        if (extras != null) {
+            arguments.putAll(intent.getExtras());
+        }
+
+        return arguments;
+    }
+
+    /**
+     * Converts a fragment arguments bundle into an intent.
+     */
+    public static Intent fragmentArgumentsToIntent(Bundle arguments) {
+        Intent intent = new Intent();
+        if (arguments == null) {
+            return intent;
+        }
+
+        final Uri data = arguments.getParcelable("_uri");
+        if (data != null) {
+            intent.setData(data);
+        }
+
+        intent.putExtras(arguments);
+        intent.removeExtra("_uri");
+        return intent;
+    }
+    
 }

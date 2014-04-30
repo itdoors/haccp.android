@@ -37,6 +37,7 @@
     <string name="coordinates">Coordinates</string>
     <string name="status">Status</string>
     <string name="point_number">Control point #</string>
+    <string name="contours">Contours</string>
 
     <!-- CP TYPES -->
     <string name="cp_type_grounbait_box">Grounbait box</string>
@@ -73,8 +74,12 @@
     <string name="deratisation">Deratisation</string>
     <string name="desinsectum">Desinsectum</string>
     <string name="point_list">Points list</string>
+    <string name="no_matches">No matches&#8230;</string>
 
     <!-- Restful Provider -->
     <string name="provider_name">Haccp provider</string>
     <string name="synchronization">Synchronization&#8230;</string>
+    <string name="title_search">Search</string>
+    <string name="search_point_label">Haccp points</string>
+    <string name="search_point_hint">Point name</string>
 </resources>
