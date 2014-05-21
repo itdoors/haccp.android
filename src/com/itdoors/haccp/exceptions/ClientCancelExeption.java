@@ -4,7 +4,8 @@ public class ClientCancelExeption extends Exception{
 	  /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 8615316317244141541L;
+
 	public ClientCancelExeption() {
 	}
 	public ClientCancelExeption(String msg){

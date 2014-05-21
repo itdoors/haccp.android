@@ -23,10 +23,10 @@ import com.itdoors.haccp.utils.Logger;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
@@ -37,7 +37,10 @@ public class SyncUtils {
     private static final long SYNC_FREQUENCY = 60 * 60;  // 1 hour (in seconds)
     private static final String CONTENT_AUTHORITY = HaccpContract.CONTENT_AUTHORITY;
     
+    public static String FINISH_INTENT_EXTRA = "com.itdoors.sync.SyncUtils.FINISH_INTENT_EXTRA";
+    
     public static final String PREF_SETUP_COMPLETE = "setup_complete";
+    public static final String PREF_SETUP_DONE = "setup_done";
 
     /**
      * Create an entry for this application in the system account list, if it isn't already there.
@@ -46,10 +49,13 @@ public class SyncUtils {
      */
     
     public static void CreateSyncAccount(Context context) {
-        boolean newAccount = false;
-        boolean setupComplete = PreferenceManager
+        @SuppressWarnings("unused")
+		boolean newAccount = false;
+        @SuppressWarnings("unused")
+		boolean setupComplete = PreferenceManager
                 .getDefaultSharedPreferences(context).getBoolean(PREF_SETUP_COMPLETE, false);
-
+        boolean setupDone = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREF_SETUP_DONE, false);
+        
         // Create account, if it's missing. (Either first run, or user has deleted account.)
         Account account = GenericAccountService.GetAccount();
         AccountManager accountManager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
@@ -61,29 +67,45 @@ public class SyncUtils {
             // Recommend a schedule for automatic synchronization. The system may modify this based
             // on other scheduled syncs and network utilization.
             ContentResolver.addPeriodicSync(
-                    account, CONTENT_AUTHORITY, new Bundle(),SYNC_FREQUENCY);
+                    account, CONTENT_AUTHORITY, new Bundle(), SYNC_FREQUENCY);
             newAccount = true;
         }
 
         // Schedule an initial sync if we detect problems with either our account or our local
         // data has been deleted. (Note that it's possible to clear app data WITHOUT affecting
         // the account list, so wee need to check both.)
-        if (newAccount || !setupComplete) {
-            TriggerRefresh();
+        if (!setupDone) {
+            requestManualSync(context);
         }
     }
 
-    public static void cheakSync(Activity context){
-		
-		boolean setupComplete = PreferenceManager.getDefaultSharedPreferences(context).
-					getBoolean(SyncUtils.PREF_SETUP_COMPLETE, false);
-		 if(!setupComplete){
-			 Intent intent = new Intent(context, InitActivity.class);
-			 context.startActivity(intent);
-			 context.finish();
-		 }
-	}
 
+    
+    public static boolean cheakSync(Context context, Intent finishIntent){
+		
+    	boolean setupDone = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(SyncUtils.PREF_SETUP_DONE, false);
+    	if(!setupDone){
+   		 	Intent intent = new Intent(context, InitActivity.class);
+   		 	intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+   		 	intent.putExtra(FINISH_INTENT_EXTRA, finishIntent);
+   		 	context.startActivity(intent);
+   		 	return false;
+    	}
+		return true;
+	}
+    
+    public static boolean syncCompleted(Context context){
+    	return PreferenceManager.getDefaultSharedPreferences(context).
+				getBoolean(SyncUtils.PREF_SETUP_COMPLETE, false);
+    	
+    }
+
+    public static boolean wasSynced(Context context){
+    	return PreferenceManager.getDefaultSharedPreferences(context).
+				getBoolean(SyncUtils.PREF_SETUP_DONE, false);
+    	
+    }
+    
     /**
      * Helper method to trigger an immediate sync ("refresh").
      *
@@ -95,8 +117,9 @@ public class SyncUtils {
      * but the user is not actively waiting for that data, you should omit this flag; this will give
      * the OS additional freedom in scheduling your sync request.
      */
-    public static void TriggerRefresh() {
-    	Logger.Logi(SyncUtils.class, "TriggerRefresh");
+    
+    public static void requestManualSync(Context context) {
+    	Logger.Logi(SyncUtils.class, "request Manual Sync");
         Bundle b = new Bundle();
         // Disable sync backoff and ignore sync preferences. In other words...perform sync NOW!
         b.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
@@ -105,5 +128,8 @@ public class SyncUtils {
                 GenericAccountService.GetAccount(),      // Sync account
                 HaccpContract.CONTENT_AUTHORITY, // Content authority
                 b);                                      // Extras
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        sp.edit().putBoolean(PREF_SETUP_DONE, true).commit();
+        
     }
 }

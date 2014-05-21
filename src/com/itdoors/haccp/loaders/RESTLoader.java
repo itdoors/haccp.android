@@ -26,6 +26,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import com.itdoors.haccp.utils.ThreadUtils;
+
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -39,10 +41,6 @@ public class RESTLoader extends AsyncTaskLoader<RESTLoader.RESTResponse> {
     // We use this delta to determine if our cached data is 
     // old or not. The value we have here is 10 minutes;
     private static final long STALE_DELTA = 600000;
-    
-    public static final String JSONArrayTAG = TAG + ".JSONArray";
-    public static final String JSONObjectTAG = TAG + ".JSONObject";
-    public static final String JSONArrayNameTAG = TAG  + ".JSONArray.NAME";
     
     public enum HTTPVerb {
         GET,
@@ -98,14 +96,6 @@ public class RESTLoader extends AsyncTaskLoader<RESTLoader.RESTResponse> {
         mVerb   = verb;
         mAction = action;
         mParams = params;
-    }
-    public RESTLoader(Context context, HTTPVerb verb, Uri action, Bundle params, boolean postJSON) {
-        super(context);
-        
-        mVerb   = verb;
-        mAction = action;
-        mParams = params;
-   
     }
     
 
@@ -188,7 +178,6 @@ public class RESTLoader extends AsyncTaskLoader<RESTLoader.RESTResponse> {
                 // Finally, we send our request using HTTP. This is the synchronous
                 // long operation that we need to run on this Loader's thread.
                
-               // ThreadUtils.addDelay(10000);
                 HttpResponse response = client.execute(request);
                 
                 HttpEntity responseEntity = response.getEntity();
@@ -210,7 +199,7 @@ public class RESTLoader extends AsyncTaskLoader<RESTLoader.RESTResponse> {
             return new RESTResponse();
         }
         catch (UnsupportedEncodingException e) {
-            Log.e(TAG, "A UrlEncodedFormEntity was created with an unsupported encoding.", e);
+        	Log.e(TAG, "A UrlEncodedFormEntity was created with an unsupported encoding.", e);
             return new RESTResponse();
         }
         catch (ClientProtocolException e) {

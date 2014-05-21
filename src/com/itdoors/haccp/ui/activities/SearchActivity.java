@@ -85,7 +85,7 @@ public class SearchActivity extends SherlockFragmentActivity implements PointsSe
 
 	@Override
 	public void onPointPressed(int pointId) {
-		Intent intent = PointDetailsActivityV0.newInstance(this, pointId);
+		Intent intent = PointDetailsActivityV1.newInstance(this, pointId);
 		startActivity(intent);	
 	}
 }

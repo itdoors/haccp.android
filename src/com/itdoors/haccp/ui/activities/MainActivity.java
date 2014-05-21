@@ -30,6 +30,7 @@ import com.itdoors.haccp.ui.interfaces.SetQRCallback;
 import com.itdoors.haccp.ui.interfaces.TakeQRCallback;
 import com.itdoors.haccp.ui.interfaces.TakeQRListener;
 import com.itdoors.haccp.utils.Camera;
+import com.itdoors.haccp.utils.Logger;
 import com.itdoors.haccp.utils.ToastUtil;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
@@ -57,7 +58,9 @@ public class MainActivity extends SlidingFragmentActivity implements	SetQRCallba
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
-		SyncUtils.cheakSync(this);
+		Logger.Logi(getClass(), "getIntent()" + ((getIntent() == null) ? "null" : getIntent().toString()));
+		if(!SyncUtils.cheakSync(this, getIntent()))
+			finish();
 		 
 		requestWindowFeature(com.actionbarsherlock.view.Window.FEATURE_INDETERMINATE_PROGRESS);
 		getWindow().setSoftInputMode(
@@ -157,7 +160,7 @@ public class MainActivity extends SlidingFragmentActivity implements	SetQRCallba
 							.getStringExtra("SCAN_RESULT"));
 					// Intent intent = ControlPointActivity.newInstance(this,
 					// id.intValue());
-					Intent intent = PointDetailsActivityV0.newInstance(this,
+					Intent intent = PointDetailsActivityV1.newInstance(this,
 							id.intValue());
 					startActivity(intent);
 

@@ -114,7 +114,7 @@ public class ControlPointParser implements Parser{
 				int criticalValueTop = jCharacteristic.getInt("criticalValueTop");
 				
 				GroupCharacteristic groupCharacteristics = new GroupCharacteristic(charId, charName, unit, criticalValueBottom, criticalValueTop);
-				StatisticsRecord record = new StatisticsRecord(recordId, point, groupCharacteristics, recordEntrydate, recordValue);
+				StatisticsRecord record = new StatisticsRecord(recordId, groupCharacteristics, recordEntrydate, recordValue);
 				
 				records.add(record);
 				

@@ -461,7 +461,7 @@ public class StatisticsFragmentV0 extends EndlessListFragment implements LoaderC
 	
 		setState(hasMoreItems ? StreamingState.LOADING : StreamingState.COMPLETE);
 		
-		if(getState() == StreamingState.LOADING)
+		if(getStreamingState() == StreamingState.LOADING)
 			load();
 		
 		if(records == null || records.isEmpty())
@@ -496,7 +496,7 @@ public class StatisticsFragmentV0 extends EndlessListFragment implements LoaderC
 		
 		setState(hasMoreStatiscticItems ? StreamingState.LOADING : StreamingState.COMPLETE);
 		
-		if(getState() == StreamingState.LOADING)
+		if(getStreamingState() == StreamingState.LOADING)
 			load();
 		
 		if(records != null && !records.isEmpty())
@@ -517,7 +517,7 @@ public class StatisticsFragmentV0 extends EndlessListFragment implements LoaderC
 		
 		setState(hasMoreStatiscticItems ? StreamingState.LOADING : StreamingState.COMPLETE);
 		
-		if(getState() == StreamingState.LOADING)
+		if(getStreamingState() == StreamingState.LOADING)
 			load();
 		
 		if(records != null && !records.isEmpty())
@@ -629,11 +629,6 @@ public class StatisticsFragmentV0 extends EndlessListFragment implements LoaderC
         	try {
         		
 				final Content content = (Content) parser.parse(json);
-				Iterator<StatisticsRecord> iterator = content.records.iterator();
-				while(iterator.hasNext()){
-					iterator.next().setPoint(mPoint);
-				}
-				
 				boolean hasMoreResults = content.hasMoreStatiscticItems;
 				setState(hasMoreResults ? StreamingState.DONE : StreamingState.COMPLETE);
 		

@@ -64,7 +64,7 @@ public class PointStatisticsFromTimeRangeParser implements Parser{
 			
 			GroupCharacteristic groupCharacteristics = new GroupCharacteristic(charId, charName, unit, criticalValueBottom, criticalValueTop);
 			
-			StatisticsRecord record = new StatisticsRecord(recordId, null, groupCharacteristics, recordEntrydate, recordValue);
+			StatisticsRecord record = new StatisticsRecord(recordId, groupCharacteristics, recordEntrydate, recordValue);
 			records.add(record);
 			
 		}

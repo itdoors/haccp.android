@@ -29,7 +29,7 @@ import com.itdoors.haccp.model.StatististicsItemStatus;
 import com.itdoors.haccp.model.PointStatus.CODE;
 import com.itdoors.haccp.parser.StaticticsAddInputParser.Content;
 
-public class AddStatisticsFragment extends SherlockFragment {
+public class AddStatisticsFragmentV0 extends SherlockFragment {
 	
 	public interface OnAddPressedListener{
 		public void onAddPressed(HashMap<GroupCharacteristic, Double> values);
@@ -50,24 +50,24 @@ public class AddStatisticsFragment extends SherlockFragment {
 	private OnAddPressedListener mOnAddPressedListener;
 	private RadioGroup mRadioGroup;
 	
-	public static AddStatisticsFragment newInstance(Content content){
+	public static AddStatisticsFragmentV0 newInstance(Content content){
 		
 		Bundle args = new Bundle();
 		args.putSerializable(CONTENT_TAG, content);
-		AddStatisticsFragment f = new AddStatisticsFragment();
+		AddStatisticsFragmentV0 f = new AddStatisticsFragmentV0();
 		f.setArguments(args);
 		
 		return f;
 	}
 
-	public static AddStatisticsFragment newInstance(Content content, Point point, ArrayList<PointStatus> statuses){
+	public static AddStatisticsFragmentV0 newInstance(Content content, Point point, ArrayList<PointStatus> statuses){
 		
 		Bundle args = new Bundle();
 		args.putSerializable(CONTENT_TAG, content);
 		args.putSerializable(POINT_TAG, point);
 		args.putSerializable(STATUSES_TAG, statuses);
 		
-		AddStatisticsFragment f = new AddStatisticsFragment();
+		AddStatisticsFragmentV0 f = new AddStatisticsFragmentV0();
 		f.setArguments(args);
 		
 		return f;

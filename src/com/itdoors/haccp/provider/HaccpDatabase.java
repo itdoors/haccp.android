@@ -33,7 +33,7 @@ public class HaccpDatabase extends SQLiteOpenHelper {
 				  /* Foreign keys */
 				  " FOREIGN KEY (company_id) "+
 				  " REFERENCES companies(uid) "+
-				  " ON DELETE NO ACTION "+
+				  " ON DELETE CASCADE "+
 				  " ON UPDATE NO ACTION "+
 				  " );";
 		
@@ -48,7 +48,7 @@ public class HaccpDatabase extends SQLiteOpenHelper {
 				  /* Foreign keys */
 				  " FOREIGN KEY (service_id) "+
 				  " REFERENCES services(uid) "+
-				  " ON DELETE NO ACTION "+
+				  " ON DELETE CASCADE "+
 				  " ON UPDATE NO ACTION "+
 				  " );";
 		
@@ -67,11 +67,11 @@ public class HaccpDatabase extends SQLiteOpenHelper {
 				  /* Foreign keys */
 				  " FOREIGN KEY (parent_id) "+
 				  " REFERENCES plans(uid) "+
-				  " ON DELETE NO ACTION "+
+				  " ON DELETE CASCADE "+
 				  " ON UPDATE NO ACTION, "+
 				  " FOREIGN KEY (company_object_id) "+
 				  " REFERENCES company_objects(uid) "+
-				  " ON DELETE NO ACTION "+
+				  " ON DELETE CASCADE "+
 				  " ON UPDATE NO ACTION "+
 				  " );";
 		
@@ -92,7 +92,7 @@ public class HaccpDatabase extends SQLiteOpenHelper {
 				  /* Foreign keys */
 				  " FOREIGN KEY (point_group_id) "+
 				  " REFERENCES point_groups(uid) "+
-				  " ON DELETE NO ACTION "+
+				  " ON DELETE CASCADE "+
 				  " ON UPDATE NO ACTION "+
 				  " );";
 		
@@ -113,11 +113,11 @@ public class HaccpDatabase extends SQLiteOpenHelper {
 				  /* Foreign keys */
 				  " FOREIGN KEY (characteristic_id) "+
 				  " REFERENCES point_group_characteristics(uid) "+
-				  " ON DELETE NO ACTION "+
+				  " ON DELETE CASCADE "+
 				  " ON UPDATE NO ACTION, "+
 				  " FOREIGN KEY (point_id) "+
 				  " REFERENCES points(uid) "+
-				  " ON DELETE NO ACTION "+
+				  " ON DELETE CASCADE "+
 				  " ON UPDATE NO ACTION "+
 				  " );";
 		
@@ -143,19 +143,19 @@ public class HaccpDatabase extends SQLiteOpenHelper {
 				  /* Foreign keys */
 				  " FOREIGN KEY (status_id) "+
 				  " REFERENCES point_statuses(uid) "+
-				  " ON DELETE NO ACTION "+
+				  " ON DELETE SET NULL "+
 				  " ON UPDATE NO ACTION, "+
 				  " FOREIGN KEY (contour_id) "+
 				  " REFERENCES contours(uid) "+
-				  " ON DELETE NO ACTION "+
+				  " ON DELETE CASCADE "+
 				  " ON UPDATE NO ACTION,  "+
 				  " FOREIGN KEY (point_group_id) "+
 				  " REFERENCES point_groups(uid) "+
-				  " ON DELETE NO ACTION "+
+				  " ON DELETE CASCADE "+
 				  " ON UPDATE NO ACTION, "+ 
 				  " FOREIGN KEY (plan_id) "+
 				  " REFERENCES plans(uid) "+
-				  " ON DELETE NO ACTION "+
+				  " ON DELETE CASCADE "+
 				  " ON UPDATE NO ACTION "+
 				  " );";
 			
@@ -164,6 +164,18 @@ public class HaccpDatabase extends SQLiteOpenHelper {
 				" name  varchar(50) NOT NULL,"+
 				" uid   integer NOT NULL UNIQUE"+
 				" );";
+		
+		String TRANSACTIONS = "CREATE TABLE transactions ("+
+			  " _id               integer PRIMARY KEY AUTOINCREMENT NOT NULL,"+
+			  " action_type       integer NOT NULL,"+
+			  " uri               text NOT NULL,"+
+			  " params            text DEFAULT NULL,"+
+			  " method            varchar(50) NOT NULL,"+
+			  " transacting       integer NOT NULL,"+
+			  " result            integer,"+
+			  " transacting_date  timestamp,"+
+			  " try_count         integer DEFAULT 1"+
+			  " );";
 		
 	}
 
@@ -179,6 +191,7 @@ public class HaccpDatabase extends SQLiteOpenHelper {
 		String POINT_STATUSES ="point_statuses";
 		String POINTS = "points";
 		String POINT_STATISTICS = "point_statistics";
+		String TRANSACTIONS = "transactions";
 		
 	}
 	interface DeleteTableSqls{
@@ -193,6 +206,7 @@ public class HaccpDatabase extends SQLiteOpenHelper {
 		String POINT_STATUSES 	 	  		=   "DROP TABLE IF EXISTS " + Tables.POINT_STATUSES;
 		String POINTS 	 	  				=   "DROP TABLE IF EXISTS " + Tables.POINTS;
 		String SERVICES 	 	  			=   "DROP TABLE IF EXISTS " + Tables.SERVICES;
+		String TRANSACTIONS 				= 	"DROP TABLE IF EXISTS " + Tables.TRANSACTIONS;
 	}
 	
 
@@ -214,6 +228,7 @@ public class HaccpDatabase extends SQLiteOpenHelper {
 		db.execSQL(CreateTableSqls.POINT_STATUSES);
 		db.execSQL(CreateTableSqls.POINTS);
 		db.execSQL(CreateTableSqls.POINT_STATISTICS);
+		db.execSQL(CreateTableSqls.TRANSACTIONS);
 		
 		
 		
@@ -222,6 +237,7 @@ public class HaccpDatabase extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		
+		db.execSQL(DeleteTableSqls.TRANSACTIONS);
 		db.execSQL(DeleteTableSqls.POINT_STATISTICS);
 		db.execSQL(DeleteTableSqls.POINTS);
 		db.execSQL(DeleteTableSqls.POINT_STATUSES);
@@ -232,7 +248,7 @@ public class HaccpDatabase extends SQLiteOpenHelper {
 		db.execSQL(DeleteTableSqls.SERVICES);
 		db.execSQL(DeleteTableSqls.COMPANY_OBJECTS);
 		db.execSQL(DeleteTableSqls.COMPANIES);
-		
+	
 		onCreate(db);
 		
 	}

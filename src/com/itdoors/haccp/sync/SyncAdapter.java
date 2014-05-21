@@ -13,6 +13,8 @@ import android.os.Bundle;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
+	public static final int MAX_RETRY_COUNT_FOR_TRANSACTION = 15;
+	
 	private static String TAG = "SyncAdapter";
     private final Context mContext;
     private SyncHelper mSyncHelper;
@@ -78,7 +80,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
         try {
             mSyncHelper.performSync(syncResult,
-                    SyncHelper.FLAG_SYNC_LOCAL | SyncHelper.FLAG_SYNC_REMOTE);
+                    SyncHelper.FLAG_SYNC_INITIAL | SyncHelper.FLAG_SYNC_REMOTE);
 
         } catch (IOException e) {
             ++syncResult.stats.numIoExceptions;

@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.itdoors.haccp.R;
-import com.itdoors.haccp.utils.ContextUtils;
 import com.itdoors.haccp.utils.Logger;
 
 import android.graphics.Color;
@@ -41,13 +40,12 @@ public abstract class  EndlessListFragment extends ListFragment implements AbsLi
 	Handler mHandler = new Handler();
 	
 	private View mListViewFootter;
-	private View mErrorView;
-	private View mLoadingView;
+	
 	
 	protected BaseAdapter mStreamAdapter;
 	protected List<Object> mStream = new ArrayList<Object>();
 	
-	protected static enum StreamingState {	INIT, LOADING, DONE, ERROR, COMPLETE; }
+	protected static enum StreamingState {	INIT, LOADING, REPEAT, DONE, ERROR, COMPLETE; }
 	
 	private StreamingState mStreamingState;
 	
@@ -55,7 +53,7 @@ public abstract class  EndlessListFragment extends ListFragment implements AbsLi
 	
 	protected abstract void loadMoreResults();
 	
-	protected StreamingState getState(){
+	protected StreamingState getStreamingState(){
 		return mStreamingState;
 	}
 	
@@ -117,13 +115,7 @@ public abstract class  EndlessListFragment extends ListFragment implements AbsLi
     	
 		mListViewFootter = (View) getActivity().getLayoutInflater().inflate(
                 			R.layout.list_item_load_more_or_retry_or_complete, null, false);
-    	mLoadingView = ContextUtils.getLoadingView(getActivity());
-  		mErrorView = ContextUtils.getErrorWhileConnectionView(getActivity(), new View.OnClickListener() {
- 			@Override
- 			public void onClick(View v) {
- 				retry();
- 			}
-  		});
+
   		
     	Button retryBtn = (Button)mListViewFootter.findViewById(R.id.retry_btn);
         retryBtn.setOnClickListener(new View.OnClickListener() {
@@ -135,13 +127,7 @@ public abstract class  EndlessListFragment extends ListFragment implements AbsLi
         
         changeFooterState();
         listView.addFooterView(mListViewFootter);
-		        
 	
-		//if(mStreamingState == StreamingState.INIT )
-		//	((ViewGroup)view).addView(mLoadingView);
-						
-		//if(mStreamingState == StreamingState.ERROR && mStream.isEmpty())
-		//	((ViewGroup)view).addView(mErrorView);
 		
 		
     }
@@ -179,6 +165,17 @@ public abstract class  EndlessListFragment extends ListFragment implements AbsLi
 				footer.findViewById(R.id.complete_lo).setVisibility(View.GONE);
 			
 				break;
+				
+			case REPEAT:
+				
+				footer.setVisibility(View.VISIBLE);
+				footer.findViewById(R.id.load_more_lo).setVisibility(View.VISIBLE);
+				footer.findViewById(R.id.retry_lo).setVisibility(View.GONE);
+				footer.findViewById(R.id.complete_lo).setVisibility(View.GONE);
+				
+				
+				break;
+				
 			case ERROR:
 				
 				footer.setVisibility(View.VISIBLE);
@@ -202,12 +199,7 @@ public abstract class  EndlessListFragment extends ListFragment implements AbsLi
     	
     	setState(StreamingState.ERROR);
     	
-    	if(getView() != null && mStream.isEmpty()){
-    		((ViewGroup)getView()).removeView(mLoadingView);
-    		((ViewGroup)getView()).addView(mErrorView);
-    	}
-    	
-			
+   		
 	}
     
 	
@@ -224,11 +216,7 @@ public abstract class  EndlessListFragment extends ListFragment implements AbsLi
     	
 	   if(mStreamingState == StreamingState.COMPLETE){
 			
-		   //if views exist
-			((ViewGroup)getView()).removeView(mErrorView);
-			((ViewGroup)getView()).removeView(mLoadingView);
-				
-				
+		 		
 			//toastMsg(R.string.no_more_items_to_load);
 		 	if (mListViewStatePosition != -1 ) {
 	         	getListView().setSelectionFromTop(mListViewStatePosition, mListViewStateTop);
@@ -238,10 +226,7 @@ public abstract class  EndlessListFragment extends ListFragment implements AbsLi
 
 	   }
 	   else{
-		  
 		   mStreamAdapter.notifyDataSetChanged();
-		   if(isAdded())
-			   ((ViewGroup)getView()).removeView(mLoadingView);
 	   }
 	}
 	
@@ -258,32 +243,22 @@ public abstract class  EndlessListFragment extends ListFragment implements AbsLi
         mStreamAdapter.notifyDataSetInvalidated();
         loadMoreResults();
     }
-
       
 
       private boolean streamHasMoreResults() {
     	  return  mStreamingState != StreamingState.COMPLETE && mStreamingState != StreamingState.INIT;
       }
-      
-	  
-	  private void retry(){
-		  
-		  if(isAdded()){
-			  if(mStream.isEmpty()){
-						((ViewGroup)getView()).removeView(mErrorView);
-						((ViewGroup)getView()).addView(mLoadingView);
-			  }
-		  }
-		  
+      	  
+	  public void retry(){
 		  load();
-			
 	  }
-	  
-
+	
 	  @Override
 	  public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-		   
-		  if (visibleItemCount != 0 && firstVisibleItem + visibleItemCount >= totalItemCount && streamHasMoreResults()) {
+		  
+		  boolean appropriateState = mStreamingState != StreamingState.ERROR && mStreamingState != StreamingState.REPEAT;
+		  
+		  if (appropriateState && visibleItemCount != 0 && firstVisibleItem + visibleItemCount >= totalItemCount && streamHasMoreResults()) {
 	            loadMoreResults();
 	       }
 	  }

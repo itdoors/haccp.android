@@ -44,6 +44,10 @@ public final class HaccpContract {
     	public static final String LEVEL = "level";
     	
     	
+    	public static final String NAME_FULL = HaccpDatabase.Tables.CONTOURS +"." + NAME;
+    	public static final String UID_FULL = HaccpDatabase.Tables.CONTOURS +"." + BaseColumns.UID;
+    	public static final String _ID_FULL = HaccpDatabase.Tables.CONTOURS +"." + BaseColumns._ID;
+    	public static final String SLUG_FULL = HaccpDatabase.Tables.CONTOURS +"." + SLUG;
     	
     }
     
@@ -64,6 +68,50 @@ public final class HaccpContract {
     	
     }
     
+    public static interface StatusesColumns{
+    	
+    	public static final String NAME = "name";
+    	public static final String SLUG = "slug";
+    	
+    	public static final String NAME_FULL = HaccpDatabase.Tables.POINT_STATUSES +"." + NAME;
+    	public static final String UID_FULL = HaccpDatabase.Tables.POINT_STATUSES +"." + BaseColumns.UID;
+    	public static final String _ID_FULL = HaccpDatabase.Tables.POINT_STATUSES +"." + BaseColumns._ID;
+    	
+    	public static final String SLUG_FULL = HaccpDatabase.Tables.POINT_STATUSES +"." + SLUG;
+    	
+    }
+    
+    public static interface GroupsColumns{
+    	
+    	public static final String NAME = "name";
+    	
+    	public static final String NAME_FULL = HaccpDatabase.Tables.POINT_GROUPS +"." + NAME;
+    	public static final String UID_FULL = HaccpDatabase.Tables.POINT_GROUPS +"." + BaseColumns.UID;
+    	public static final String _ID_FULL = HaccpDatabase.Tables.POINT_GROUPS +"." + BaseColumns._ID;
+    
+    }
+    
+    public static interface GroupCharacteristicsColumns{
+    
+    	public static final String NAME = "name";
+    	
+    	public static final String POINT_GROUP_ID = "point_group_id";
+    	public static final String DESCRIPTION = "description";
+    	public static final String UNIT = "unit";
+    	public static final String DATA_TYPE = "data_type";
+    	public static final String ALLOW_VALUE_MAX = "allow_value_max";
+    	public static final String ALLOW_VALUE_MIN = "allow_value_min";
+    	public static final String CRITICAL_VALUE_TOP = "critical_value_top";
+    	public static final String CRITICAL_VALUE_BOTTOM = "critical_value_bottom";
+    	public static final String CRITICAL_VALUE_MIDDLE = "critical_color_middle";
+    	public static final String INPUT_TYPE = "input_type";
+    	
+    	public static final String NAME_FULL = HaccpDatabase.Tables.POINT_GROUP_CHARACTERISTICS +"." + NAME;
+    	public static final String UID_FULL  = HaccpDatabase.Tables.POINT_GROUP_CHARACTERISTICS +"." + BaseColumns.UID;
+    	public static final String _ID_FULL  = HaccpDatabase.Tables.POINT_GROUP_CHARACTERISTICS +"." + BaseColumns._ID;
+    	
+    }
+    
     public static interface PointsColumns{
     	public static final String NAME = "name";
     	public static final String PLAN_ID = "plan_id";
@@ -75,6 +123,30 @@ public final class HaccpContract {
     	public static final String CONTOUR_ID = "contour_id";
     	public static final String INSTALATION_DATE = "installationdate";
     	public static final String STATUS_ID = "status_id";
+    }
+    
+    public static interface StatisticsColumns{
+    
+    	public static final String CHARACTERISTICS_ID = "characteristic_id"; 
+    	public static final String POINT_ID = "point_id"; 
+    	public static final String CREATED_AT = "created_at"; 
+    	public static final String ENTRY_DATE = "entry_date";
+    	public static final String VALUE = "value";
+    	
+    }
+    
+    public static interface TransactionsColumns{
+    
+    	public static final String ACTION_TYPE = "action_type";
+    	public static final String URI = "uri";
+    	public static final String PARAMS = "params";
+    	public static final String METHOD = "method";
+    	public static final String TRANSACTING = "transacting";
+    	public static final String RESULT = "result";
+    	public static final String TRANSACTING_DATE = "transacting_date";
+    	public static final String TRY_COUNT = "try_count";
+    	
+    	
     }
    
     public static class Services implements ServicesColumns, BaseColumns{
@@ -146,6 +218,61 @@ public final class HaccpContract {
             return uri.getPathSegments().get(1);
         }
     }
+    
+    public static class Statuses implements StatusesColumns, BaseColumns{
+        
+    	public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath("statuses").build();
+    	
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/vnd.com.itdoors.haccp.statuses";
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/vnd.com.itdoors.haccp.statuses";
+        
+        /** Default "ORDER BY" clause. */
+        public static final String DEFAULT_SORT = BaseColumns.UID + " ASC";
+        
+    }
+    
+    public static class Groups implements GroupsColumns, BaseColumns{
+        
+    	public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/vnd.com.itdoors.haccp.groups";
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/vnd.com.itdoors.haccp.groups";
+        
+        /** Default "ORDER BY" clause. */
+        public static final String DEFAULT_SORT = BaseColumns.UID + " ASC";
+        
+    }
+    
+    public static class GroupCharacterisitcs implements GroupCharacteristicsColumns, BaseColumns{
+    	
+    	public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/vnd.com.itdoors.haccp.groupcharacterisitics";
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/vnd.com.itdoors.haccp.groupcharacterisitics";
+        /** Default "ORDER BY" clause. */
+        public static final String DEFAULT_SORT = BaseColumns.UID + " ASC";
+        
+        public static final String GROUP_ID_PROJECTION = "group_id";
+        public static final String GROUP_NAME_PROJECTION = "group_name";
+        public static final String GROUP_UID_PROJECTION = "group_uid";
+        
+        public static Uri buildUriForGroup(int groupId){
+        	return BASE_CONTENT_URI
+            		.buildUpon()
+            		.appendPath("groups")
+            		.appendPath(String.valueOf(groupId))
+            		.appendPath("characteristics")
+            		.build();
+        }
+        public static String getGroupId(Uri uri){
+        	return uri.getPathSegments().get(1);
+        }
+        
+    
+    }
     public static class Plans implements PlansColumns, BaseColumns{
     
     	public static final String CONTENT_TYPE =
@@ -171,6 +298,21 @@ public final class HaccpContract {
         public static final String PLANS_NAME_PROJECTION = "plan_name";
         public static final String PLANS_UID_PROJECTION = "plan_uid";
         
+        public static final String CONTOUR_ID_PROJECTION = "contour_id";
+        public static final String CONTOUR_NAME_PROJECTION = "contour_name";
+        public static final String CONTOUR_UID_PROJECTION = "contour_uid";
+        public static final String CONTOUR_SLUG_PROJECTION = "contour_slug";
+        
+        public static final String STATUS_ID_PROJECTION = "status_id";
+        public static final String STATUS_NAME_PROJECTION = "status_name";
+        public static final String STATUS_UID_PROJECTION = "status_uid";
+        public static final String STATUS_SLUG_PROJECTION = "status_slug";
+        
+        public static final String GROUP_ID_PROJECTION = "group_id";
+        public static final String GROUP_NAME_PROJECTION = "group_name";
+        public static final String GROUP_UID_PROJECTION = "group_uid";
+        
+        
         public static Uri builduriForCompanyObjectInContour(int companyObjectId, int contourId){
         	return  BASE_CONTENT_URI
             		.buildUpon()
@@ -181,8 +323,6 @@ public final class HaccpContract {
             		.appendPath("points")
             		.build();
         }
-        
-        
         
         public static String getCompanyObjectId(Uri uri){
         	return uri.getPathSegments().get(1);
@@ -202,6 +342,82 @@ public final class HaccpContract {
             		.appendPath(PATH_SEARCH)
             		.appendPath(query).build();
         
+        }
+        
+        public static Uri buildPointUri(int point_id){
+        	return BASE_CONTENT_URI
+        			.buildUpon()
+        			.appendPath("points")
+        			.appendPath(String.valueOf(point_id))
+        			.build();
+        }
+        
+        public static String getPointId(Uri uri){
+        	return uri.getPathSegments().get(1);
+        }
+        
+    }
+    
+    public static class Statistics implements StatisticsColumns, BaseColumns{
+    	
+    	public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/vnd.com.itdoors.haccp.statistics";
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/vnd.com.itdoors.haccp.statistics";
+        /** Default "ORDER BY" clause. */
+        public static final String DEFAULT_SORT = BaseColumns.UID + " ASC";
+        
+        public static Uri buildUriForPoint(int pointID){
+        	return BASE_CONTENT_URI
+            		.buildUpon()
+            		.appendPath("points")
+            		.appendPath(String.valueOf(pointID))
+            		.appendPath("statististics")
+            		.build();
+        }
+        public static String getPointId(Uri uri){
+        	return uri.getPathSegments().get(1);
+        }
+        
+    
+    }
+    
+    public static class Transactions implements TransactionsColumns, android.provider.BaseColumns{
+    	
+    	public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/vnd.com.itdoors.haccp.transactions";
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/vnd.com.itdoors.haccp.transactions";
+        /** Default "ORDER BY" clause. */
+        public static final String DEFAULT_SORT = _ID + " ASC";
+        
+        public static final Uri PENDING_TRANSACTIONS_URI = buildPendingUri(); 
+        public static final Uri IN_PROGRESS_TRANSACTIONS_URI = buildInProgressUri(); 
+        
+        private static Uri buildPendingUri(){
+        	return BASE_CONTENT_URI.buildUpon().appendPath("transactions").appendPath("pending").build();
+        }
+        
+        private static Uri buildInProgressUri(){
+        	return BASE_CONTENT_URI.buildUpon().appendPath("transactions").appendPath("in-progress").build();
+        }
+    
+        public static Uri buildPendingUriForId(long id){
+        	return Uri.withAppendedPath(PENDING_TRANSACTIONS_URI, Long.toString(id));
+        }
+        
+        public static Uri buildInProgressUriForId(long id){
+        	return Uri.withAppendedPath(IN_PROGRESS_TRANSACTIONS_URI, Long.toString(id));
+        }
+        
+        public static Uri buildUriForId(long transactionId){
+        	return BASE_CONTENT_URI.buildUpon().appendPath("transactions").appendPath(Long.toString(transactionId)).build();
+        }
+        public static String getTransactionId(Uri uri){
+        	return uri.getPathSegments().get(1);
+        }
+        public static String getInProgressTransactionsId(Uri uri){
+        	return uri.getPathSegments().get(2);
         }
     }
 }

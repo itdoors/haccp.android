@@ -1,6 +1,6 @@
 <sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
     android:contentAuthority="com.itdoors.haccp.restcontentprovider"
-    android:accountType="com.itdoors.haccp.restcontentprovider"
+    android:accountType="com.itdoors.HACCP"
     android:userVisible="true" 
     android:allowParallelSyncs="false"
     android:isAlwaysSyncable="false"

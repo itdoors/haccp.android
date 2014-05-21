@@ -30,11 +30,11 @@ import com.itdoors.haccp.model.PointStatus;
 import com.itdoors.haccp.model.StatisticsRecord;
 import com.itdoors.haccp.parser.AddStatisticResponceParser;
 import com.itdoors.haccp.parser.StaticticsAddInputParser.Content;
-import com.itdoors.haccp.ui.fragments.AddStatisticsFragment;
+import com.itdoors.haccp.ui.fragments.AddStatisticsFragmentV0;
 import com.itdoors.haccp.utils.Logger;
 import com.itdoors.haccp.utils.ToastUtil;
 
-public class AddStatisticsActivity extends SherlockFragmentActivity implements LoaderCallbacks<RESTLoader.RESTResponse>, AddStatisticsFragment.OnAddPressedListener{
+public class AddStatisticsActivityV0 extends SherlockFragmentActivity implements LoaderCallbacks<RESTLoader.RESTResponse>, AddStatisticsFragmentV0.OnAddPressedListener{
 	
 	public static final String CHARACTERISTICS_TAG = "com.itdoors.haccp.activities.AddStatisticsActivity.CHARACTERISTICS_TAG";
 	public static final String POINT_TAG = "com.itdoors.haccp.activities.AddStatisticsActivity.PRODUCT_TAG";
@@ -82,7 +82,7 @@ public class AddStatisticsActivity extends SherlockFragmentActivity implements L
 				@SuppressWarnings("unchecked")
 				ArrayList<PointStatus> statuses = (ArrayList<PointStatus>)getIntent().getExtras().getSerializable(STATUSES_TAG);
 				
-				mFragment = AddStatisticsFragment.newInstance(content, point, statuses);
+				mFragment = AddStatisticsFragmentV0.newInstance(content, point, statuses);
 				getSupportFragmentManager()
 					.beginTransaction()
 					.add(R.id.add_statictics_frame,mFragment, ADD_STATICTICS_FRAGMENT_TAG)
@@ -195,7 +195,7 @@ public class AddStatisticsActivity extends SherlockFragmentActivity implements L
 		if(getIntent().getExtras() != null){
 			
 			Point point = (Point)getIntent().getExtras().getSerializable(POINT_TAG);
-			HashMap<GroupCharacteristic, Double> values = ((AddStatisticsFragment)mFragment).getValues();
+			HashMap<GroupCharacteristic, Double> values = ((AddStatisticsFragmentV0)mFragment).getValues();
 			beginAddRequest(point, values);
 		}
 		

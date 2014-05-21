@@ -13,5 +13,8 @@
     <string name="failed_to_load">Failed to load content</string>
     <string name="failed_to_change_status">Failed to change status. Check your internet settings.</string>
     <string name="status_successfully_changed">Status successfully changed.</string>
-
+    <string name="failed_to_add_statistics_db_error">Failed to add statistics. Local databases error.</string>
+    <string name="data_will_be_entered_on_the_server">Data will be entered on the server</string>
+    <string name="changes_will_be_entered_on_the_server">Changes will be entered on the server</string>
+    <string name="no_connection_cant_sync">Can\'t synchronize data with server. Check your network connection.</string>
 </resources>

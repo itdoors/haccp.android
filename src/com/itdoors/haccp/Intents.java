@@ -34,6 +34,15 @@ public final class Intents {
 		
 	}
 	
+	public static final class Point{
+		public static final String UID = "com.itdoors.haccp.Intents.Contour.UID";
+		public static final String POINT = "com.itdoors.haccp.Intents.Contour.POINT";
+		
+	}
+	
+	
+	
+	
 	
 	/**
      * Converts an intent into a {@link Bundle} suitable for use as fragment arguments.

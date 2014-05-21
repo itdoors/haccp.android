@@ -7,12 +7,13 @@ public class Global {
 	
 	public static String API_URL = URL + API_VERSION_CODE;
 	
-	
 	public static boolean loggingEnabled = true;
 	public static boolean imgLoggingEnabled = false;
 	
 	public static String dateFormat = "yyyy-MM-dd";
 	public static String usualDateFromat = "dd.MM.yyyy";
-		
-	public static final int TWEET_LENGTH  = 118;
+	
+	public static String PREFERENCES_DOWNLOAD_DATE = "pref_down_date";
+	public static String REST_PREFS = "rest_pref";
+
 }

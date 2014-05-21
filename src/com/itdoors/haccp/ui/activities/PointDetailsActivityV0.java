@@ -52,7 +52,8 @@ import com.itdoors.haccp.utils.ToastUtil;
 import java.util.Date;
 
 @SuppressLint("SimpleDateFormat")
-public class PointDetailsActivityV0 extends SherlockFragmentActivity implements StatisticsFragmentV0.OnContextMenuItemPressedListener,
+public class PointDetailsActivityV0 extends SherlockFragmentActivity implements 
+																			  StatisticsFragmentV0.OnContextMenuItemPressedListener,
 																			  StatisticsFragmentV0.OnLongStatisticsItemPressedListener,
 																			  StatisticsFragmentV0.TimeRangeParametersHolder,																			  
 																			  StatisticsFragmentV0.StatisticsListModeHolder,
@@ -135,7 +136,7 @@ public class PointDetailsActivityV0 extends SherlockFragmentActivity implements 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		setSupportProgressBarIndeterminateVisibility(false);
 		
-		setContentView(R.layout.activity_control_point);
+		setContentView(R.layout.activity_control_point_v0);
 		mStatisticFragmentMode = MODE.GENERAL;
 		String title = getResources().getString(R.string.control_point);
 		
@@ -333,10 +334,10 @@ public class PointDetailsActivityV0 extends SherlockFragmentActivity implements 
 	private void showAddStatisticActivity(StaticticsAddInputParser.Content content){
 		if(content != null){
 			
-			Intent intent = new Intent(this, AddStatisticsActivity.class);
-			intent.putExtra(AddStatisticsActivity.CHARACTERISTICS_TAG, content);
-			intent.putExtra(AddStatisticsActivity.POINT_TAG, ((Content)mContent).point);
-			intent.putExtra(AddStatisticsActivity.STATUSES_TAG, mStatusesList);
+			Intent intent = new Intent(this, AddStatisticsActivityV0.class);
+			intent.putExtra(AddStatisticsActivityV0.CHARACTERISTICS_TAG, content);
+			intent.putExtra(AddStatisticsActivityV0.POINT_TAG, ((Content)mContent).point);
+			intent.putExtra(AddStatisticsActivityV0.STATUSES_TAG, mStatusesList);
 			startActivityForResult(intent, ADD_STATISTICS_REQUEST);
 		
 		}
@@ -404,8 +405,6 @@ public class PointDetailsActivityV0 extends SherlockFragmentActivity implements 
 	    		StatisticsRecord record = (StatisticsRecord)data.getSerializableExtra(Intents.Statistic.STATISTIC_RECORD);
 	    		
 	    		if(record != null){
-	    			
-	    			record.setPoint(((Content)mContent).point);
 	    			((Content)mContent).records.add(0,record);
 	    			updateStatisticsAfterAddRequestSuccess();
 	    			scrollStatisticsToTop();

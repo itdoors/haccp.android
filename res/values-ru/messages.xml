@@ -13,5 +13,9 @@
     <string name="failed_to_load">Не удалось загрузить контент</string>
     <string name="failed_to_change_status">Не удалось изменить статус. Попытайтесь снова. Проверьте установки интернета.</string>
     <string name="status_successfully_changed">Статус успешно изменен.</string>
-
+    <string name="failed_to_add_statistics_db_error">Не удалось добавить статистику. Ошибка локальной базы данных.</string>
+    <string name="data_will_be_entered_on_the_server">Данные будут внесены на сервер.</string>
+    <string name="changes_will_be_entered_on_the_server">Изменения будут внесены на сервер.</string>
+    <string name="no_connection_cant_sync">Не удается синхронизировать данные с сервером. Проверьте подключение к интернету.</string>
+    
 </resources>

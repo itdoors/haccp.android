@@ -214,12 +214,12 @@
         <!-- CP status -->
 
         <LinearLayout
-            android:id="@+id/cp_attr_coordinates_holder"
+            android:id="@+id/cp_attr_status_holder"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:orientation="vertical" >
-
+ 		
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -229,8 +229,7 @@
                 android:textColor="@android:color/black"
                 android:textSize="15sp"
                 android:textStyle="bold" />
-
-            <TextView
+			<TextView
                 android:id="@+id/cp_attr_status"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -242,6 +241,7 @@
                 android:singleLine="false"
                 android:textColor="@android:color/black"
                 android:textSize="16sp" />
+           
         </LinearLayout>
     </LinearLayout>
 

@@ -88,7 +88,7 @@ public class PointDetailsFragmentV0 extends SherlockFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 			
-			View v = inflater.inflate(R.layout.fragment_control_point_details, null);
+			View v = inflater.inflate(R.layout.fragment_control_point_details_v0, null);
 			
 			mTabHost = (TabHost)v.findViewById(android.R.id.tabhost);
 		    mTabHost.setup();

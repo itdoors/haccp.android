@@ -17,6 +17,7 @@
     <uses-permission android:name="android.permission.READ_SYNC_STATS"/>
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.front" android:required="false" />
@@ -45,16 +46,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.itdoors.haccp.ui.activities.PointDetailsActivityV0" />
+        <activity android:name="com.itdoors.haccp.ui.activities.PointDetailsActivityV1" />
         <activity android:name="com.itdoors.haccp.ui.activities.CalendarActivity" />
         <activity android:name="com.itdoors.haccp.ui.activities.LoginActivity" />
-        <activity android:name="com.itdoors.haccp.ui.activities.AddStatisticsActivity" />
+        <activity android:name="com.itdoors.haccp.ui.activities.AddStatisticsActivityV1" />
         <activity android:name="com.itdoors.haccp.ui.activities.PointsListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
             <meta-data android:name="android.app.default_searchable"
-                       android:value=".activities.SearchActivity" />
+                       android:value="com.itdoors.haccp.ui.activities.SearchActivity" />
         </activity>
         <activity android:name="com.itdoors.haccp.ui.activities.ServicesAndContoursActivity" />
         <activity

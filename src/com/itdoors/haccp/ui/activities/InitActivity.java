@@ -8,6 +8,7 @@ import com.itdoors.haccp.sync.SyncUtils;
 import com.itdoors.haccp.sync.accounts.GenericAccountService;
 import com.itdoors.haccp.ui.fragments.InitFragment;
 import com.itdoors.haccp.utils.LoadActivityUtils;
+import com.itdoors.haccp.utils.Logger;
 import com.itdoors.haccp.utils.ToastUtil;
 
 import android.accounts.Account;
@@ -17,6 +18,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SyncStatusObserver;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
@@ -34,8 +37,13 @@ public class InitActivity extends BaseSherlockFragmentActivity {
      * foreground.
      */
     private Object mSyncObserverHandle;
+
+
+	private Intent mFinishIntent;
     
-   
+	private static final String POST_AUTH_CATEGORY
+    	= "com.google.android.iosched.category.POST_AUTH";
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
@@ -43,11 +51,26 @@ public class InitActivity extends BaseSherlockFragmentActivity {
     	LoadActivityUtils.addLoadingView(this, R.string.synchronization);
     	SyncUtils.CreateSyncAccount(this);
     	
+    	final Intent intent = getIntent();
+        if (intent.hasExtra(SyncUtils.FINISH_INTENT_EXTRA)) {
+            mFinishIntent = intent.getParcelableExtra(SyncUtils.FINISH_INTENT_EXTRA);
+        }
+        
+        ConnectivityManager cm = (ConnectivityManager)
+                getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (activeNetwork == null || !activeNetwork.isConnected()) {
+           ToastUtil.ToastLong(this, getResources().getString(R.string.no_connection_cant_sync));
+        }
+
     }
 	
 	@Override
 	public void onResume() {
 		super.onResume();
+		
+		if(SyncUtils.syncCompleted(this))
+	       	finishInitialSetup();
 		
 	    mSyncStatusObserver.onStatusChanged(0);
         // Watch for sync state changes
@@ -57,6 +80,7 @@ public class InitActivity extends BaseSherlockFragmentActivity {
         mSyncObserverHandle = ContentResolver.addStatusChangeListener(mask, mSyncStatusObserver);
         LocalBroadcastManager.getInstance(this).registerReceiver(syncFinishedReceiver, new IntentFilter(SyncComplete.ACTION_FINISHED_SYNC));
         
+       
 	}
 	
 	@Override
@@ -69,6 +93,7 @@ public class InitActivity extends BaseSherlockFragmentActivity {
 		
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(syncFinishedReceiver);
 		
+		
 	}
 	
 	@Override
@@ -78,6 +103,17 @@ public class InitActivity extends BaseSherlockFragmentActivity {
 		setContentFragment(fragment);
 	}
 	
+	private void finishInitialSetup(){
+		Logger.Logi(getClass(), "finishInitialSetup");
+		
+		if(mFinishIntent != null){
+			mFinishIntent.addCategory(POST_AUTH_CATEGORY);
+			startActivity(mFinishIntent);
+		}
+		
+		finish();
+		
+	}
 
 	private BroadcastReceiver syncFinishedReceiver = new BroadcastReceiver() {
 
@@ -86,12 +122,13 @@ public class InitActivity extends BaseSherlockFragmentActivity {
 	    	
 	    	boolean localInsertSuccesfull = intent.getExtras().getBoolean(Intents.SyncComplete.LOCAL_SYNC_COMPELTED_SUCCESFULLY);
 	    	if(localInsertSuccesfull){
-	    		Intent newIntent = new Intent(InitActivity.this, MainActivity.class);
-	    		startActivity(newIntent);
-	    		finish();
+	    		
+	    		finishInitialSetup();
+	    	
 	    	}
 	    	else{
-	    		ToastUtil.ToastLong(InitActivity.this, "Harr error has happened. Retry later.");
+	    		Logger.Loge(getClass(), "Hard error has happened when performing initial sync.");
+	    		ToastUtil.ToastLong(InitActivity.this, "Hard error has happened. Retry later.");
 	    	}
 	    	
 	    }

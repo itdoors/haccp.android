@@ -47,7 +47,7 @@ public class AddStatisticResponceParser implements Parser{
 		int criticalValueTop = jCharacteristic.getInt("criticalValueTop");
 		
 		GroupCharacteristic groupCharacteristics = new GroupCharacteristic(charId, charName, unit, criticalValueBottom, criticalValueTop);
-		StatisticsRecord record = new StatisticsRecord(recordId, null, groupCharacteristics, recordEntrydate, recordValue);
+		StatisticsRecord record = new StatisticsRecord(recordId, groupCharacteristics, recordEntrydate, recordValue);
 		
 		Content content = new Content();
 		content.record = record;

@@ -29,7 +29,7 @@ import android.util.Log;
 
 public class GenericAccountService extends Service {
     private static final String TAG = "GenericAccountService";
-    private static final String ACCOUNT_TYPE = "com.itdoors.haccp.restcontentprovider";
+    private static final String ACCOUNT_TYPE = "com.itdoors.HACCP";
     public static final String ACCOUNT_NAME = "haccp_sync";
     private Authenticator mAuthenticator;
 
