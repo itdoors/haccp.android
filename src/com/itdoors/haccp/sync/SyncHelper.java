@@ -25,7 +25,6 @@ import com.itdoors.haccp.exceptions.rest.NetworkSystemException;
 import com.itdoors.haccp.exceptions.rest.WebServiceConnectionException;
 import com.itdoors.haccp.exceptions.rest.WebServiceFailedException;
 import com.itdoors.haccp.provider.HaccpContract;
-import com.itdoors.haccp.provider.DatabaseUtils;
 import com.itdoors.haccp.provider.HaccpDatabase;
 import com.itdoors.haccp.rest.HttpMethod;
 import com.itdoors.haccp.rest.InsertStatisticsCommand;
@@ -36,9 +35,10 @@ import com.itdoors.haccp.rest.RESTMethod;
 import com.itdoors.haccp.rest.RestAction;
 import com.itdoors.haccp.rest.UpdatePointStatusCommand;
 import com.itdoors.haccp.utils.BundleUtils;
-import com.itdoors.haccp.utils.EnviromentUtils;
+import com.itdoors.haccp.utils.Enviroment;
 import com.itdoors.haccp.utils.HttpHelper;
 import com.itdoors.haccp.utils.Logger;
+import com.itdoors.haccp.utils.StreamParser;
 
 /**
  * A helper class for dealing with sync and other remote persistence operations.
@@ -100,7 +100,7 @@ public class SyncHelper {
 	        	SQLiteDatabase db = dbHelper.getWritableDatabase();
 	        	
 	        	boolean sucess = false;
-	        	File tempDBFile = EnviromentUtils.getDiskDir(mContext, TEMP_DB_NAME);
+	        	File tempDBFile = Enviroment.getDiskDir(mContext, TEMP_DB_NAME);
 	        	Logger.Logi(getClass(), "Create temp file:" + tempDBFile.getAbsolutePath());
 	        	
         		try {
@@ -116,7 +116,7 @@ public class SyncHelper {
 		        			Logger.Logi(getClass(), "Perform parsing, file :" + tempDBFile.getAbsolutePath());
 		            		
 	                		db.beginTransaction();
-			        		DatabaseUtils.parseZippedDatabase(tempDBFile, db);
+			        		StreamParser.parseZippedDatabase(tempDBFile, db);
 			        		db.setTransactionSuccessful();
 			        		
 			        		if (syncResult != null) {

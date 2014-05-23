@@ -101,8 +101,9 @@ public class ServicesAndContoursFragment extends ListFragment implements
 		mListView.setBackgroundResource(R.drawable.abs__ab_solid_light_holo);
 		mListView.setSelector(R.drawable.abs__tab_indicator_ab_holo);
 		mListView.setCacheColorHint(Color.TRANSPARENT);
-		
+		//mListView.setEmptyView(ContextUtils.getEmptyListView(getActivity()));
 
+		
 		mServiceSimpleCursorAdapter = new SimpleCursorAdapter(
 				getActivity(), 
 				R.layout.list_item_service, 
@@ -117,10 +118,12 @@ public class ServicesAndContoursFragment extends ListFragment implements
 				CONTOUR_FROM_COLUMNS,
 				CONTOUR_TO_FIELDS, 
 				0);
+		
 		setEmptyText(getText(R.string.loading));
 		mSectionedListAdapter = new SectionedListAdapter(getActivity(), mServiceSimpleCursorAdapter, mContourSimpleCursorAdapter);
 	}
 
+	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);

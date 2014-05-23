@@ -25,13 +25,4 @@ public class UpdatePointStatusCommand extends BaseRESTCommand{
 		Logger.Loge(getClass(), "handleError");
 		return Processor.getInstance(mContext).requestFailure(mRequestId, httpResult, allowRetry);
 	}
-
-	public static int getPointId(Uri uri){
-		return Integer.parseInt(uri.getPathSegments().get(3));
-	}
-	
-	public static int getStatusId(Bundle params){
-		return Integer.parseInt(params.getString("pointStatusApiForm[statusId]"));
-	}
-	
 }

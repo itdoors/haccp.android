@@ -4,9 +4,12 @@ import java.io.File;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Environment;
 
-public class EnviromentUtils {
+public class Enviroment {
 
     /**
      * Get a usable cache directory (external if available, internal otherwise).
@@ -34,7 +37,7 @@ public class EnviromentUtils {
      */
     @TargetApi(9)
     public static boolean isExternalStorageRemovable() {
-        if (ApiLevelUtils.hasGingerbread()) {
+        if (ApiLevel.hasGingerbread()) {
             return Environment.isExternalStorageRemovable();
         }
         return true;
@@ -49,7 +52,7 @@ public class EnviromentUtils {
      */
     @TargetApi(8)
     public static File getExternalCacheDir(Context context) {
-        if (ApiLevelUtils.hasFroyo()) {
+        if (ApiLevel.hasFroyo()) {
             return context.getExternalCacheDir();
         }
 
@@ -92,11 +95,28 @@ public class EnviromentUtils {
     
     @TargetApi(8)
     public static File getExternalDir(Context context) {
-        if (ApiLevelUtils.hasFroyo()) {
+        if (ApiLevel.hasFroyo()) {
             return context.getExternalFilesDir(null);
         }
         // Before Froyo we need to construct the external cache dir ourselves
         final String cacheDir = "/Android/data/" + context.getPackageName() + "/temp/";
         return new File(Environment.getExternalStorageDirectory().getPath() + cacheDir);
     }
+    
+    public static boolean checkCameraHardware(Context context) {
+	    if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+	        return true;
+	    } else {
+	        return false;
+	    }
+	}
+    
+	public static boolean isNetworkAvaliable(Context context){
+	 	
+		ConnectivityManager cm = (ConnectivityManager)
+	                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+	    return activeNetwork != null && activeNetwork.isConnected();
+	    
+	}
 }

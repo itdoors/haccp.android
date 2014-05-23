@@ -8,6 +8,7 @@ import com.itdoors.haccp.model.CompanyObject;
 import com.itdoors.haccp.model.Contour;
 import com.itdoors.haccp.model.Point;
 import com.itdoors.haccp.ui.fragments.PointsSectionesListFragment;
+import com.itdoors.haccp.utils.Logger;
 
 import android.app.SearchManager;
 import android.content.Intent;
@@ -50,6 +51,8 @@ public class SearchActivity extends SherlockFragmentActivity implements PointsSe
             
 	    	
     		String query = intent.getStringExtra(SearchManager.QUERY);
+    		Logger.Logi(getClass(), "search query: " + query);
+    		
 	    	Bundle extra = intent.getBundleExtra(SearchManager.APP_DATA);
 	    	
 	    	if( extra != null){
@@ -85,7 +88,7 @@ public class SearchActivity extends SherlockFragmentActivity implements PointsSe
 
 	@Override
 	public void onPointPressed(int pointId) {
-		Intent intent = PointDetailsActivityV1.newInstance(this, pointId);
+		Intent intent = PointDetailsActivity.newIntent(this, pointId);
 		startActivity(intent);	
 	}
 }

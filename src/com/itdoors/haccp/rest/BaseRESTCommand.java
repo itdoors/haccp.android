@@ -227,8 +227,8 @@ public abstract class BaseRESTCommand  implements RESTCommand{
 			}
 			
 			Processor processor = Processor.getInstance(mContext);
-			//processor.handleResponce(mResponce);
-			processor.handleResponce(mResponce, mUri, mParams);
+			processor.handleResponce(mResponce);
+			
 		}
 		
 		return statusCode;

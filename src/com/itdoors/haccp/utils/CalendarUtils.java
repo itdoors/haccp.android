@@ -1,7 +1,11 @@
 package com.itdoors.haccp.utils;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import android.annotation.SuppressLint;
+import com.itdoors.haccp.Global;
 
 
 public class CalendarUtils {
@@ -43,5 +47,10 @@ public class CalendarUtils {
 	
 	public static Date fromTimeStamp(String timeStamp){
 		return new Date(Long.valueOf(timeStamp)*1000);
+	}
+	
+	@SuppressLint("SimpleDateFormat")
+	public static String inUsualDateFromat(String timeStamp){
+		return new SimpleDateFormat(Global.usualDateFromat).format(new Date(Long.valueOf(timeStamp)*1000)).toString();
 	}
 }

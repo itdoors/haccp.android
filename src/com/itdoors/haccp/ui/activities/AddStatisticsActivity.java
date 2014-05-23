@@ -14,19 +14,17 @@ import com.actionbarsherlock.view.MenuItem;
 import com.itdoors.haccp.Intents;
 import com.itdoors.haccp.R;
 import com.itdoors.haccp.model.GroupCharacteristic;
-import com.itdoors.haccp.model.Point;
 import com.itdoors.haccp.model.PointStatus;
 import com.itdoors.haccp.rest.AsyncSQLiteOperations;
-import com.itdoors.haccp.ui.fragments.AddStatisticsFragmentV1;
+import com.itdoors.haccp.ui.fragments.AddStatisticsFragment;
+import com.itdoors.haccp.ui.fragments.AddStatisticsFragment.Action;
 import com.itdoors.haccp.utils.ToastUtil;
 
-public class AddStatisticsActivityV1 extends SherlockFragmentActivity implements AddStatisticsFragmentV1.OnAddPressedListener{
+public class AddStatisticsActivity extends SherlockFragmentActivity implements AddStatisticsFragment.OnAddPressedListener{
 	
-	private static final String STATUSES_TO_CHANGE_SAVE_TAG = "com.itdoors.haccp.activities.AddStatisticsActivity.STATUSES_TO_CHANGE_SAVE_TAG";
 	private static final String ADD_STATICTICS_FRAGMENT_TAG = "com.itdoors.haccp.activities.AddStatisticsActivity.ADD_STATICTICS_FRAGMENT_TAG";
 	
 	private Fragment mFragment;
-	private PointStatus statusToChange;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,30 +36,17 @@ public class AddStatisticsActivityV1 extends SherlockFragmentActivity implements
 		setContentView(R.layout.activity_add_statictics);
 		setTitle(R.string.add_statistic_record);
 		
-		initFragment();
-		
-		if(savedInstanceState != null){
-			statusToChange = (PointStatus) savedInstanceState.getSerializable(STATUSES_TO_CHANGE_SAVE_TAG);
-		}
-	}
-	
-	protected void initFragment(){
-		
 		mFragment = getSupportFragmentManager().findFragmentByTag(ADD_STATICTICS_FRAGMENT_TAG );
 		if(mFragment == null){
-				mFragment = new AddStatisticsFragmentV1();
+				mFragment = new AddStatisticsFragment();
 				getSupportFragmentManager()
 					.beginTransaction()
 					.add(R.id.add_statictics_frame,mFragment, ADD_STATICTICS_FRAGMENT_TAG)
 					.commit();
 		}
+		
 	}
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		if(statusToChange != null)
-			outState.putSerializable(STATUSES_TO_CHANGE_SAVE_TAG, statusToChange);
-	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    menu.add(Menu.NONE, 0 , Menu.NONE, getString(R.string.done))
@@ -77,17 +62,29 @@ public class AddStatisticsActivityV1 extends SherlockFragmentActivity implements
 				finish();
 				return true;
 			case 0 :
-			break;
+				onDonePressed();
+				return true;
+			
 		}
 		return super.onOptionsItemSelected(item);
 	
 	}
-	
-	protected void showProgress(){
-		setSupportProgressBarIndeterminateVisibility(true);
-	}
-	protected void hideProgress(){
-		setSupportProgressBarIndeterminateVisibility(false);
+
+	public void onDonePressed(){
+		
+		if(mFragment != null && mFragment.isAdded()){
+			AddStatisticsFragment fragment = (AddStatisticsFragment)mFragment;
+			Action action = fragment.getActionType();
+			switch (action) {
+				case CHANGE_STATUS:
+					changeStatusPressed(fragment.getStatus());
+					break;
+				case ADD_STATISTICS:
+					onAddPressed(fragment.getValues());
+					break;
+			}
+			
+		}
 	}
 	
 	@Override
@@ -100,8 +97,11 @@ public class AddStatisticsActivityV1 extends SherlockFragmentActivity implements
 		Iterator<Entry<GroupCharacteristic, Double>> iterator = values.entrySet().iterator();
 		Entry<GroupCharacteristic, Double> entry = null;
 		
-		if(iterator.hasNext())		entry = iterator.next();
-		if(entry == null) return;
+		if(iterator.hasNext())
+			entry = iterator.next();
+		if(entry == null) 
+			return;
+		
 		
 		GroupCharacteristic characteristic = entry.getKey();
 		Double value = entry.getValue();

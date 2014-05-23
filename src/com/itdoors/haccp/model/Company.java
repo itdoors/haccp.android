@@ -12,10 +12,8 @@ public class Company implements Serializable{
 	private final String name;
 	
 	public Company(int id, String name) {
-		
 		this.id = id;
 		this.name = name;
-	
 	}
 	
 	public String getName() {
@@ -26,7 +24,6 @@ public class Company implements Serializable{
 		return id;
 	}
 	
-
 	@Override
 	public int hashCode() {
 		

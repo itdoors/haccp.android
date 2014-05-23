@@ -42,7 +42,7 @@ import com.itdoors.haccp.model.PointStatus.CODE;
 import com.itdoors.haccp.provider.HaccpContract;
 import com.itdoors.haccp.utils.Logger;
 
-public class AddStatisticsFragmentV1 extends SherlockFragment implements LoaderCallbacks<Cursor>{
+public class AddStatisticsFragment extends SherlockFragment implements LoaderCallbacks<Cursor>{
 	
 	public interface OnAddPressedListener{
 		public void onAddPressed(HashMap<GroupCharacteristic, Double> values);
@@ -63,9 +63,9 @@ public class AddStatisticsFragmentV1 extends SherlockFragment implements LoaderC
 	private ArrayList<PointStatus> mStatuses;
 	
 	// three queries to db
-	private CountDownLatch allLoadsCompleted;
-	private Handler handler;
 	
+	private Handler handler = new MyLoadingHandler(this);
+	private CountDownLatch allLoadsCompleted;
 	private Thread waitingThread;
 	
 	@SuppressWarnings("unused")
@@ -166,16 +166,16 @@ public class AddStatisticsFragmentV1 extends SherlockFragment implements LoaderC
 	
 	private static class MyLoadingHandler extends Handler{
 		
-		private final WeakReference<AddStatisticsFragmentV1> mWeakRef;
+		private final WeakReference<AddStatisticsFragment> mWeakRef;
 		
-		MyLoadingHandler(AddStatisticsFragmentV1 target) {
-			mWeakRef = new WeakReference<AddStatisticsFragmentV1>(target);
+		MyLoadingHandler(AddStatisticsFragment target) {
+			mWeakRef = new WeakReference<AddStatisticsFragment>(target);
 		}
 		
 		@Override
 		public void handleMessage(Message msg) {
 			if(msg.what == READY_MSG){
-				AddStatisticsFragmentV1 fragment = mWeakRef.get();
+				AddStatisticsFragment fragment = mWeakRef.get();
 				if(fragment != null){
 					fragment.fillViews();
 				}
@@ -187,15 +187,15 @@ public class AddStatisticsFragmentV1 extends SherlockFragment implements LoaderC
 	
 	private static class MyLoadingRunnable implements Runnable{
 		
-		private final WeakReference<AddStatisticsFragmentV1> mWeakRef;
+		private final WeakReference<AddStatisticsFragment> mWeakRef;
 		
-		MyLoadingRunnable(AddStatisticsFragmentV1 target) {
-			mWeakRef = new WeakReference<AddStatisticsFragmentV1>(target);
+		MyLoadingRunnable(AddStatisticsFragment target) {
+			mWeakRef = new WeakReference<AddStatisticsFragment>(target);
 		}
 		@Override
 		public void run() {
 			
-				AddStatisticsFragmentV1 fragment = mWeakRef.get();
+				AddStatisticsFragment fragment = mWeakRef.get();
 				if(fragment != null){
 					try {
 						Logger.Logi(getClass(), "waiting thread locked");
@@ -231,20 +231,19 @@ public class AddStatisticsFragmentV1 extends SherlockFragment implements LoaderC
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		ViewGroup root = (ViewGroup)inflater.inflate(R.layout.fragment_add_statistics, container, false);
-		
 		Button addBtn = (Button)root.findViewById(R.id.add_st_done_btn);
 		addBtn.setOnClickListener(new View.OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
 				if(mOnAddPressedListener != null){
-					final int chechedId = mRadioGroup.getCheckedRadioButtonId(); 
-					if( chechedId!= -1 )	{
-						PointStatus status = (PointStatus)mRadioGroup.findViewById(chechedId).getTag();
-						mOnAddPressedListener.changeStatusPressed(status);
-					}
-					else{
-						mOnAddPressedListener.onAddPressed(getValues());
+					Action action = getActionType();
+					switch (action) {
+						case CHANGE_STATUS:
+							mOnAddPressedListener.changeStatusPressed(getStatus());
+							break;
+						case ADD_STATISTICS:
+							mOnAddPressedListener.onAddPressed(getValues());
+							break;
 					}
 				}
 			}
@@ -252,10 +251,29 @@ public class AddStatisticsFragmentV1 extends SherlockFragment implements LoaderC
 		return root;
 	}
 	
-	//Both variables used for detection: do we need to create waiting thread for cursor loaders queries?. 
-	boolean resumedWithoutStateLost = false;
-	boolean stopedWithoutStateLost = false;
+	// cheak if fragment was recreated or not
+	boolean isFragmentLostHisState = true;
 	
+	
+	public static enum Action { 
+		ADD_STATISTICS, CHANGE_STATUS;
+	}
+	
+	public Action getActionType(){
+		
+		final int chechedId = mRadioGroup.getCheckedRadioButtonId(); 
+		if(chechedId != -1)
+			return Action.CHANGE_STATUS;
+		else return Action.ADD_STATISTICS;
+	
+	}
+	
+	public PointStatus getStatus(){
+		
+		final int chechedId = mRadioGroup.getCheckedRadioButtonId(); 
+		PointStatus status = (PointStatus)mRadioGroup.findViewById(chechedId).getTag();
+		return status;
+	}
 	
 	@Override
 	public void onResume() {
@@ -264,12 +282,12 @@ public class AddStatisticsFragmentV1 extends SherlockFragment implements LoaderC
 		
 		
 		allLoadsCompleted = new CountDownLatch(3);
-		handler = new MyLoadingHandler(this);
+		
 		
 		getLoaderManager().initLoader(PointQuery._TOKEN, null, this);
 		getLoaderManager().initLoader(StatusesQuery._TOKEN, null , this);
 	
-		if(!resumedWithoutStateLost || !stopedWithoutStateLost){
+		if(isFragmentLostHisState){
 			
 			Logger.Logi(getClass(), "waiting thread created !");
 			waitingThread = new Thread( new MyLoadingRunnable(this) );
@@ -281,11 +299,7 @@ public class AddStatisticsFragmentV1 extends SherlockFragment implements LoaderC
 	@Override
 	public void onPause() {
 		super.onPause();
-		
 		Logger.Logi(getClass(), "onPause");
-		
-		
-		
 		if(waitingThread != null){
 			if(waitingThread.isAlive()){
 				waitingThread.interrupt();
@@ -293,22 +307,19 @@ public class AddStatisticsFragmentV1 extends SherlockFragment implements LoaderC
 			}
 			waitingThread = null;
 		}
-		resumedWithoutStateLost = true;
-		
-		
-		
+		isFragmentLostHisState = false;
 	}
 	
 	@Override
 	public void onStop() {
 		super.onStop();
 		Logger.Logi(getClass(), "onStop");
+		isFragmentLostHisState = false;
 	}
 	@Override
 	public void onStart() {
 		super.onStart();
 		Logger.Logi(getClass(), "onStart");
-		stopedWithoutStateLost = true;
 	}
 	
 	@Override
@@ -463,7 +474,7 @@ public class AddStatisticsFragmentV1 extends SherlockFragment implements LoaderC
 	  	args.putInt("group_id", groupId);
 	  		
 	  	LoaderManager loaderManager = getLoaderManager();
-	  	loaderManager.initLoader(GroupCharacteristicsQuery._TOKEN, args , AddStatisticsFragmentV1.this);
+	  	loaderManager.initLoader(GroupCharacteristicsQuery._TOKEN, args , AddStatisticsFragment.this);
 	    Logger.Logi(getClass(), "point countDown");
   		
   		

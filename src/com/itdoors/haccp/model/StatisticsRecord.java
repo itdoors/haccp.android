@@ -5,11 +5,11 @@ import java.util.Date;
 
 public class StatisticsRecord implements Serializable{
 
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
-	
+	private static final long serialVersionUID = 7248785514259274730L;
 	private int id;
 	private double value;
 	private Date entryDate;

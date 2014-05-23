@@ -23,7 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class AttributesFragmentV1 extends Fragment implements  LoaderCallbacks<Cursor>{
+public class AttributesFragment extends Fragment implements  LoaderCallbacks<Cursor>{
 	
 	private ContentObserver mObserver = new ContentObserver(new Handler()) {
 	        @Override
@@ -31,7 +31,7 @@ public class AttributesFragmentV1 extends Fragment implements  LoaderCallbacks<C
 	            if (getActivity() == null) {
 	                return;
 	            }
-	            getLoaderManager().restartLoader(PointQuery._TOKEN, null, AttributesFragmentV1.this);
+	            getLoaderManager().restartLoader(PointQuery._TOKEN, null, AttributesFragment.this);
 	        }
     };
 

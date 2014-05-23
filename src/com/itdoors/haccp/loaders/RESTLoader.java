@@ -26,8 +26,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-import com.itdoors.haccp.utils.ThreadUtils;
-
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;

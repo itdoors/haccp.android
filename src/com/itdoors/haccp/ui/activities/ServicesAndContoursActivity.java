@@ -34,9 +34,7 @@ public class ServicesAndContoursActivity extends SherlockFragmentActivity implem
 		setTitle(R.string.contours);
 		
 		initFragment();
-		if(savedInstanceState != null){
 		
-		}
 	}
 	
 	public static Intent newIntentInstance(Context context, CompanyObject companyobject){
@@ -61,17 +59,6 @@ public class ServicesAndContoursActivity extends SherlockFragmentActivity implem
 			}
 			
 		}
-	}
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-	}
-	
-	protected void showProgress(){
-		setSupportProgressBarIndeterminateVisibility(true);
-	}
-	protected void hideProgress(){
-		setSupportProgressBarIndeterminateVisibility(false);
 	}
 
 	@Override

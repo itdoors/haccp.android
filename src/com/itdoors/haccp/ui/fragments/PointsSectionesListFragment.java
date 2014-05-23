@@ -37,9 +37,9 @@ public class PointsSectionesListFragment  extends ListFragment implements
 		public void onPointPressed(int pointId);
 	}
 	
-	private static final String COMPANY_OBJECT_TAG = "com.itdoors.haccp.fragments.PointsSectionesListFragment.COMPANY_OBJECT_TAG";
-	private static final String CONTOUR_TAG = "com.itdoors.haccp.fragments.PointsSectionesListFragment.CONTOUR_TAG";
-	private static final String QUERY_TAG = "com.itdoors.haccp.fragments.PointsSectionesListFragment.QUERY_TAG";
+	private static final String COMPANY_OBJECT_TAG 	 	= "com.itdoors.haccp.fragments.PointsSectionesListFragment.COMPANY_OBJECT_TAG";
+	private static final String CONTOUR_TAG			 	= "com.itdoors.haccp.fragments.PointsSectionesListFragment.CONTOUR_TAG";
+	private static final String QUERY_TAG 				= "com.itdoors.haccp.fragments.PointsSectionesListFragment.QUERY_TAG";
 	
 	private MyPointsAdapter mPointsAdapter;
 	private SimpleSectionedListAdapter mSectionedListAdapter;
@@ -101,6 +101,13 @@ public class PointsSectionesListFragment  extends ListFragment implements
 		mOnPointPressedListener = (OnPointPressedListener) activity;
 	}
 
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		View root =  super.onCreateView(inflater, container, savedInstanceState);
+		root.setBackgroundResource(R.drawable.abs__ab_solid_light_holo);
+		return root;
+	}
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);

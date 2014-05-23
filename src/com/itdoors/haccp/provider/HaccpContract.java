@@ -367,6 +367,9 @@ public final class HaccpContract {
         /** Default "ORDER BY" clause. */
         public static final String DEFAULT_SORT = BaseColumns.UID + " ASC";
         
+        public static final String GROUP_CHARACTERISTICS_ID_PROJECTION = "group_char_id";
+        public static final String GROUP_CHARACTERISTICS_UID_PROJECTION = "group_char_uid";
+        
         public static Uri buildUriForPoint(int pointID){
         	return BASE_CONTENT_URI
             		.buildUpon()

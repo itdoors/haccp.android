@@ -21,8 +21,8 @@ import android.os.Build;
 /**
  * Class containing some static utility methods.
  */
-public class ApiLevelUtils {
-    private ApiLevelUtils() {};
+public class ApiLevel {
+    private ApiLevel() {};
 
     public static boolean hasFroyo() {
         // Can use static final constants like FROYO, declared in later versions

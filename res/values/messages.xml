@@ -17,4 +17,6 @@
     <string name="data_will_be_entered_on_the_server">Data will be entered on the server</string>
     <string name="changes_will_be_entered_on_the_server">Changes will be entered on the server</string>
     <string name="no_connection_cant_sync">Can\'t synchronize data with server. Check your network connection.</string>
+    <string name="not_avalieble_without_any_interent_connection">Not available without any internet connection.</string>
+    <string name="no_records">No records avaliable.</string>
 </resources>

@@ -1,21 +1,18 @@
 package com.itdoors.haccp.model.rest;
 
-import java.io.Serializable;
 import java.util.Date;
 
-public class StatisticsRecord implements Serializable{
+import org.json.JSONException;
+import org.json.JSONObject;
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
+public class StatisticsRecord {
+
 	private int id;
 	private double value;
 	private Date entryDate;
-	private int groupCharacteristicsId;
-	
 	private Date createdAt;
+	
+	private int groupCharacteristicsId;
 	private int pointId;
 	
 	public StatisticsRecord(int id, int groupCharacteristicsId, Date entryDate, double value, int pointId) {
@@ -52,6 +49,23 @@ public class StatisticsRecord implements Serializable{
 		return pointId;
 	}
 	
+	public static StatisticsRecord valueOf(JSONObject jObj) throws JSONException{
+		
+		int recordId = jObj.getInt("id");
+		double recordValue = jObj.getDouble("value");
+		String recordEntrydateStr = jObj.getString("entryDate");
+		java.util.Date recordEntrydate = null;
+		try{
+			recordEntrydate = new java.util.Date(Long.valueOf(recordEntrydateStr)*1000);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		int characteristicsId = jObj.getInt("characteristicId");
+		int pointId = jObj.getInt("pointId");
+		
+		return new StatisticsRecord(recordId, characteristicsId, recordEntrydate, recordValue, pointId);
+	}
 	
 	@Override
 	public int hashCode() {

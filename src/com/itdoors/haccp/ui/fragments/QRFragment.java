@@ -58,9 +58,7 @@ public class QRFragment extends SherlockFragment implements TakeQRCallback{
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
-		
 		View view = inflater.inflate(R.layout.fragment_scan_code, null);
-		
 		QRBtn = view.findViewById(R.id.qr_btn);
 		QRResultHolder = view.findViewById(R.id.rq_result_holder);
 		QRResultView = (EditText)view.findViewById(R.id.qr_result);
@@ -77,22 +75,13 @@ public class QRFragment extends SherlockFragment implements TakeQRCallback{
 		}
 
 		QRBtn.setOnClickListener( new View.OnClickListener() {
-			
-		
-				@Override
-				public void onClick(View v) {
-				
-					if(mListener != null){
-						
-						mListener.takeQR();
-							/*							
-							Integer id = Integer.valueOf(15);
-							Intent intent = PointDetailsActivity.newInstance(getActivity(), id.intValue());
-							startActivity(intent);
- 							*/
-						}
+			@Override
+			public void onClick(View v) {
+				if(mListener != null){
+					mListener.takeQR();
 				}
-			});
+			}
+		});
 		
 		return view;
 	}
@@ -101,7 +90,6 @@ public class QRFragment extends SherlockFragment implements TakeQRCallback{
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		setRetainInstance(true);
-		
 	}
 	
 	@Override

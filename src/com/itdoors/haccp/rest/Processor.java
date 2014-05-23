@@ -3,6 +3,7 @@ package com.itdoors.haccp.rest;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.itdoors.haccp.model.rest.PointRecord;
 import com.itdoors.haccp.model.rest.StatisticsRecord;
 import com.itdoors.haccp.parser.rest.AddStatisticsResponce;
 import com.itdoors.haccp.parser.rest.Responce;
@@ -19,7 +20,6 @@ import android.content.Context;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.RemoteException;
 
 public class Processor {
@@ -42,11 +42,9 @@ public class Processor {
 	 * Mark transaction completed.
 	 * Make changes in database.
 	 * Remove transaction.
-	 * @throws OperationApplicationException 
-	 * @throws RemoteException 
 	 */
 	
-	public void handleResponce(Responce responce, Uri httpRequestUri, Bundle params) {
+	public void handleResponce(Responce responce) {
 		
 		
 		final Context context = mContext;
@@ -104,9 +102,8 @@ public class Processor {
 				if(record != null){
 					
 					final int pointID = record.getPointId();
-				    Logger.Logi(getClass(), "handleResponce. pointId: " + pointID);
-				    
-			    	ContentValues statisticsInsertValues = new ContentValues();
+					
+					ContentValues statisticsInsertValues = new ContentValues();
 			    	statisticsInsertValues.put(HaccpContract.Statistics.UID, record.getId());
 			    	statisticsInsertValues.put(HaccpContract.Statistics.CHARACTERISTICS_ID, record.getGroupCharacteristicsId());
 			    	if(record.getCreatedAt() != null)
@@ -134,18 +131,22 @@ public class Processor {
 				
 				@SuppressWarnings("unused")
 				final UpdatePointStatusResponce updatePointStatusResponce = (UpdatePointStatusResponce) responce;
-				final int pointId = UpdatePointStatusCommand.getPointId(httpRequestUri);
-				final int statusId = UpdatePointStatusCommand.getStatusId(params);
-				
-				ContentValues updatePointStatusValues = new ContentValues();
-				updatePointStatusValues.put(HaccpContract.Points.STATUS_ID, statusId);
-				
-				Uri pointUri = HaccpContract.Points.buildPointUri(pointId);
-				ContentProviderOperation updateStatus = ContentProviderOperation
-						.newUpdate(pointUri)
-						.withValues(updatePointStatusValues)
-						.build();
-				batch.add(updateStatus);
+				final PointRecord record = updatePointStatusResponce.getPointRecord();
+				if(record != null){
+					
+					final int pointId = record.getId();
+					final int statusId = record.getStatusId();
+					
+					ContentValues updatePointStatusValues = new ContentValues();
+					updatePointStatusValues.put(HaccpContract.Points.STATUS_ID, statusId);
+					
+					Uri pointUri = HaccpContract.Points.buildPointUri(pointId);
+					ContentProviderOperation updateStatus = ContentProviderOperation
+							.newUpdate(pointUri)
+							.withValues(updatePointStatusValues)
+							.build();
+					batch.add(updateStatus);
+					}
 			}
 			break;
 			default:

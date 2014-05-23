@@ -155,6 +155,7 @@ public class RestContentProvider extends ContentProvider {
 	private static HashMap<String, String> sPointsMap;
 	private static HashMap<String, String> sPointsInCObjByContProjMap;
 	private static HashMap<String, String> sPointInfoMap;
+	private static HashMap<String, String> sPointStatisticsMap;
 	
 	
 	static{
@@ -223,7 +224,31 @@ public class RestContentProvider extends ContentProvider {
 			
 		}
 		
-		
+		{
+			
+			sPointStatisticsMap = new HashMap<String, String>();
+			
+			sPointStatisticsMap.put(HaccpContract.Statistics._ID, 			  	  HaccpDatabase.Tables.POINT_STATISTICS + "." + HaccpContract.Statistics._ID);
+			sPointStatisticsMap.put(HaccpContract.Statistics.CHARACTERISTICS_ID,  HaccpDatabase.Tables.POINT_STATISTICS + "." + HaccpContract.Statistics.CHARACTERISTICS_ID);
+			sPointStatisticsMap.put(HaccpContract.Statistics.POINT_ID, 			  HaccpDatabase.Tables.POINT_STATISTICS + "." + HaccpContract.Statistics.POINT_ID);
+			sPointStatisticsMap.put(HaccpContract.Statistics.CREATED_AT, 		  HaccpDatabase.Tables.POINT_STATISTICS + "." + HaccpContract.Statistics.CREATED_AT);
+			sPointStatisticsMap.put(HaccpContract.Statistics.ENTRY_DATE, 		  HaccpDatabase.Tables.POINT_STATISTICS + "." + HaccpContract.Statistics.ENTRY_DATE);
+			sPointStatisticsMap.put(HaccpContract.Statistics.VALUE, 			  HaccpDatabase.Tables.POINT_STATISTICS + "." + HaccpContract.Statistics.VALUE);
+			sPointStatisticsMap.put(HaccpContract.Statistics.UID, 			 	  HaccpDatabase.Tables.POINT_STATISTICS + "." + HaccpContract.Statistics.UID);
+			
+			sPointStatisticsMap.put(HaccpContract.GroupCharacterisitcs.NAME,      			   HaccpDatabase.Tables.POINT_GROUP_CHARACTERISTICS + "." + HaccpContract.GroupCharacterisitcs.NAME);
+			sPointStatisticsMap.put(HaccpContract.GroupCharacterisitcs.UNIT,      			   HaccpDatabase.Tables.POINT_GROUP_CHARACTERISTICS + "." + HaccpContract.GroupCharacterisitcs.UNIT);
+			sPointStatisticsMap.put(HaccpContract.GroupCharacterisitcs.CRITICAL_VALUE_BOTTOM,  HaccpDatabase.Tables.POINT_GROUP_CHARACTERISTICS + "." + HaccpContract.GroupCharacterisitcs.CRITICAL_VALUE_BOTTOM);
+			sPointStatisticsMap.put(HaccpContract.GroupCharacterisitcs.CRITICAL_VALUE_TOP,     HaccpDatabase.Tables.POINT_GROUP_CHARACTERISTICS + "." + HaccpContract.GroupCharacterisitcs.CRITICAL_VALUE_TOP);
+			
+			sPointStatisticsMap.put(HaccpContract.Statistics.GROUP_CHARACTERISTICS_ID_PROJECTION,
+								HaccpContract.GroupCharacterisitcs._ID_FULL +" AS " 
+										+ HaccpContract.Statistics.GROUP_CHARACTERISTICS_ID_PROJECTION);
+			sPointStatisticsMap.put(HaccpContract.Statistics.GROUP_CHARACTERISTICS_UID_PROJECTION,	
+								HaccpContract.GroupCharacterisitcs.UID_FULL +" AS " 
+										+ HaccpContract.Statistics.GROUP_CHARACTERISTICS_UID_PROJECTION);
+			
+		}
 		
 		
 		
@@ -360,6 +385,26 @@ public class RestContentProvider extends ContentProvider {
 				qBuilder.appendWhere(HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.UID + "=" + HaccpContract.Points.getPointId(uri));
 				qBuilder.setProjectionMap(sPointInfoMap);
 				
+				break;
+				
+			}
+			case POINT_ID_STATISTICS:
+			{
+				
+				if(TextUtils.isEmpty(sortOrder))
+					sortOrder = HaccpDatabase.Tables.POINT_STATISTICS + "." + HaccpContract.Statistics.ENTRY_DATE + " DESC";
+				
+				qBuilder.setTables(
+						HaccpDatabase.Tables.POINT_STATISTICS + 
+						
+						" INNER JOIN " +  HaccpDatabase.Tables.POINT_GROUP_CHARACTERISTICS + 
+							" ON " +  "(" + HaccpDatabase.Tables.POINT_STATISTICS + "." + HaccpContract.Statistics.CHARACTERISTICS_ID  + " = " +
+								    		HaccpDatabase.Tables.POINT_GROUP_CHARACTERISTICS + "." + HaccpContract.GroupCharacterisitcs.UID + 
+								    	")"
+				);
+				
+				qBuilder.appendWhere(HaccpDatabase.Tables.POINT_STATISTICS + "." + HaccpContract.Statistics.POINT_ID + "=" + HaccpContract.Statistics.getPointId(uri));
+				qBuilder.setProjectionMap(sPointStatisticsMap);
 				break;
 				
 			}

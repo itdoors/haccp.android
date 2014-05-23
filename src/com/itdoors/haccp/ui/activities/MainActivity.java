@@ -29,7 +29,7 @@ import com.itdoors.haccp.ui.fragments.QRFragment;
 import com.itdoors.haccp.ui.interfaces.SetQRCallback;
 import com.itdoors.haccp.ui.interfaces.TakeQRCallback;
 import com.itdoors.haccp.ui.interfaces.TakeQRListener;
-import com.itdoors.haccp.utils.Camera;
+import com.itdoors.haccp.utils.Enviroment;
 import com.itdoors.haccp.utils.Logger;
 import com.itdoors.haccp.utils.ToastUtil;
 import com.slidingmenu.lib.SlidingMenu;
@@ -160,7 +160,7 @@ public class MainActivity extends SlidingFragmentActivity implements	SetQRCallba
 							.getStringExtra("SCAN_RESULT"));
 					// Intent intent = ControlPointActivity.newInstance(this,
 					// id.intValue());
-					Intent intent = PointDetailsActivityV1.newInstance(this,
+					Intent intent = PointDetailsActivity.newIntent(this,
 							id.intValue());
 					startActivity(intent);
 
@@ -177,7 +177,7 @@ public class MainActivity extends SlidingFragmentActivity implements	SetQRCallba
 
 	@Override
 	public void takeQR() {
-		if (Camera.checkCameraHardware(this)) {
+		if (Enviroment.checkCameraHardware(this)) {
 
 			Intent intent = new Intent(this, CaptureActivity.class);
 

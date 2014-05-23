@@ -1,4 +1,4 @@
-package com.itdoors.haccp.provider;
+package com.itdoors.haccp.utils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -16,16 +16,15 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
 
-import com.itdoors.haccp.utils.Logger;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 
 
-public class DatabaseUtils {
+public class StreamParser {
 	
-	public static void readCompany( JsonParser parser, SQLiteDatabase db) throws JsonParseException, SQLiteException, IOException{
+	private static void readCompany( JsonParser parser, SQLiteDatabase db) throws JsonParseException, SQLiteException, IOException{
     	
     	String id = null;
     	String name = null;
@@ -51,7 +50,7 @@ public class DatabaseUtils {
 		
     }
 
-	public static void readCompanyObject(JsonParser parser, SQLiteDatabase db)  throws JsonParseException, SQLiteException, IOException{
+	private static void readCompanyObject(JsonParser parser, SQLiteDatabase db)  throws JsonParseException, SQLiteException, IOException{
 		
 		String id = null;
 		String companyId = null;
@@ -84,7 +83,7 @@ public class DatabaseUtils {
 		
 	}
 	
-	public static void readService(JsonParser parser, SQLiteDatabase db)  throws JsonParseException, SQLiteException, IOException{
+	private static void readService(JsonParser parser, SQLiteDatabase db)  throws JsonParseException, SQLiteException, IOException{
 		
 		String id = null;
 		String name = null;
@@ -110,7 +109,7 @@ public class DatabaseUtils {
 		
 	}
 	
-	public static void readContour(JsonParser parser, SQLiteDatabase db)  throws JsonParseException, SQLiteException, IOException{
+	private static void readContour(JsonParser parser, SQLiteDatabase db)  throws JsonParseException, SQLiteException, IOException{
 		
 		String id = null;
 		String name = null;
@@ -150,7 +149,7 @@ public class DatabaseUtils {
 		
 	}
 	
-	public static void readPlan(JsonParser parser, SQLiteDatabase db)  throws JsonParseException, SQLiteException, IOException{
+	private static void readPlan(JsonParser parser, SQLiteDatabase db)  throws JsonParseException, SQLiteException, IOException{
 		
 		String id = null;
 		String name = null;
@@ -209,7 +208,7 @@ public class DatabaseUtils {
 		
 	}
 	
-	public static void readGroup(JsonParser parser, SQLiteDatabase db)  throws JsonParseException, SQLiteException, IOException{
+	private static void readGroup(JsonParser parser, SQLiteDatabase db)  throws JsonParseException, SQLiteException, IOException{
 		
 		String id = null;
 		String name = null;
@@ -236,7 +235,7 @@ public class DatabaseUtils {
 		
 	}
 	
-	public static void readGroupCharacteristic(JsonParser parser, SQLiteDatabase db)  throws JsonParseException, SQLiteException, IOException{
+	private static void readGroupCharacteristic(JsonParser parser, SQLiteDatabase db)  throws JsonParseException, SQLiteException, IOException{
 		
 		String id = null;
 		String name = null;
@@ -304,7 +303,7 @@ public class DatabaseUtils {
 		
 	}
 	
-	public static void readStatus(JsonParser parser, SQLiteDatabase db)  throws JsonParseException, SQLiteException, IOException{
+	private static void readStatus(JsonParser parser, SQLiteDatabase db)  throws JsonParseException, SQLiteException, IOException{
 		
 		String id = null;
 		String name = null;
@@ -334,7 +333,7 @@ public class DatabaseUtils {
 		
 	}
 	
-	public static void readPoint(JsonParser parser, SQLiteDatabase db) throws JsonParseException, SQLiteException, IOException{
+	private static void readPoint(JsonParser parser, SQLiteDatabase db) throws JsonParseException, SQLiteException, IOException{
 		
 		String id = null;
 		String name = null;
@@ -396,7 +395,7 @@ public class DatabaseUtils {
 		
 	}
 	
-	public static void readStatistics(JsonParser parser, SQLiteDatabase db)  throws JsonParseException, SQLiteException, IOException{
+	private static void readStatistics(JsonParser parser, SQLiteDatabase db)  throws JsonParseException, SQLiteException, IOException{
 		
 		String id = null;
 		String charId = null;
@@ -442,7 +441,7 @@ public class DatabaseUtils {
 	}
 	
 	
-	public static String readStream(GZIPInputStream gzip) throws IOException {
+	private static String readStream(GZIPInputStream gzip) throws IOException {
 		 
 		Writer writer = new StringWriter();
 	        char[] buffer = new char[1024];
@@ -481,59 +480,59 @@ public class DatabaseUtils {
 				if("company".equals(fieldName)){
 					jParser.nextToken();
 					while(jParser.nextToken() != JsonToken.END_ARRAY){
-			    		DatabaseUtils.readCompany(jParser, db);
+			    		StreamParser.readCompany(jParser, db);
 			    	}
 			    	
 				}else if("company_object".equals(fieldName)){
 					jParser.nextToken();
 			    	while(jParser.nextToken() != JsonToken.END_ARRAY){
-			    		DatabaseUtils.readCompanyObject(jParser, db);
+			    		StreamParser.readCompanyObject(jParser, db);
 			    	}
 				}else if("service".equals(fieldName)){
 					jParser.nextToken();
 			    	while(jParser.nextToken() != JsonToken.END_ARRAY){
-			    		DatabaseUtils.readService(jParser, db);
+			    		StreamParser.readService(jParser, db);
 			    	}
 				}else if("contour".equals(fieldName)){
 					jParser.nextToken();
 			    	while(jParser.nextToken() != JsonToken.END_ARRAY){
-			    		DatabaseUtils.readContour(jParser, db);
+			    		StreamParser.readContour(jParser, db);
 			    	}			
 				}else if("plan".equals(fieldName)){
 					jParser.nextToken();
 			    	while(jParser.nextToken() != JsonToken.END_ARRAY){
-			    		DatabaseUtils.readPlan(jParser, db);
+			    		StreamParser.readPlan(jParser, db);
 			    	}
 				}else if("point_group".equals(fieldName)){
 					jParser.nextToken();
 			    	while(jParser.nextToken() != JsonToken.END_ARRAY){
-			    		DatabaseUtils.readGroup(jParser, db);
+			    		StreamParser.readGroup(jParser, db);
 			    	}
 				}else if("point_group_characteristic".equals(fieldName)){
 					jParser.nextToken();
 			    	while(jParser.nextToken() != JsonToken.END_ARRAY){
-			    		DatabaseUtils.readGroupCharacteristic(jParser, db);
+			    		StreamParser.readGroupCharacteristic(jParser, db);
 			    	}
 				}else if("point_status".equals(fieldName)){
 					jParser.nextToken();
 			    	while(jParser.nextToken() != JsonToken.END_ARRAY){
-			    		DatabaseUtils.readStatus(jParser, db);
+			    		StreamParser.readStatus(jParser, db);
 			    	}
 				}else if("point".equals(fieldName)){
 					jParser.nextToken();
 			    	while(jParser.nextToken() != JsonToken.END_ARRAY){
-			    		DatabaseUtils.readPoint(jParser, db);
+			    		StreamParser.readPoint(jParser, db);
 			    		points ++;
 			    	}
 				}else if("point_statistics".equals(fieldName)){
 					jParser.nextToken();
 			    	while(jParser.nextToken() != JsonToken.END_ARRAY){
-			    		DatabaseUtils.readStatistics(jParser, db);
+			    		StreamParser.readStatistics(jParser, db);
 			    		statistics ++;
 			    	}
 				}
 			}
-			Logger.Logi(DatabaseUtils.class, " Total parsing: points - " + points +", statistics - " + statistics);
+			Logger.Logi(StreamParser.class, " Total parsing: points - " + points +", statistics - " + statistics);
 			
 		 } 
 		

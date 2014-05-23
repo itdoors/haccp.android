@@ -46,10 +46,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.itdoors.haccp.ui.activities.PointDetailsActivityV1" />
+        <activity android:name="com.itdoors.haccp.ui.activities.PointDetailsActivity" />
         <activity android:name="com.itdoors.haccp.ui.activities.CalendarActivity" />
-        <activity android:name="com.itdoors.haccp.ui.activities.LoginActivity" />
-        <activity android:name="com.itdoors.haccp.ui.activities.AddStatisticsActivityV1" />
+        <activity android:name="com.itdoors.haccp.ui.activities.AddStatisticsActivity" />
         <activity android:name="com.itdoors.haccp.ui.activities.PointsListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />

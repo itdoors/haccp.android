@@ -17,5 +17,7 @@
     <string name="data_will_be_entered_on_the_server">Данные будут внесены на сервер.</string>
     <string name="changes_will_be_entered_on_the_server">Изменения будут внесены на сервер.</string>
     <string name="no_connection_cant_sync">Не удается синхронизировать данные с сервером. Проверьте подключение к интернету.</string>
+    <string name="not_avalieble_without_any_interent_connection">Недоступно в отсутствии интернет подключения.</string>
+    <string name="no_records">Нет записей.</string>
     
 </resources>
