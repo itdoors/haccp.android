@@ -207,7 +207,7 @@ public abstract class  EndlessListFragment extends ListFragment implements AbsLi
     }
 
     private boolean streamHasMoreResults() {
-    	return  mStreamingState != StreamingState.COMPLETE && mStreamingState != StreamingState.INIT;
+    	return  mStreamingState == StreamingState.DONE;
     }
       	  
 	public void retry(){
@@ -216,10 +216,9 @@ public abstract class  EndlessListFragment extends ListFragment implements AbsLi
 	
 	@Override
 	public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-	  boolean appropriateState = mStreamingState != StreamingState.ERROR && mStreamingState != StreamingState.REPEAT;
-	  if (appropriateState && visibleItemCount != 0 && firstVisibleItem + visibleItemCount >= totalItemCount && streamHasMoreResults()) {
+	  if (visibleItemCount != 0 && firstVisibleItem + visibleItemCount >= totalItemCount && streamHasMoreResults()) {
 		  Logger.Logi(getClass(), "try load More");
-	      loadMoreResults();
+	      load();
 	  }
 	}
 	@Override
