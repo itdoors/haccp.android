@@ -108,7 +108,7 @@ public class AddStatisticsActivity extends SherlockFragmentActivity implements A
 		String date = Long.toString(Calendar.getInstance().getTime().getTime() / 1000);;
 		
 		AsyncSQLiteOperations.startInsertStatistics(getContentResolver(), pointId, characteristic.getId(), date, date, Integer.toString(value.intValue()));
-		ToastUtil.ToastLong(this, getString(R.string.data_will_be_entered_on_the_server));
+		ToastUtil.ToastLong(getApplicationContext(), getString(R.string.data_will_be_entered_on_the_server));
 		finish();
 	}
 
@@ -120,7 +120,7 @@ public class AddStatisticsActivity extends SherlockFragmentActivity implements A
 			return;
 		
 		AsyncSQLiteOperations.startUpdatePointStatus(getContentResolver(), pointId, status.getId());
-		ToastUtil.ToastLong(this, getString(R.string.data_will_be_entered_on_the_server));
+		ToastUtil.ToastLong(getApplicationContext(), getString(R.string.data_will_be_entered_on_the_server));
 		finish();
 	}
 }

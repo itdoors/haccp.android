@@ -1,23 +1,21 @@
 package com.itdoors.haccp.ui.activities;
 
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONException;
-
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -29,9 +27,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TabHost;
-import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
@@ -43,9 +43,9 @@ import com.itdoors.haccp.exceptions.ServerFailedException;
 import com.itdoors.haccp.loaders.RESTLoader;
 import com.itdoors.haccp.model.Point;
 import com.itdoors.haccp.model.StatisticsRecord;
+import com.itdoors.haccp.model.StatististicsItemStatus;
 import com.itdoors.haccp.parser.LoadMoreStatisticsParser;
 import com.itdoors.haccp.parser.PointStatisticsFromTimeRangeParser;
-import com.itdoors.haccp.provider.HaccpContract;
 import com.itdoors.haccp.ui.fragments.AttributesFragment;
 import com.itdoors.haccp.ui.fragments.StatisticsOnlineFragment;
 import com.itdoors.haccp.ui.fragments.StatisticsOfflineFragment;
@@ -62,14 +62,13 @@ import com.itdoors.haccp.utils.ToastUtil;
 public class PointDetailsActivity extends SherlockFragmentActivity implements 
 			
 		ViewPager.OnPageChangeListener,
-		TabHost.OnTabChangeListener,
 		OnContextMenuItemPressedListener,
 		OnLongStatisticsItemPressedListener,
 		StatisticsOnlineFragment.TimeRangeParametersHolder,																			  
 		StatisticsOnlineFragment.StatisticsListModeHolder,
 		OnTimeRangeChooseListener,
 		OnRefreshListener,
-		LoaderCallbacks<RESTLoader.RESTResponse>
+		LoaderCallbacks<RESTLoader.RESTResponse>, TabListener
 {
 	
 	protected static final String CHOOSE_TIME_RANGE_TYPE_DIALOG 	= "com.itdoors.haccp.activities.PointDetailsActivity.CHOOSE_TIME_RANGE_TYPE_DIALOG";
@@ -103,7 +102,6 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		return intent;
 	}
 	
-	private TabHost mTabHost;
     private ViewPager  mViewPager;
     
     private Fragment mStatisticsFragment;
@@ -115,7 +113,6 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	@SuppressWarnings("unused")
 	private ActionMode mActionMode;
 	
-	private Uri statisticsUri;
 	private Mode networkMode;
 	
 	@Override
@@ -154,24 +151,18 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		mViewPager = (ViewPager)findViewById(R.id.cp_pager);
         
 		if(mViewPager != null){
-        	
-			mTabHost = (TabHost)findViewById(android.R.id.tabhost);
-		    mTabHost.setup();
-	    	
-		    LayoutInflater inflater = getLayoutInflater();
-			View cpStatisticsView = createTabView(inflater, getResources().getString(R.string.statistics));
-		    View cpAttributesView = createTabView(inflater, getResources().getString(R.string.attributes));
-		    
-		    TabSpec mStatisticsTabSpec = mTabHost.newTabSpec(CONTROL_POINT_STATISTICS_TAG).setContent(new DummyTabFactory(this)).setIndicator(cpStatisticsView);
-		    TabSpec mAttributesTabSpec = mTabHost.newTabSpec(CONTROL_POINT_ATTRIBUTES_TAG).setContent(new DummyTabFactory(this)).setIndicator(cpAttributesView);
-		    
-		    mTabHost.addTab(mStatisticsTabSpec);
-		    mTabHost.addTab(mAttributesTabSpec);
-		    
-		    mTabHost.setOnTabChangedListener(this);
-		    
+     		
 		    mViewPager.setAdapter( new PointInfoTabsAdapter(getSupportFragmentManager()));
 		    mViewPager.setOnPageChangeListener(this);
+		    
+		    final ActionBar actionBar = getSupportActionBar();
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+            actionBar.addTab(actionBar.newTab()
+                    .setText(R.string.statistics)
+                    .setTabListener(this));
+            actionBar.addTab(actionBar.newTab()
+                    .setText(R.string.attributes)
+                    .setTabListener(this));
            
 		   // mViewPager.setPageMarginDrawable(R.drawable.grey_border_inset_lr);
            // mViewPager.setPageMargin(getResources()
@@ -192,28 +183,40 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		bottomPanel.findViewById(R.id.cp_bp_params_item).setOnClickListener(mOnBottomPanelClickListener);
 		bottomPanel.findViewById(R.id.cp_bp_calendar_item).setOnClickListener(mOnBottomPanelClickListener);
 	
-		int pointId = getIntent().getExtras().getInt(Intents.Point.UID);
-		statisticsUri = HaccpContract.Statistics.buildUriForPoint(pointId);
 	}
    
 	@Override
+	public void onTabSelected(Tab tab, FragmentTransaction ft) {
+		 mViewPager.setCurrentItem(tab.getPosition());
+	}
+
+	@Override
+	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+	}
+
+	@Override
+	public void onTabReselected(Tab tab, FragmentTransaction ft) {
+	}
+	@Override
 	protected void onPause() {
 		super.onPause();
-		getContentResolver().registerContentObserver(statisticsUri, true, mStatiscticsObserver);
+		//getContentResolver().registerContentObserver(statisticsUri, true, mStatiscticsObserver);
 	}
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
-		getContentResolver().unregisterContentObserver(mStatiscticsObserver);
+		//getContentResolver().unregisterContentObserver(mStatiscticsObserver);
 	}
 	
-	private ContentObserver mStatiscticsObserver = new ContentObserver(new Handler()) {
+	/*
+	private ContentObserver mStatiscticsObserver = new ContentObserver(null) {
 		public void onChange(boolean selfChange) {
 			if(networkMode == Mode.ONLINE && Enviroment.isNetworkAvaliable(PointDetailsActivity.this))
 				beginRefreshStatistics();
 		};
 	};
+	*/
 	
 	static class DummyTabFactory implements TabHost.TabContentFactory {
 		private final Context mContext;
@@ -240,10 +243,12 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		@Override
 		public Fragment getItem(int position) {
 			switch (position) {
+			
 				case 0: return ( mStatisticsFragment = 
 									(networkMode == Mode.ONLINE) 
-										? new ReplaceableFragment( new StatisticsOnlineFragment() ) 
-										: new ReplaceableFragment( new StatisticsOfflineFragment() ));
+										? ReplaceableFragment.newInstance(StatisticsOnlineFragment.class)
+										: ReplaceableFragment.newInstance(StatisticsOfflineFragment.class));
+			
 				case 1:	return new AttributesFragment();
 			};
 			return new Fragment();
@@ -256,37 +261,50 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	
 	}
 	
-	@SuppressLint("ValidFragment")
-	private static class ReplaceableFragment extends Fragment{
-		
+	public static class ReplaceableFragment extends Fragment{
+	
 		private Fragment mInsideFragment;
 		
-		public ReplaceableFragment(Fragment insideFragment) {
-			mInsideFragment = insideFragment;
+		public static ReplaceableFragment newInstance(Class<?> _class){
+			
+			ReplaceableFragment f = new ReplaceableFragment();
+			Bundle args = new Bundle();
+			args. putSerializable("class", _class);
+			f.setArguments(args);
+			return f;
+		
 		}
 		
 		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			setRetainInstance(true);
+		public void onActivityCreated(Bundle savedInstanceState) {
+			super.onActivityCreated(savedInstanceState);
+			
+			FragmentManager fm = getChildFragmentManager();
+			mInsideFragment = fm.findFragmentByTag("insideFragment");
+			if(mInsideFragment == null && getArguments() != null){
+				Class<?> clazz = (Class<?>)getArguments().getSerializable("class");
+				mInsideFragment = Fragment.instantiate(getActivity(), clazz.getName());
+				fm.beginTransaction()
+					.add(R.id.root_frame, mInsideFragment, "insideFragment")
+					.commit();
+			}
 		}
 		
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
 			View view = inflater.inflate(R.layout.fragment_replaceable, container, false);
-			if(mInsideFragment != null){
-				replaceInsidefragment(mInsideFragment);
-			}
+			setRetainInstance(true);
+			Logger.Logi(getClass(), "onCreateView");
 			return view;
 		}
-		
-		public void replaceInsidefragment(Fragment fragment){
+	
+		public void replaceInside(Fragment fragment){
 			mInsideFragment = fragment;
-			FragmentTransaction transaction = getChildFragmentManager()
-					.beginTransaction();
-			transaction.replace(R.id.root_frame, fragment);
-			transaction.commit();
+			getChildFragmentManager()
+					.beginTransaction()
+					.replace(R.id.root_frame, fragment, "insideFragment")
+					.commit();
 		}
 		
 		public Fragment getFragment(){
@@ -308,7 +326,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 				return true;
 			
 			case R.id.cp_bp_params_item:
-				ToastUtil.ToastLong(this, "Params");
+				ToastUtil.ToastLong(getApplicationContext(), "Params");
 				return true;
 			
 			case R.id.cp_bp_calendar_item:
@@ -321,7 +339,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 					
 				}
 				else{
-					ToastUtil.ToastLong(this, getString(R.string.not_avalieble_without_any_interent_connection));
+					ToastUtil.ToastLong(getApplicationContext(), getString(R.string.not_avalieble_without_any_interent_connection));
 					return false;
 				}
 			}
@@ -359,13 +377,6 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 						mStatisticsFragment);
 	    }
 	}
-  
-    private static View createTabView(LayoutInflater inflater, final String text) {
-        View view = inflater.inflate(R.layout.tabs_view, null);
-        TextView tv = (TextView) view.findViewById(R.id.tabsText);
-        tv.setText(text);
-        return view;
-    }
 
     @SuppressLint("SimpleDateFormat")
 	@Override
@@ -380,7 +391,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	    		String fromTimeStampStr = CalendarUtils.inUsualDateFromat(fromTimeStamp);
 	    		String toTimeStampStr = CalendarUtils.inUsualDateFromat(toTimeStamp);
 	    				
-	    		ToastUtil.ToastLong(this, getString(R.string.from) + " : " + fromTimeStampStr + ", " + getString(R.string.to) + " : " + toTimeStampStr);
+	    		ToastUtil.ToastLong(getApplicationContext(), getString(R.string.from) + " : " + fromTimeStampStr + ", " + getString(R.string.to) + " : " + toTimeStampStr);
 	    		beginStatisticsFromTimeStampLoading(fromTimeStamp, toTimeStamp);
 	    	
 	    	}
@@ -420,7 +431,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             
-        	ToastUtil.ToastLong(PointDetailsActivity.this, "Got click: " + item);
+        	ToastUtil.ToastLong(PointDetailsActivity.this.getApplicationContext(), "Got click: " + item);
             mode.finish();
             return true;
         }
@@ -437,12 +448,12 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 
 	@Override
 	public void onEditStaticticsItemContextMenuPressed(int position) {
-		ToastUtil.ToastLong(this, getString(R.string.edit) + ":" + position);
+		ToastUtil.ToastLong(getApplicationContext(), getString(R.string.edit) + ":" + position);
 	}
 
 	@Override
 	public void onDeleteStaticticsItemContextMenuPressed(int position) {
-		ToastUtil.ToastLong(this, getString(R.string.delete) + ":" + position);
+		ToastUtil.ToastLong(getApplicationContext(), getString(R.string.delete) + ":" + position);
 	}	
 
 	@Override
@@ -455,11 +466,12 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 				beginRefreshStatistics();
 			}
 			else{
-				ToastUtil.ToastLong(this, getString(R.string.not_avalieble_without_any_interent_connection));
+				ToastUtil.ToastLong(getApplicationContext(), getString(R.string.not_avalieble_without_any_interent_connection));
 				refreshFailed();
 			}
 		}
 	}
+	
 
 	@SuppressLint("SimpleDateFormat")
 	@Override
@@ -530,13 +542,13 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 				if( today )		toastMess = getString(R.string.today) + " : " + fromTimeStampStr;
 	    		if( yesterday )	toastMess = getString(R.string.yesterday) + " : " + fromTimeStampStr;
 	    		
-	    		ToastUtil.ToastLong(this, toastMess);
+	    		ToastUtil.ToastLong(getApplicationContext(), toastMess);
 	    		
 	    		beginStatisticsFromTimeStampLoading(fromUnixTimeStamp, toUnixTimeStamp);
 				
 			}
 			else{
-				ToastUtil.ToastLong(this, getString(R.string.not_avalieble_without_any_interent_connection));
+				ToastUtil.ToastLong(getApplicationContext(), getString(R.string.not_avalieble_without_any_interent_connection));
 			}
 		}
 	}
@@ -551,14 +563,9 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 
 	@Override
     public void onPageSelected(int position) {
-		mTabHost.setCurrentTab(position);
+		 getSupportActionBar().setSelectedNavigationItem(position);
     }
 
-	@Override
-	public void onTabChanged(String tabId) {
-		  int position = mTabHost.getCurrentTab();
-		  mViewPager.setCurrentItem(position);
-	}
 	
 	
 	@Override
@@ -668,17 +675,17 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	    		updateStatisticsAfterTimeRangeLoadSuccess(loadedContent);
         	}
         	catch (JSONException e) {
-        		ToastUtil.ToastLong(this, "JSONException.");
+        		ToastUtil.ToastLong(getApplicationContext(), "JSONException.");
 				e.printStackTrace();
 			}
         	catch (ServerFailedException e) {
-        		ToastUtil.ToastLong(this, "ServerFailedException.");
+        		ToastUtil.ToastLong(getApplicationContext(), "ServerFailedException.");
     	        e.printStackTrace();
     		}
         }
         else {
         	Logger.Logi(getClass(), "code: " + code +"; json: " + json);
-        	ToastUtil.ToastLong(this, getString(R.string.failed_to_load_data));
+        	ToastUtil.ToastLong(getApplicationContext(), getString(R.string.failed_to_load_data));
         }
 	}
 	
@@ -699,19 +706,19 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
         	}
         	catch (JSONException e) {
 				failed = true;
-        		ToastUtil.ToastLong(this, "JSONException.");
+        		ToastUtil.ToastLong(getApplicationContext(), "JSONException.");
 				e.printStackTrace();
 			}
         	catch (ServerFailedException e) {
         		failed = true;
-        		ToastUtil.ToastLong(this, "ServerFailedException.");
+        		ToastUtil.ToastLong(getApplicationContext(), "ServerFailedException.");
     	        e.printStackTrace();
     		}
        }
        else {
     	    failed = true;
        		Logger.Logi(getClass(), "code: " + code +"; json: " + json);
-       		ToastUtil.ToastLong(this, getString(R.string.failed_to_load_data));
+       		ToastUtil.ToastLong(getApplicationContext(), getString(R.string.failed_to_load_data));
        }
        if(failed){
     	   refreshFailed();
@@ -733,7 +740,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
     					content.hasMoreStatiscticItems
     			);
     			
-    			fragment.replaceInsidefragment(newFragment);
+    			fragment.replaceInside(newFragment);
     			networkMode = Mode.ONLINE;
 			}
 		}
@@ -756,7 +763,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	    					content.hasMoreStatiscticItems
 	    			);
 	    			
-	    			fragment.replaceInsidefragment(newFragment);
+	    			fragment.replaceInside(newFragment);
 	    			networkMode = Mode.ONLINE;	
 				}
 			}
@@ -765,16 +772,49 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	
 	protected void refreshFailed(){
 		if(mStatisticsFragment != null){
-			Fragment statisticsFragment = ((ReplaceableFragment)mStatisticsFragment).getFragment();
-			if(networkMode == Mode.ONLINE){
-				StatisticsOnlineFragment fragment = (StatisticsOnlineFragment)statisticsFragment;
-				fragment.refreshReshFailed();
-			}
-			else{
-				StatisticsOfflineFragment fragment = (StatisticsOfflineFragment)statisticsFragment;
-				fragment.refreshReshFailed();
-			}
+			Fragment frg = ((ReplaceableFragment)mStatisticsFragment).getFragment();
+			if(frg.getClass().equals(StatisticsOfflineFragment.class))
+				((StatisticsOfflineFragment)frg).refreshReshFailed();
+			else if(frg.getClass().equals(StatisticsOnlineFragment.class))
+				((StatisticsOnlineFragment)frg).refreshReshFailed();
+			 
+		}
+	}
+
+	public static void setUpStatusView(StatististicsItemStatus status, TextView tv, Map<StatististicsItemStatus, String> statuses){
+		switch (status) {
+			case WARNING:
+				tv.setText(statuses.get(StatististicsItemStatus.WARNING));
+				tv.setBackgroundResource(R.color.status_warning);
+			break;
+			case DANGER:
+				tv.setText(statuses.get(StatististicsItemStatus.DANGER));
+				tv.setBackgroundResource(R.color.status_danger);
+			break;
+			default:
+				tv.setText(statuses.get(StatististicsItemStatus.APPROVED));
+				tv.setBackgroundResource(R.color.status_approved);
+			break;
 		}
 	}
 	
+	public static HashMap<StatististicsItemStatus, String> getStatusesMap (Context context){
+		
+		String approved = context.getString(R.string.cp_statistics_type_approved);
+		String warning = context.getString(R.string.cp_statistics_type_warning);
+		String danger = context.getString(R.string.cp_statistics_type_danger);
+		
+		HashMap<StatististicsItemStatus, String> map = new HashMap<StatististicsItemStatus, String>();
+		map.put(StatististicsItemStatus.APPROVED, approved);
+		map.put(StatististicsItemStatus.WARNING, warning);
+		map.put(StatististicsItemStatus.DANGER, danger);
+		
+		return map;
+	}
+	
+	public static StatististicsItemStatus getStatus(double value, double top, double bottom){
+		return ( value <= bottom ) ? StatististicsItemStatus.APPROVED : ( 
+			   (value > bottom && value <= top) ? StatististicsItemStatus.WARNING : StatististicsItemStatus.DANGER );
+		
+	}
 }

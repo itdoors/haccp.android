@@ -100,23 +100,23 @@ public class SyncHelper {
 	        	SQLiteDatabase db = dbHelper.getWritableDatabase();
 	        	
 	        	boolean sucess = false;
-	        	File tempDBFile = Enviroment.getDiskDir(mContext, TEMP_DB_NAME);
-	        	Logger.Logi(getClass(), "Create temp file:" + tempDBFile.getAbsolutePath());
+	        	File tempFile = Enviroment.getDiskDir(mContext, TEMP_DB_NAME);
+	        	Logger.Logi(getClass(), "Create temp file:" + tempFile.getAbsolutePath());
 	        	
         		try {
         				
         				final long startloadingLocal = System.currentTimeMillis();
-    	            	HttpHelper.downloadViaHttp(DB_URI, tempDBFile, HttpHelper.ContentType.GZIP );
+    	            	HttpHelper.downloadViaHttp(DB_URI, tempFile, HttpHelper.ContentType.GZIP );
 		        		
 	                	Logger.Logi(TAG, "Loading took " + (System.currentTimeMillis() - startloadingLocal) + "ms");
 	                	
 	                	final long startParsingLocal = System.currentTimeMillis();
 		        		try{
 		        			
-		        			Logger.Logi(getClass(), "Perform parsing, file :" + tempDBFile.getAbsolutePath());
+		        			Logger.Logi(getClass(), "Perform parsing, file :" + tempFile.getAbsolutePath());
 		            		
 	                		db.beginTransaction();
-			        		StreamParser.parseZippedDatabase(tempDBFile, db);
+			        		StreamParser.parseZippedDatabase(tempFile, db);
 			        		db.setTransactionSuccessful();
 			        		
 			        		if (syncResult != null) {
@@ -148,8 +148,8 @@ public class SyncHelper {
 			        	Logger.Logi(TAG, "Parsing file took " + (System.currentTimeMillis() - startParsingLocal) + "ms");
 	        	}
 	        	finally {
-	        			String path = tempDBFile.getAbsolutePath();
-	        			boolean exeption = !tempDBFile.delete();
+	        			String path = tempFile.getAbsolutePath();
+	        			boolean exeption = !tempFile.delete();
 	        			Logger.Logi(getClass(), "Removing temp file :" + path + ", with exeption  - "  + (exeption ? "yes" : "no" ));
 	        	}
 	        	

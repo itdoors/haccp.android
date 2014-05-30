@@ -1,5 +1,6 @@
 package com.itdoors.haccp.ui.adapters;
 
+
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -14,6 +15,8 @@ import android.widget.TextView;
 
 import java.util.Arrays;
 import java.util.Comparator;
+
+import com.itdoors.haccp.R;
 
 public class SimpleSectionedListAdapter extends BaseAdapter {
     private boolean mValid = true;
@@ -166,15 +169,17 @@ public class SimpleSectionedListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (isSectionHeaderPosition(position)) {
-            TextView view = (TextView) convertView;
-            if (view == null) {
-                view = (TextView) mLayoutInflater.inflate(mSectionResourceId, parent, false);
+        	TextView view;
+        	if (convertView == null) {
+            	convertView = mLayoutInflater.inflate(mSectionResourceId, parent, false);
             }
+        	view = (TextView)convertView.findViewById(R.id.list_item_schedule_header_textview);
             view.setText(mSections.get(position).title);
-            return view;
+            return convertView;
 
         } else {
             return mBaseAdapter.getView(sectionedPositionToPosition(position), convertView, parent);
         }
     }
+    
 }

@@ -42,7 +42,7 @@ public class InitActivity extends BaseSherlockFragmentActivity {
 	private Intent mFinishIntent;
     
 	private static final String POST_AUTH_CATEGORY
-    	= "com.google.android.iosched.category.POST_AUTH";
+    	= "com.itdoors.haccp.POST_AUTH";
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +60,7 @@ public class InitActivity extends BaseSherlockFragmentActivity {
                 getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         if (activeNetwork == null || !activeNetwork.isConnected()) {
-           ToastUtil.ToastLong(this, getResources().getString(R.string.no_connection_cant_sync));
+           ToastUtil.ToastLong(getApplicationContext(), getResources().getString(R.string.no_connection_cant_sync));
         }
 
     }
@@ -128,7 +128,7 @@ public class InitActivity extends BaseSherlockFragmentActivity {
 	    	}
 	    	else{
 	    		Logger.Loge(getClass(), "Hard error has happened when performing initial sync.");
-	    		ToastUtil.ToastLong(InitActivity.this, "Hard error has happened. Retry later.");
+	    		ToastUtil.ToastLong(InitActivity.this.getApplicationContext(), "Hard error has happened. Retry later.");
 	    	}
 	    	
 	    }

@@ -1,9 +1,11 @@
 package com.itdoors.haccp.ui.fragments;
 
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONException;
 
@@ -20,6 +22,7 @@ import com.itdoors.haccp.model.StatisticsRecord;
 import com.itdoors.haccp.model.StatististicsItemStatus;
 import com.itdoors.haccp.parser.LoadMoreStatisticsParser;
 import com.itdoors.haccp.parser.LoadMoreStatisticsParser.Content;
+import com.itdoors.haccp.ui.activities.PointDetailsActivity;
 import com.itdoors.haccp.ui.interfaces.OnContextMenuItemPressedListener;
 import com.itdoors.haccp.ui.interfaces.OnLongStatisticsItemPressedListener;
 import com.itdoors.haccp.utils.LoadActivityUtils;
@@ -32,6 +35,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.view.ContextMenu;
@@ -94,9 +98,8 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
 	private StatisticsListModeHolder mStatisticsListModeHolder;
 	private OnContextMenuItemPressedListener mOnContextMenuItemPressedListener;
 	private OnRefreshListener mOnRefreshListener;
-	
 	private PullToRefreshLayout mPullToRefreshLayout;
-
+	
 	private boolean isPreLoadedContentSet = false;
 	
 	public static StatisticsOnlineFragment newInstance(boolean dontStart) {
@@ -187,11 +190,13 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
         
         if(getActivity() != null){
         	
-        	Loader<Object> loader = getActivity().getSupportLoaderManager().getLoader(STATICTIS_MORE_CODE);
-			if(  loader == null )
-				 getActivity().getSupportLoaderManager().initLoader(STATICTIS_MORE_CODE, args, this);
-			else getActivity().getSupportLoaderManager().restartLoader(STATICTIS_MORE_CODE, args, this);
-        
+        	LoaderManager lm = getActivity().getSupportLoaderManager();
+        	Loader<RESTLoader.RESTResponse> loader = lm.getLoader(STATICTIS_MORE_CODE);
+			
+        	if(  loader == null ) 
+        		 lm.initLoader(STATICTIS_MORE_CODE, args, this);
+        	else 
+        		 lm.restartLoader(STATICTIS_MORE_CODE, args, this);
         }
 	}
 	
@@ -233,8 +238,8 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
 			mOnLongStatisticsItemPressedListener = (OnLongStatisticsItemPressedListener) activity;
 			mTimeRangeParametersHolder = (TimeRangeParametersHolder) activity;
 			mStatisticsListModeHolder = (StatisticsListModeHolder) activity;
-			mOnRefreshListener = (OnRefreshListener)activity;
 			mOnContextMenuItemPressedListener = (OnContextMenuItemPressedListener)activity;
+			mOnRefreshListener = (OnRefreshListener)activity;
 		}
 		catch(ClassCastException e){
 			 throw new ClassCastException(activity.toString() + " must implement OnLongStatisticsItemPressedListener, " +
@@ -291,21 +296,23 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
 		listView.setDrawSelectorOnTop(true);
 		listView.setTranscriptMode(ListView.TRANSCRIPT_MODE_DISABLED);
 		
-		mStreamAdapter =  new StatisticListAdapter(getActivity());
+		mStreamAdapter =  new StatisticListAdapter(getActivity(), mStream);
 		setListAdapter(mStreamAdapter);
 		registerForContextMenu(getListView());
 		
-		if(mStream != null && mStream.isEmpty() && !isDontStartInArgs())
+		if(mStream != null && mStream.isEmpty() && !isDontStartInArgs()){
+			
 			fillStatistics();
+		}
 		
-		  // Adding pullToRefresh 
-		  ViewGroup viewGroup = (ViewGroup) view;
-          mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
-          ActionBarPullToRefresh.from(getActivity())
-                  .insertLayoutInto(viewGroup)
-                  .theseChildrenArePullable(android.R.id.list)
-                  .listener(mOnRefreshListener)
-                  .setup(mPullToRefreshLayout);
+		// Adding pullToRefresh 
+		ViewGroup viewGroup = (ViewGroup) view;
+        mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
+        ActionBarPullToRefresh.from(getActivity())
+                .insertLayoutInto(viewGroup)
+                .theseChildrenArePullable(android.R.id.list)
+                .listener(mOnRefreshListener)
+                .setup(mPullToRefreshLayout);
         
         if(savedInstanceState != null){
         	isPreLoadedContentSet = savedInstanceState.getBoolean(SAVE_PRELOADED_CONTENT_SET);
@@ -334,13 +341,18 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
       	
 	}
 	
-	private class StatisticListAdapter extends BaseAdapter{
+	private static class StatisticListAdapter extends BaseAdapter{
 			 
 		private LayoutInflater mLayoutInflater;
-		
-		public StatisticListAdapter(Context context) {
+		private List<Object> mStream;
+		private Map<StatististicsItemStatus, String> statusesMap;
+
+		public StatisticListAdapter(Context context, List<Object> stream) {
+			mStream = stream;
 			mLayoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			statusesMap = PointDetailsActivity.getStatusesMap(context);
 		}
+		
 		@Override
 		public int getCount() {
 			return mStream.size();
@@ -385,62 +397,31 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
 				double valueTop = statistics.getGroupCharacteristics() == null ? 100 : statistics.getGroupCharacteristics().getCriticalTopValue();
 				double valueBottom = statistics.getGroupCharacteristics() == null ? 0 : statistics.getGroupCharacteristics().getCriticalBottomValue();
 				
-				
-				StatististicsItemStatus cpStatus = StatististicsItemStatus.APPROVED;
-				
-				if(statistics.getGroupCharacteristics() != null){
+				StatististicsItemStatus status = PointDetailsActivity.getStatus(value, valueTop, valueBottom);
+				PointDetailsActivity.setUpStatusView(status, holder.status, statusesMap);
 					
-					if(value <= valueBottom)
-						cpStatus = StatististicsItemStatus.APPROVED;
-					else if( value > valueBottom && value < valueTop )
-						cpStatus = StatististicsItemStatus.WARNING;
-					else if( value >= valueTop)
-						cpStatus = StatististicsItemStatus.DANGER;
-				
-				}
-				
-				if(isAdded()){
+				String groupNameStr  = statistics.getGroupCharacteristics() == null ? "-" : statistics.getGroupCharacteristics().getName();
+				String unit = statistics.getGroupCharacteristics() == null ? "%" : statistics.getGroupCharacteristics().getUnit();
+				String valueStr = Integer.toString((int)statistics.getValue()) + unit;
+				String whoSetStr = "Михайличенко";
+				Date date = statistics.getEntryDate();
 					
-					String warning = getString(StatististicsItemStatus.WARNING.getStringResourceID());
-					String danger = getString(StatististicsItemStatus.DANGER.getStringResourceID());
-					String approved = getString(StatististicsItemStatus.APPROVED.getStringResourceID());
+				String dateStr = date== null ? "-" : new SimpleDateFormat(Global.usualDateFromat).format(date) .toString();
 					
-					switch (cpStatus) {
-						case WARNING:
-							holder.status.setText(warning);
-							holder.status.setBackgroundResource(R.color.status_warning);
-						break;
-						case DANGER:
-							holder.status.setText(danger);
-							holder.status.setBackgroundResource(R.color.status_danger);
-						break;
-						default:
-							holder.status.setText(approved);
-							holder.status.setBackgroundResource(R.color.status_approved);
-						break;
-					}
-					
-					String groupNameStr  = statistics.getGroupCharacteristics() == null ? "-" : statistics.getGroupCharacteristics().getName();
-					String unit = statistics.getGroupCharacteristics() == null ? "%" : statistics.getGroupCharacteristics().getUnit();
-					String valueStr = Integer.toString((int)statistics.getValue()) + unit;
-					String whoSetStr = "Михайличенко";
-					Date date = statistics.getEntryDate();
-					
-					String dateStr = date== null ? "-" : new SimpleDateFormat(Global.usualDateFromat).format(date) .toString();
-					
-					holder.inspector.setText(whoSetStr);
-					holder.characteristicGroupName.setText(groupNameStr);
-					holder.value.setText(valueStr);
-					holder.date.setText(dateStr);
+				holder.inspector.setText(whoSetStr);
+				holder.characteristicGroupName.setText(groupNameStr);
+				holder.value.setText(valueStr);
+				holder.date.setText(dateStr);
 					
 				}
-					int backgroundResources = (position % 2 == 0) ? R.drawable.abs__ab_solid_light_holo : R.drawable.abs__ab_solid_shadow_holo;
-					((RelativeLayout)convertView).setBackgroundResource(backgroundResources);
-			}
+				
+				int backgroundResources = (position % 2 == 0) ? R.drawable.abs__ab_solid_light_holo : R.drawable.abs__ab_solid_shadow_holo;
+				((RelativeLayout)convertView).setBackgroundResource(backgroundResources);
+			
 			return convertView;
 		}
 		
-		private class ViewHolder{
+		private static class ViewHolder{
 			TextView inspector;
 			TextView status;
 			TextView characteristicGroupName;
@@ -449,6 +430,7 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
 		}
 		
 	  }
+	
 	
 	public void restoreStatistics(List<StatisticsRecord> records){
 	
@@ -534,7 +516,7 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
 		if(mPullToRefreshLayout != null) 
 			mPullToRefreshLayout.setRefreshComplete();
 	}
-	
+
 	public void clearStatistics() {
 		setState(StreamingState.INIT);
 		mStream.clear();
@@ -576,6 +558,7 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
 	@Override
 	public void onLoadFinished(Loader<RESTLoader.RESTResponse> loader, RESTLoader.RESTResponse data) {
 		if(loader.getId() == STATICTIS_MORE_CODE) {
+			Logger.Logi(getClass(), "onLoadFinished with data: " + data.toString());
 			onLoadMoreCompleted(data);
 	   }
 	}
@@ -613,29 +596,45 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
         	}
         }
         if(failed){
-        
-        	// simple exponential back-off
-        	retryInterval = 2 * retryInterval < MAX_RETRY_INTERVAL ? 2 * retryInterval : MAX_RETRY_INTERVAL;
-        	if(retryCount < MAX_RETRY_COUNT){
-        		Handler handler = new Handler();
-        		handler.postDelayed( new Runnable() {
-					@Override
-					public void run() {
-						Logger.Logi(getClass(), "retry : " + "count: "  + retryCount + ", interval:" + retryInterval);
-		        		setState(StreamingState.REPEAT);
-		        		loadMoreResults();
-						retryCount++;
-					}
-				}, retryInterval);
-        	}
-        	else{
-        		retryCount = 0;
-        		retryInterval = MIN_RETRY_INTERVAL;
-        		// remove loading view and add retry view
-        		onError();
-        	}
+        	tryExponetialBackOff();
         }
 	}
+	
+	private void tryExponetialBackOff(){
+		// simple exponential back-off
+    	retryInterval = 2 * retryInterval < MAX_RETRY_INTERVAL ? 2 * retryInterval : MAX_RETRY_INTERVAL;
+    	if(retryCount < MAX_RETRY_COUNT){
+    		Handler handler = new Handler();
+    		handler.postDelayed( 
+    				new MyBackOffRunnable(this), retryInterval);
+    	}
+    	else{
+    		retryCount = 0;
+    		retryInterval = MIN_RETRY_INTERVAL;
+    		// remove loading view and add retry view
+    		onError();
+    	}
+	}
+
+	private static class MyBackOffRunnable implements Runnable {
+
+		private WeakReference<StatisticsOnlineFragment> fragmentRef;
+		
+		public MyBackOffRunnable(StatisticsOnlineFragment fragment){
+			fragmentRef = new WeakReference<StatisticsOnlineFragment>(fragment);
+		}
+		@Override
+		public void run() {
+			StatisticsOnlineFragment fragment = fragmentRef.get();
+			if(fragment != null){
+				Logger.Logi(getClass(), "retry : " + "count: "  + fragment.retryCount + ", interval:" + fragment.retryInterval);
+        		fragment.setState(StreamingState.REPEAT);
+        		fragment.loadMoreResults();
+				fragment.retryCount++;
+			}
+		}
+		
+	};
 
 	
 	

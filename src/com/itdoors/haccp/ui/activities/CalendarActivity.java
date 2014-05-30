@@ -111,7 +111,7 @@ public class CalendarActivity extends SherlockActivity {
 			finish();
 		}
 		else{
-			ToastUtil.ToastLong(this, getResources().getString(R.string.no_time_range_has_been_selected));
+			ToastUtil.ToastLong(getApplicationContext(), getResources().getString(R.string.no_time_range_has_been_selected));
 		}
 	}
 	

@@ -2,19 +2,21 @@ package com.itdoors.haccp.ui.fragments;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
-
 
 import com.itdoors.haccp.Global;
 import com.itdoors.haccp.Intents;
 import com.itdoors.haccp.R;
 import com.itdoors.haccp.model.StatististicsItemStatus;
 import com.itdoors.haccp.provider.HaccpContract;
+import com.itdoors.haccp.ui.activities.PointDetailsActivity;
 import com.itdoors.haccp.ui.interfaces.OnContextMenuItemPressedListener;
 import com.itdoors.haccp.utils.CalendarUtils;
+import com.itdoors.haccp.utils.Logger;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -43,12 +45,13 @@ import android.widget.TextView;
 public class StatisticsOfflineFragment extends ListFragment implements
 		LoaderManager.LoaderCallbacks<Cursor>{
 	
-	private OnRefreshListener mOnRefreshListener;
-	private PullToRefreshLayout mPullToRefreshLayout;
 	private OnContextMenuItemPressedListener mOnContextMenuItemPressedListener;
 	
 	private CursorAdapter mStatisticsAdapter;
-	 
+	
+	private OnRefreshListener mOnRefreshListener;
+	private PullToRefreshLayout mPullToRefreshLayout;
+	
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
@@ -57,7 +60,7 @@ public class StatisticsOfflineFragment extends ListFragment implements
 			mOnRefreshListener = (OnRefreshListener)activity;
 		}
 		catch(ClassCastException e){
-			 throw new ClassCastException(activity.toString() + " must implement OnContextMenuItemPressedListener, OnRefreshListener");
+			 throw new ClassCastException(activity.toString() + " must implement OnContextMenuItemPressedListener, mOnRefreshListener");
 		}
 	}
 	
@@ -91,6 +94,7 @@ public class StatisticsOfflineFragment extends ListFragment implements
                 .theseChildrenArePullable(android.R.id.list)
                 .listener(mOnRefreshListener)
                 .setup(mPullToRefreshLayout);
+
 	}
 	
 	@Override
@@ -98,8 +102,14 @@ public class StatisticsOfflineFragment extends ListFragment implements
 		super.onActivityCreated(savedInstanceState);
 		setListAdapter(mStatisticsAdapter);
 		getLoaderManager().initLoader(0, null, this);
+		Logger.Logi(getClass(), "onViewCreated");
 	}
-	 
+	
+	public void refreshReshFailed() {
+		if(mPullToRefreshLayout != null) 
+			mPullToRefreshLayout.setRefreshComplete();
+	}
+	
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle data) {
 		int pointID  = getActivity().getIntent().getIntExtra(Intents.Point.UID, -1);
@@ -152,20 +162,19 @@ public class StatisticsOfflineFragment extends ListFragment implements
 		return super.onContextItemSelected(item);
 	}
 	
-	public void refreshReshFailed() {
-		if(mPullToRefreshLayout != null) 
-			mPullToRefreshLayout.setRefreshComplete();
-	}
-	
-	private class MyStatisticsAdapter extends CursorAdapter{
+	private static class MyStatisticsAdapter extends CursorAdapter{
 
 			private Drawable lightDrawable;
 			private Drawable darkDrawable;
+			
+			private Map<StatististicsItemStatus, String> statusesMap;
 			
 			public MyStatisticsAdapter(Context context) {
 	            super(context, null, 0);
 	            lightDrawable = context.getResources().getDrawable(R.drawable.abs__ab_solid_light_holo);
 	            darkDrawable = context.getResources().getDrawable(R.drawable.abs__ab_solid_shadow_holo);
+	            statusesMap = PointDetailsActivity.getStatusesMap(context);
+	            
 	        }
 
 	        @Override
@@ -223,42 +232,19 @@ public class StatisticsOfflineFragment extends ListFragment implements
 	        public void bindView(View view, Context context, final Cursor cursor) {
 	        	
 	        	
-				StatististicsItemStatus cpStatus = StatististicsItemStatus.APPROVED;
+	        	ViewHolder holder = (ViewHolder)view.getTag();
+				
 				try{
-					
+										
 					double value = Double.parseDouble(cursor.getString(StatisticsQuery.VALUE));
 					double valueTop = Double.parseDouble(cursor.getString(StatisticsQuery.CHARACTERISTICS_CRITICAL_VALUE_TOP));
 					double valueBottom = Double.parseDouble(cursor.getString(StatisticsQuery.CHARACTERISTICS_CRITICAL_VALUE_BOTTOM));
 					
-					if(value <= valueBottom)
-						cpStatus = StatististicsItemStatus.APPROVED;
-					else if( value > valueBottom && value < valueTop )
-						cpStatus = StatististicsItemStatus.WARNING;
-					else if( value >= valueTop)
-						cpStatus = StatististicsItemStatus.DANGER;
+					StatististicsItemStatus status = PointDetailsActivity.getStatus(value, valueTop, valueBottom);
+					PointDetailsActivity.setUpStatusView(status, holder.status, statusesMap);
 				}
 				catch (Exception e){
 					e.printStackTrace();
-				}
-				
-				String warning = getString(StatististicsItemStatus.WARNING.getStringResourceID());
-				String danger = getString(StatististicsItemStatus.DANGER.getStringResourceID());
-				String approved = getString(StatististicsItemStatus.APPROVED.getStringResourceID());
-				
-				ViewHolder holder = (ViewHolder)view.getTag();
-				switch (cpStatus) {
-					case WARNING:
-						holder.status.setText(warning);
-						holder.status.setBackgroundResource(R.color.status_warning);
-					break;
-					case DANGER:
-						holder.status.setText(danger);
-						holder.status.setBackgroundResource(R.color.status_danger);
-					break;
-					default:
-						holder.status.setText(approved);
-						holder.status.setBackgroundResource(R.color.status_approved);
-					break;
 				}
 				
 				String groupNameStr  = "";
@@ -293,7 +279,7 @@ public class StatisticsOfflineFragment extends ListFragment implements
 				
 	        }
 		
-	    	private class ViewHolder{
+	    	private static class ViewHolder{
 				TextView inspector;
 				TextView status;
 				TextView characteristicGroupName;
@@ -328,8 +314,9 @@ public class StatisticsOfflineFragment extends ListFragment implements
 		int CHARACTERISTICS_UID = 5;
 		int CHARACTERISTICS_NAME = 6;
 		int CHARACTERISTICS_UNIT = 7;
-		int CHARACTERISTICS_CRITICAL_VALUE_TOP = 8;
-		int CHARACTERISTICS_CRITICAL_VALUE_BOTTOM = 9;
+		int CHARACTERISTICS_CRITICAL_VALUE_BOTTOM = 8;
+		int CHARACTERISTICS_CRITICAL_VALUE_TOP = 9;
+		
 	}
 	  
 	  

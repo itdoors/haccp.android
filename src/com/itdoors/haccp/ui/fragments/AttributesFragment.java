@@ -10,10 +10,8 @@ import com.itdoors.haccp.provider.HaccpContract;
 import com.itdoors.haccp.utils.Logger;
 
 import android.annotation.SuppressLint;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
@@ -25,27 +23,7 @@ import android.widget.TextView;
 
 public class AttributesFragment extends Fragment implements  LoaderCallbacks<Cursor>{
 	
-	private ContentObserver mObserver = new ContentObserver(new Handler()) {
-	        @Override
-	        public void onChange(boolean selfChange) {
-	            if (getActivity() == null) {
-	                return;
-	            }
-	            getLoaderManager().restartLoader(PointQuery._TOKEN, null, AttributesFragment.this);
-	        }
-    };
-
-    @Override
-    public void onAttach(android.app.Activity activity) {
-    	super.onAttach(activity);
-    		if(activity.getIntent().getExtras() != null ){
-    			int point_id = activity.getIntent().getIntExtra(Intents.Point.UID, -1);
-    			activity.getContentResolver().registerContentObserver(
-    				HaccpContract.Points.buildPointUri(point_id), false, mObserver);
-    		}
-    };
-
-    
+        
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.fragment_point_attributes, container, false);
@@ -57,13 +35,7 @@ public class AttributesFragment extends Fragment implements  LoaderCallbacks<Cur
 		getLoaderManager().initLoader(PointQuery._TOKEN, null, this);
 		
 	}
-	@Override
-    public void onDetach() {
-        super.onDetach();
-        getActivity().getContentResolver().unregisterContentObserver(mObserver);
-
-    }
-	
+		
 	@SuppressWarnings("unused")
 	private interface PointQuery{
 	 

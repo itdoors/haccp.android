@@ -218,6 +218,7 @@ public abstract class  EndlessListFragment extends ListFragment implements AbsLi
 	public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 	  boolean appropriateState = mStreamingState != StreamingState.ERROR && mStreamingState != StreamingState.REPEAT;
 	  if (appropriateState && visibleItemCount != 0 && firstVisibleItem + visibleItemCount >= totalItemCount && streamHasMoreResults()) {
+		  Logger.Logi(getClass(), "try load More");
 	      loadMoreResults();
 	  }
 	}

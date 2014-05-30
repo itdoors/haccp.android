@@ -167,11 +167,11 @@ public class MainActivity extends SlidingFragmentActivity implements	SetQRCallba
 				} catch (JSONException e) {
 					e.printStackTrace();
 					ToastUtil
-							.ToastLong(this, getString(R.string.scanner_error));
+							.ToastLong(getApplicationContext(), getString(R.string.scanner_error));
 				}
 			}
 		} else if (resultCode == Activity.RESULT_CANCELED) {
-			ToastUtil.ToastLong(this, "QR scanning canceled");
+			ToastUtil.ToastLong(getApplicationContext(), "QR scanning canceled");
 		}
 	}
 
@@ -191,7 +191,7 @@ public class MainActivity extends SlidingFragmentActivity implements	SetQRCallba
 			intent.putExtra("SAVE_HISTORY", false);
 			startActivityForResult(intent, GET_RECOGNIZED_TEXT_REQUEST_CODE);
 		} else {
-			ToastUtil.ToastLong(this,
+			ToastUtil.ToastLong(getApplicationContext(),
 					getResources()
 							.getString(R.string.your_device_has_no_camera));
 		}

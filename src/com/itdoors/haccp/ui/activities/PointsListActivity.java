@@ -76,10 +76,11 @@ public class PointsListActivity extends SherlockFragmentActivity implements Poin
 	@Override
 	public void startActivity(Intent intent) {
 		
-		if(intent.getAction() != null && intent.getAction().equals(Intent.ACTION_SEARCH))
-			if(ApiLevel.hasHoneycomb() && getExtraSearchInfo() != null)
-				intent.putExtra(SearchManager.APP_DATA, getExtraSearchInfo());
-		
+		if(intent.getAction() != null && intent.getAction().equals(Intent.ACTION_SEARCH)){
+			Bundle bundle = getExtraSearchInfo();
+			if(bundle != null && ( ApiLevel.hasHoneycomb() || intent.getBundleExtra(SearchManager.APP_DATA) == null))
+					intent.putExtra(SearchManager.APP_DATA, bundle);
+		}
 		super.startActivity(intent);
 	}
 	

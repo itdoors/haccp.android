@@ -26,6 +26,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import com.itdoors.haccp.utils.Logger;
+
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -34,9 +36,7 @@ import android.util.Log;
 
 public class RESTLoader extends AsyncTaskLoader<RESTLoader.RESTResponse> {
     
-	private static final String TAG = RESTLoader.class.getName();
-    
-    // We use this delta to determine if our cached data is 
+	// We use this delta to determine if our cached data is 
     // old or not. The value we have here is 10 minutes;
     private static final long STALE_DELTA = 600000;
     
@@ -103,7 +103,7 @@ public class RESTLoader extends AsyncTaskLoader<RESTLoader.RESTResponse> {
         try {
             // At the very least we always need an action.
             if (mAction == null) {
-                Log.e(TAG, "You did not define an action. REST call canceled.");
+                Logger.Loge(getClass(), "You did not define an action. REST call canceled.");
                 return new RESTResponse(); // We send an empty response back. The LoaderCallbacks<RESTResponse>
                                            // implementation will always need to check the RESTResponse
                                            // and handle error cases like this.
@@ -143,7 +143,7 @@ public class RESTLoader extends AsyncTaskLoader<RESTLoader.RESTResponse> {
                     if (mParams != null) {
                     		
                         	UrlEncodedFormEntity formEntity = new UrlEncodedFormEntity(paramsToList(mParams));
-                        	Log.d(TAG, "POST params" +  paramsToList(mParams).toString());
+                        	Logger.Logd(getClass(), "POST params" +  paramsToList(mParams).toString());
                         	
                         	postRequest.setEntity(formEntity);
                         
@@ -171,7 +171,7 @@ public class RESTLoader extends AsyncTaskLoader<RESTLoader.RESTResponse> {
                 
                 // Let's send some useful debug information so we can monitor things
                 // in LogCat.
-                Log.d(TAG, "Executing request: "+ verbToString(mVerb) +": "+ mAction.toString());
+                Logger.Logd(getClass(), " ***** Executing request: "+ verbToString(mVerb) +": "+ mAction.toString() +" *************");
                 
                 // Finally, we send our request using HTTP. This is the synchronous
                 // long operation that we need to run on this Loader's thread.
@@ -193,19 +193,19 @@ public class RESTLoader extends AsyncTaskLoader<RESTLoader.RESTResponse> {
             return new RESTResponse();
         }
         catch (URISyntaxException e) {
-            Log.e(TAG, "URI syntax was incorrect. "+ verbToString(mVerb) +": "+ mAction.toString(), e);
+            Logger.Loge(getClass(), "URI syntax was incorrect. "+ verbToString(mVerb) +": "+ mAction.toString(), e);
             return new RESTResponse();
         }
         catch (UnsupportedEncodingException e) {
-        	Log.e(TAG, "A UrlEncodedFormEntity was created with an unsupported encoding.", e);
+        	Logger.Loge(getClass(), "A UrlEncodedFormEntity was created with an unsupported encoding.", e);
             return new RESTResponse();
         }
         catch (ClientProtocolException e) {
-            Log.e(TAG, "There was a problem when sending the request.", e);
+        	Logger.Loge(getClass(), "There was a problem when sending the request.", e);
             return new RESTResponse();
         }
         catch (IOException e) {
-            Log.e(TAG, "There was a problem when sending the request.", e);
+        	Logger.Loge(getClass(), "There was a problem when sending the request.", e);
             return new RESTResponse();
         }
     }
@@ -272,7 +272,7 @@ public class RESTLoader extends AsyncTaskLoader<RESTLoader.RESTResponse> {
             }
         }
         catch (URISyntaxException e) {
-            Log.e(TAG, "URI syntax was incorrect: "+ uri.toString());
+        	Logger.Loge(RESTLoader.class.getClass(), "URI syntax was incorrect: "+ uri.toString());
         }
     }
     

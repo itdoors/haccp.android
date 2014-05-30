@@ -17,6 +17,17 @@ public class Logger {
 		}
 	}
 	
+	public static void Loge(Class<?> mClass, String msg, Throwable cause){
+		if(BuildConfig.DEBUG && Global.loggingEnabled){
+			Log.e(mClass.getSimpleName(), msg, cause);
+		}
+	}
+	
+	public static void Logd(Class<?> mClass, String msg){
+		if(BuildConfig.DEBUG && Global.loggingEnabled){
+			Log.d(mClass.getSimpleName(), msg);
+		}
+	}
 	public static void Logd(final String tag, String message) {
         //noinspection PointlessBooleanExpression,ConstantConditions
         if (BuildConfig.DEBUG && Global.loggingEnabled) {
