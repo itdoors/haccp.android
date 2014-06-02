@@ -35,9 +35,12 @@ import com.itdoors.haccp.utils.ToastUtil;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
-public class MainActivity extends SlidingFragmentActivity implements	SetQRCallback, 
-								TakeQRListener, MenuFragment.OnProfilePressedListener, 
-								MenuFragment.OnPointsPressedListener, CompanyObjectsFragment.OnCompanyObjectItemPressedListener {
+public class MainActivity extends SlidingFragmentActivity implements	
+		SetQRCallback, 
+		TakeQRListener, 
+		MenuFragment.OnProfilePressedListener, 
+		MenuFragment.OnPointsPressedListener, 
+		CompanyObjectsFragment.OnCompanyObjectItemPressedListener {
 
 	public static final int GET_RECOGNIZED_TEXT_REQUEST_CODE = 111;
 
@@ -99,7 +102,7 @@ public class MainActivity extends SlidingFragmentActivity implements	SetQRCallba
 			mActionMode = (MenuActionMode) savedInstanceState
 					.getSerializable("actionBarMode");
 			setTitle(savedInstanceState.getString("title"));
-
+	
 		}
 
 		if (mContent == null) {
@@ -137,7 +140,7 @@ public class MainActivity extends SlidingFragmentActivity implements	SetQRCallba
 		getSupportActionBar().setIcon(R.drawable.mobile_menu);
 
 	}
-
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -148,6 +151,21 @@ public class MainActivity extends SlidingFragmentActivity implements	SetQRCallba
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
+	private View getSelectedView(){
+		int id = -1;
+		switch (mActionMode) {
+			case USER_PROFILE: id = MenuFragment.profile_id;	break;
+			case SCANNER:	   id = MenuFragment.scanner_id;	break;
+			case POINTS:	   id = MenuFragment.points_id;		break;
+			case ABOUT:		   id = MenuFragment.about_id;		break;
+		}
+		return getMenuView(id);
+	}
+	
+	public void initSelectedView(){
+		getSlidingMenu().setSelectedView(getSelectedView());
+	}
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -156,18 +174,13 @@ public class MainActivity extends SlidingFragmentActivity implements	SetQRCallba
 			if (requestCode == GET_RECOGNIZED_TEXT_REQUEST_CODE) {
 				mTakeCodeFromCameraCallback.codeFromCameraCallback(data);
 				try {
-					Integer id = (Integer) (new ScanResultParser()).parse(data
-							.getStringExtra("SCAN_RESULT"));
-					// Intent intent = ControlPointActivity.newInstance(this,
-					// id.intValue());
-					Intent intent = PointDetailsActivity.newIntent(this,
-							id.intValue());
+					Integer id = (Integer) (new ScanResultParser()).parse(data.getStringExtra("SCAN_RESULT"));
+					Intent intent = PointDetailsActivity.newIntent(this,id.intValue());
 					startActivity(intent);
 
 				} catch (JSONException e) {
 					e.printStackTrace();
-					ToastUtil
-							.ToastLong(getApplicationContext(), getString(R.string.scanner_error));
+					ToastUtil.ToastLong(getApplicationContext(), getString(R.string.scanner_error));
 				}
 			}
 		} else if (resultCode == Activity.RESULT_CANCELED) {
@@ -177,30 +190,26 @@ public class MainActivity extends SlidingFragmentActivity implements	SetQRCallba
 
 	@Override
 	public void takeQR() {
+		
 		if (Enviroment.checkCameraHardware(this)) {
 
 			Intent intent = new Intent(this, CaptureActivity.class);
-
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-
 			intent.setAction("com.itdoors.haccp.SCAN");
-			// for Qr code, its “QR_CODE_MODE” instead of “PRODUCT_MODE”
 			intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
-			// this stops saving ur barcode in barcode scanner app’s history
 			intent.putExtra("SAVE_HISTORY", false);
+			
 			startActivityForResult(intent, GET_RECOGNIZED_TEXT_REQUEST_CODE);
+		
 		} else {
 			ToastUtil.ToastLong(getApplicationContext(),
-					getResources()
-							.getString(R.string.your_device_has_no_camera));
+					getResources().getString(R.string.your_device_has_no_camera));
 		}
-
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-
 		super.onSaveInstanceState(outState);
 
 		getSupportFragmentManager().putFragment(outState, "mContent", mContent);
@@ -213,10 +222,9 @@ public class MainActivity extends SlidingFragmentActivity implements	SetQRCallba
 	public void switchContent(final Fragment fragment, String title,
 			View selectedView, MenuActionMode actionMode) {
 
-		mContent = fragment;
-
 		getSupportFragmentManager().beginTransaction()
-				.replace(R.id.main_content_frame, fragment).commit();
+		.replace(R.id.main_content_frame, mContent = fragment)
+		.commit();
 
 		Handler h = new Handler();
 		h.postDelayed(new Runnable() {
@@ -226,11 +234,10 @@ public class MainActivity extends SlidingFragmentActivity implements	SetQRCallba
 		}, 50);
 
 		mActionMode = actionMode;
-		// invalidateOptionsMenu();
 		setTitle(title);
 		getSlidingMenu().setSelectedView(selectedView);
 	}
-
+	
 	@Override
 	public void setTakeCodeFromCameraCallBack(TakeQRCallback callback) {
 		this.mTakeCodeFromCameraCallback = callback;
@@ -242,34 +249,30 @@ public class MainActivity extends SlidingFragmentActivity implements	SetQRCallba
 	}
 
 	private void showProfile() {
-		String title = getResources().getString(R.string.user_profile);
-		// Fragment newContent = new ProfileFragment();
-		Fragment newContent = new LoginFragment();
-		switchContent(newContent, title, getMenuView(MenuFragment.profile_id),
-				MenuActionMode.USER_PROFILE);
-
+		switchContent(	new LoginFragment(), 
+						getResources().getString(R.string.user_profile), 
+						getMenuView(MenuFragment.profile_id),
+						MenuActionMode.USER_PROFILE);
 	}
 
 	private View getMenuView(int id) {
 		return getSlidingMenu().getMenu().findViewById(id);
 	}
 	
-	
 	public void addFragmentToStack(Fragment newFragment){
 		
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-	    ft.replace(R.id.main_content_frame, newFragment);
-	    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-	    ft.addToBackStack(null);
-	    ft.commit();
+		getSupportFragmentManager().beginTransaction()
+	    	.replace(R.id.main_content_frame, newFragment)
+	    	.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+	    	.addToBackStack(null)
+	    	.commit();
+	
 	}
 	
 	public void switchContentToBackstack(final Fragment fragment, String title,
 			View selectedView, MenuActionMode actionMode) {
 
-		mContent = fragment;
-
-		addFragmentToStack(fragment);
+		addFragmentToStack(mContent = fragment);
 
 		Handler h = new Handler();
 		h.postDelayed(new Runnable() {
@@ -279,20 +282,16 @@ public class MainActivity extends SlidingFragmentActivity implements	SetQRCallba
 		}, 50);
 
 		mActionMode = actionMode;
-		// invalidateOptionsMenu();
 		setTitle(title);
 		getSlidingMenu().setSelectedView(selectedView);
 	}
 
 	@Override
 	public void onPointsPressed() {
-		
-		 
-		 Company company;
 		 	
 		 Cursor companiesCursor = getContentResolver().query(HaccpContract.Companies.CONTENT_URI, ComapiesQuery.PROJECTION, null, null, HaccpContract.Companies.DEFAULT_SORT);
 		 companiesCursor.moveToFirst();
-		 company = new Company(companiesCursor.getInt(ComapiesQuery.UID), companiesCursor.getString(ComapiesQuery.NAME));
+		 Company company = new Company(companiesCursor.getInt(ComapiesQuery.UID), companiesCursor.getString(ComapiesQuery.NAME));
 		 companiesCursor.close();
 		 
 		 CompanyObjectsFragment fragment = CompanyObjectsFragment.newInstance(company);
@@ -300,11 +299,15 @@ public class MainActivity extends SlidingFragmentActivity implements	SetQRCallba
 				 		getString(R.string.points), 
 				 		getMenuView(MenuFragment.points_id),
 				 		MenuActionMode.POINTS);
-	
 	}
 
-	public interface ComapiesQuery{
+	@Override
+	public void onCompanyObjectPressedListener(CompanyObject companyObject) {
+		startActivity(ServicesAndContoursActivity.newIntentInstance(this, companyObject));
+	}
 	
+	public interface ComapiesQuery{
+		
 		String[] PROJECTION = {
 			    	HaccpContract.Companies._ID,
 	                HaccpContract.Companies.NAME,
@@ -315,16 +318,5 @@ public class MainActivity extends SlidingFragmentActivity implements	SetQRCallba
 		int UID = 2;
 	
 	}
-
-	@Override
-	public void onCompanyObjectPressedListener(CompanyObject companyObject) {
 		
-		Intent intent = ServicesAndContoursActivity.newIntentInstance(this, companyObject);
-		startActivity(intent);
-		
-	}
-	
-	
-
-	
 }

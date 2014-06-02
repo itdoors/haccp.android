@@ -32,10 +32,10 @@ public class MenuFragment extends Fragment implements OnClickListener{
 	private OnPointsPressedListener mOnPointsPressedListener;
 	
 	
-	public static final int profile_id = 1;
-	public static final int scanner_id = 2;
-	public static final int points_id = 3;
-	public static final int about_id = 4;
+	public static final int profile_id  = 1;
+	public static final int scanner_id  = 2;
+	public static final int points_id 	= 3;
+	public static final int about_id	= 4;
 	
 	String[] menus;
 	TypedArray imgs;
@@ -53,12 +53,12 @@ public class MenuFragment extends Fragment implements OnClickListener{
 	@SuppressLint("Recycle")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		LinearLayout menuView = (LinearLayout)inflater.inflate(R.layout.fragment_menu, null);
+		
+		LinearLayout menuView = (LinearLayout)inflater.inflate(R.layout.fragment_menu, container, false);
 		
 		menus = getResources().getStringArray(R.array.menu_items);
 		imgs = getResources().obtainTypedArray(R.array.menu_items_img);
 		height = getResources().getDimensionPixelSize(R.dimen.slidingmenu_icons_size);
-		
 		
 		for(int position = 0; position < menus.length; position++){
 			View menuItemView = inflater.inflate(R.layout.list_item_menu, null);
@@ -73,6 +73,13 @@ public class MenuFragment extends Fragment implements OnClickListener{
 		}
 		
 		return menuView;
+	}
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		MainActivity ma = (MainActivity) getActivity();
+		ma.initSelectedView();
+		
 	}
 	
 	private void setScaledCompoundDrawable(int id, TextView text, int width, int height, int padding){
@@ -93,31 +100,22 @@ public class MenuFragment extends Fragment implements OnClickListener{
 			case 0:
 				if(mOnProfilePressedListener != null)
 					mOnProfilePressedListener.onProfilePressed();
-			break;
-			
+				break;
 			case 1:
 				title = getResources().getString(R.string.scanner);
 				newContent = new QRFragment();
 				actionMode = MenuActionMode.SCANNER;
-			break;
-			
+				break;
 			case 2:
 				title = getResources().getString(R.string.points);
-				
 				if(mOnPointsPressedListener != null)
 					mOnPointsPressedListener.onPointsPressed();
-				/**
-					newContent = new ServicesAndContoursFragment();
-					actionMode = MenuActionMode.POINTS;
-				*/
-			break;
-			
+				break;
 			case 3:
 				title = getResources().getString(R.string.about_program);
 				newContent = new AboutFragment();
 				actionMode = MenuActionMode.ABOUT;
-		
-			break;
+				break;
 			
 		}
 		
@@ -127,13 +125,10 @@ public class MenuFragment extends Fragment implements OnClickListener{
 	}
 	
 	private void switchFragment(Fragment fragment, String title, View v, MenuActionMode actionMode) {
-		if (getActivity() == null) return;
-		
-		if (getActivity() instanceof MainActivity) {
-					MainActivity ra = (MainActivity) getActivity();
-					ra.switchContent(fragment,title,v, actionMode);
-			}
+		if (getActivity() != null && getActivity() instanceof MainActivity) {
+			MainActivity ra = (MainActivity) getActivity();
+			ra.switchContent(fragment,title,v, actionMode);
+		}
 	}
-	
 	
 }

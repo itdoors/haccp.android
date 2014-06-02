@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONException;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -23,6 +22,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +49,7 @@ import com.itdoors.haccp.parser.PointStatisticsFromTimeRangeParser;
 import com.itdoors.haccp.ui.fragments.AttributesFragment;
 import com.itdoors.haccp.ui.fragments.StatisticsOnlineFragment;
 import com.itdoors.haccp.ui.fragments.StatisticsOfflineFragment;
+import com.itdoors.haccp.ui.fragments.SwipeRefreshListFragment;
 import com.itdoors.haccp.ui.fragments.TimeRangeDialogFragment;
 import com.itdoors.haccp.ui.fragments.StatisticsOnlineFragment.MODE;
 import com.itdoors.haccp.ui.interfaces.OnContextMenuItemPressedListener;
@@ -455,7 +456,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	public void onDeleteStaticticsItemContextMenuPressed(int position) {
 		ToastUtil.ToastLong(getApplicationContext(), getString(R.string.delete) + ":" + position);
 	}	
-
+/*
 	@Override
 	public void onRefreshStarted(View view) {
 		if(networkMode == Mode.ONLINE){
@@ -471,7 +472,25 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 			}
 		}
 	}
+	*/
 	
+	// Swipe refresh support.v4 rev.19.1;
+	@Override
+	public void onRefresh() {
+		if(networkMode == Mode.ONLINE){
+			beginRefreshStatistics();
+		}
+		else{
+			if(Enviroment.isNetworkAvaliable(this)){
+				beginRefreshStatistics();
+			}
+			else{
+				ToastUtil.ToastLong(getApplicationContext(), getString(R.string.not_avalieble_without_any_interent_connection));
+				refreshFailed();
+			}
+		}
+		
+	}
 
 	@SuppressLint("SimpleDateFormat")
 	@Override
@@ -723,6 +742,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
        if(failed){
     	   refreshFailed();
        }
+       
 	}
 	
 	protected void updateStatisticsAfterTimeRangeLoadSuccess(com.itdoors.haccp.parser.PointStatisticsFromTimeRangeParser.Content content){
@@ -752,7 +772,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 					
 					StatisticsOnlineFragment fragment = (StatisticsOnlineFragment) ((ReplaceableFragment)mStatisticsFragment).getFragment();
 					(fragment).updateStatisticsAfterRefreshSuccess(content.records, content.hasMoreStatiscticItems);
-				
+					refreshSuccess();
 				}
 				else{
 					ReplaceableFragment fragment = (ReplaceableFragment)mStatisticsFragment;
@@ -773,11 +793,15 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	protected void refreshFailed(){
 		if(mStatisticsFragment != null){
 			Fragment frg = ((ReplaceableFragment)mStatisticsFragment).getFragment();
-			if(frg.getClass().equals(StatisticsOfflineFragment.class))
-				((StatisticsOfflineFragment)frg).refreshReshFailed();
-			else if(frg.getClass().equals(StatisticsOnlineFragment.class))
-				((StatisticsOnlineFragment)frg).refreshReshFailed();
-			 
+			SwipeRefreshListFragment swipeFrg = (SwipeRefreshListFragment)frg;
+			swipeFrg.setRefreshing(false);
+		}
+	}
+	protected void refreshSuccess(){
+		if(mStatisticsFragment != null){
+			Fragment frg = ((ReplaceableFragment)mStatisticsFragment).getFragment();
+			SwipeRefreshListFragment swipeFrg = (SwipeRefreshListFragment)frg;
+			swipeFrg.setRefreshing(false);
 		}
 	}
 
@@ -817,4 +841,6 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 			   (value > bottom && value <= top) ? StatististicsItemStatus.WARNING : StatististicsItemStatus.DANGER );
 		
 	}
+
+	
 }

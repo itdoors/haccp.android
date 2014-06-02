@@ -4,10 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
-import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
-import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
-
 import com.itdoors.haccp.Global;
 import com.itdoors.haccp.Intents;
 import com.itdoors.haccp.R;
@@ -26,11 +22,11 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -42,7 +38,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class StatisticsOfflineFragment extends ListFragment implements
+public class StatisticsOfflineFragment extends SwipeRefreshListFragment implements
 		LoaderManager.LoaderCallbacks<Cursor>{
 	
 	private OnContextMenuItemPressedListener mOnContextMenuItemPressedListener;
@@ -50,7 +46,7 @@ public class StatisticsOfflineFragment extends ListFragment implements
 	private CursorAdapter mStatisticsAdapter;
 	
 	private OnRefreshListener mOnRefreshListener;
-	private PullToRefreshLayout mPullToRefreshLayout;
+	//private PullToRefreshLayout mPullToRefreshLayout;
 	
 	@Override
 	public void onAttach(Activity activity) {
@@ -86,6 +82,7 @@ public class StatisticsOfflineFragment extends ListFragment implements
 		registerForContextMenu(getListView());
 		mStatisticsAdapter = new MyStatisticsAdapter(getActivity());
 		
+		/*
 		// Adding pullToRefresh 
 	    ViewGroup viewGroup = (ViewGroup) view;
         mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
@@ -94,7 +91,11 @@ public class StatisticsOfflineFragment extends ListFragment implements
                 .theseChildrenArePullable(android.R.id.list)
                 .listener(mOnRefreshListener)
                 .setup(mPullToRefreshLayout);
-
+	*/
+		
+		setOnRefreshListener(mOnRefreshListener);
+		setColorScheme(R.color.swipe_first, R.color.swipe_second, R.color.swipe_third, R.color.swipe_fourth);
+		
 	}
 	
 	@Override
@@ -104,12 +105,12 @@ public class StatisticsOfflineFragment extends ListFragment implements
 		getLoaderManager().initLoader(0, null, this);
 		Logger.Logi(getClass(), "onViewCreated");
 	}
-	
+	/*
 	public void refreshReshFailed() {
 		if(mPullToRefreshLayout != null) 
 			mPullToRefreshLayout.setRefreshComplete();
 	}
-	
+	*/
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle data) {
 		int pointID  = getActivity().getIntent().getIntExtra(Intents.Point.UID, -1);

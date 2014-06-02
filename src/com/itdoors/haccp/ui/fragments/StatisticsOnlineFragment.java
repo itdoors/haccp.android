@@ -9,10 +9,6 @@ import java.util.Map;
 
 import org.json.JSONException;
 
-import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
-import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
-
 import com.itdoors.haccp.Global;
 import com.itdoors.haccp.Intents;
 import com.itdoors.haccp.R;
@@ -25,6 +21,7 @@ import com.itdoors.haccp.parser.LoadMoreStatisticsParser.Content;
 import com.itdoors.haccp.ui.activities.PointDetailsActivity;
 import com.itdoors.haccp.ui.interfaces.OnContextMenuItemPressedListener;
 import com.itdoors.haccp.ui.interfaces.OnLongStatisticsItemPressedListener;
+import com.itdoors.haccp.utils.ApiLevel;
 import com.itdoors.haccp.utils.LoadActivityUtils;
 import com.itdoors.haccp.utils.Logger;
 
@@ -38,6 +35,7 @@ import android.os.Handler;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -97,8 +95,10 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
 	private TimeRangeParametersHolder mTimeRangeParametersHolder;
 	private StatisticsListModeHolder mStatisticsListModeHolder;
 	private OnContextMenuItemPressedListener mOnContextMenuItemPressedListener;
+	//private OnRefreshListener mOnRefreshListener;
+	//private PullToRefreshLayout mPullToRefreshLayout;
+	
 	private OnRefreshListener mOnRefreshListener;
-	private PullToRefreshLayout mPullToRefreshLayout;
 	
 	private boolean isPreLoadedContentSet = false;
 	
@@ -305,6 +305,7 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
 			fillStatistics();
 		}
 		
+		/*
 		// Adding pullToRefresh 
 		ViewGroup viewGroup = (ViewGroup) view;
         mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
@@ -313,8 +314,12 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
                 .theseChildrenArePullable(android.R.id.list)
                 .listener(mOnRefreshListener)
                 .setup(mPullToRefreshLayout);
-        
-        if(savedInstanceState != null){
+        */
+		setOnRefreshListener(mOnRefreshListener);
+		setColorScheme(R.color.swipe_first, R.color.swipe_second, R.color.swipe_third, R.color.swipe_fourth);
+		
+		
+		if(savedInstanceState != null){
         	isPreLoadedContentSet = savedInstanceState.getBoolean(SAVE_PRELOADED_CONTENT_SET);
         }
         
@@ -508,14 +513,16 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
 		else
 			LoadActivityUtils.addEmptyViewIfNotExist(this, getString(R.string.no_statistic_items));
 		
-		if(mPullToRefreshLayout != null) 
-			mPullToRefreshLayout.setRefreshComplete();
+		//if(mPullToRefreshLayout != null) 
+			//mPullToRefreshLayout.setRefreshComplete();
 	}
 	
+	/*
 	public void refreshReshFailed() {
 		if(mPullToRefreshLayout != null) 
 			mPullToRefreshLayout.setRefreshComplete();
 	}
+	*/
 
 	public void clearStatistics() {
 		setState(StreamingState.INIT);

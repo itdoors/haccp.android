@@ -8,21 +8,18 @@ import com.itdoors.haccp.R;
 import com.itdoors.haccp.utils.Logger;
 
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 
 import android.widget.ListView;
 
-public abstract class  EndlessListFragment extends ListFragment implements AbsListView.OnScrollListener{
+public abstract class  EndlessListFragment extends SwipeRefreshListFragment implements AbsListView.OnScrollListener{
 
-	protected static final String STATE_POSITION 			= "com.itdoors.haccp.fragments.EndlessListFragment.STATE_POSITION";
-	protected static final String STATE_TOP 				= "com.itdoors.haccp.fragments.EndlessListFragment.STATE_TOP";
+	//protected static final String STATE_POSITION 			= "com.itdoors.haccp.fragments.EndlessListFragment.STATE_POSITION";
+	//protected static final String STATE_TOP 				= "com.itdoors.haccp.fragments.EndlessListFragment.STATE_TOP";
 	protected static final String STREAMING_STATE 			= "com.itdoors.haccp.fragments.EndlessListFragment.LOADING_STATE";
 	protected static final String HAS_MORE_ITEMS_TO_LOAD 	= "com.itdoors.haccp.fragments.EndlessListFragment.HAS_MORE_ITEMS_TO_LOAD";
 	protected static final String FIRST_LOAD 			 	= "com.itdoors.haccp.fragments.EndlessListFragment.FIRST_LOAD";
@@ -64,6 +61,7 @@ public abstract class  EndlessListFragment extends ListFragment implements AbsLi
 	    mStreamingState = state;
 	}
 
+	/*
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
         
@@ -87,6 +85,7 @@ public abstract class  EndlessListFragment extends ListFragment implements AbsLi
 	         outState.putSerializable(STREAMING_STATE, mStreamingState);
 	         super.onSaveInstanceState(outState);
 	}
+	*/
 	 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -105,7 +104,7 @@ public abstract class  EndlessListFragment extends ListFragment implements AbsLi
 			}
 		});
         changeFooterState();
-        listView.addFooterView(mListViewFootter);
+        listView.addFooterView(mListViewFootter, null, false);
 	}
     
     private void changeFooterState(){

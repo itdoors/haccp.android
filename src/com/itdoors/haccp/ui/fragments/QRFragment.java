@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.itdoors.haccp.R;
@@ -19,9 +18,7 @@ public class QRFragment extends SherlockFragment implements TakeQRCallback{
 	private static final String VERFICATION_CODE_SAVE_KEY = "com.itdoors.fragments.QRFagment.SAVE_SCANED_CODE";
 
 	private View QRBtn;
-	private View QRResultHolder;
 	
-	private EditText QRResultView;
 	private TakeQRListener mListener;
 	private String QRResult;
 	
@@ -36,17 +33,6 @@ public class QRFragment extends SherlockFragment implements TakeQRCallback{
 	public void codeFromCameraCallback(Intent data) {
 		if(data.getExtras() != null){
 			QRResult = data.getStringExtra("SCAN_RESULT");
-			if(QRResult != null && !QRResult.equals("")){
-				if(QRResultHolder != null){
-					QRResultHolder.setVisibility(View.VISIBLE);
-					QRResultView.setText(QRResult);
-				}
-				else if(QRResultView!=null){
-					QRResultView.setVisibility(View.VISIBLE);
-					QRResultView.setText(QRResult);
-				}
-				
-			}
 		}
 	}
 	@Override
@@ -60,20 +46,6 @@ public class QRFragment extends SherlockFragment implements TakeQRCallback{
 		
 		View view = inflater.inflate(R.layout.fragment_scan_code, null);
 		QRBtn = view.findViewById(R.id.qr_btn);
-		QRResultHolder = view.findViewById(R.id.rq_result_holder);
-		QRResultView = (EditText)view.findViewById(R.id.qr_result);
-		if(QRResult != null && !QRResult.equals("")){
-			if(QRResultHolder != null){
-				QRResultHolder.setVisibility(View.VISIBLE);
-				QRResultView.setText(QRResult);
-			}
-			else if(QRResultView!=null){
-				QRResultView.setVisibility(View.VISIBLE);
-				QRResultView.setText(QRResult);
-			}
-			
-		}
-
 		QRBtn.setOnClickListener( new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
