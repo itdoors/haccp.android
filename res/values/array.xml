@@ -5,12 +5,14 @@
         <item>@string/user_profile</item>
         <item>@string/scanner</item>
         <item>@string/points</item>
+        <item>@string/user_settings</item>
         <item>@string/about</item>
     </string-array>
     <string-array name="menu_items_img">
         <item>@drawable/main_menu_profile_img</item>
         <item>@drawable/main_menu_scan_img</item>
         <item>@drawable/main_menu_points_img</item>
+        <item>@drawable/main_menu_settings_img</item>
         <item>@drawable/main_menu_about_program_img</item>
     </string-array>
     <string-array name="choos_time_range">
@@ -21,5 +23,32 @@
         <item>@string/this_month</item>
         <item>@string/custom_range</item>
     </string-array>
-
+    
+    <string-array name="pref_sync_list">
+        <item>@string/pref_sync_array_half_an_hour</item>
+        <item>@string/pref_sync_array_hour</item>
+        <item>@string/pref_sync_array_day</item>
+    </string-array>
+    
+	<string-array name="pref_statistics_list">
+	    <item>@string/pref_statistics_array_7_days</item>
+	    <item>@string/pref_statistics_array_10_days</item>
+	    <item>@string/pref_statistics_array_30_days</item>
+	    <item>@string/pref_statistics_array_current_weak</item>
+	    <item>@string/pref_statistics_array_current_month</item>
+	</string-array>
+	
+	<string-array name="pref_sync_list_values">
+        <item>half_and_hour</item>
+        <item>hour</item>
+        <item>day</item>
+    </string-array>
+    
+    <string-array name="pref_statistics_list_values">
+	    <item>7_days</item>
+	    <item>10_days</item>
+	    <item>30_days</item>
+	    <item>current_weak</item>
+	    <item>current_month</item>
+	</string-array>
 </resources>

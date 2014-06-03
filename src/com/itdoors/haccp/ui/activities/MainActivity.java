@@ -40,6 +40,7 @@ public class MainActivity extends SlidingFragmentActivity implements
 		TakeQRListener, 
 		MenuFragment.OnProfilePressedListener, 
 		MenuFragment.OnPointsPressedListener, 
+		MenuFragment.OnSettingPressedListener,
 		CompanyObjectsFragment.OnCompanyObjectItemPressedListener {
 
 	public static final int GET_RECOGNIZED_TEXT_REQUEST_CODE = 111;
@@ -60,8 +61,6 @@ public class MainActivity extends SlidingFragmentActivity implements
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-
-		Logger.Logi(getClass(), "getIntent()" + ((getIntent() == null) ? "null" : getIntent().toString()));
 		if(!SyncUtils.cheakSync(this, getIntent()))
 			finish();
 		 
@@ -69,8 +68,6 @@ public class MainActivity extends SlidingFragmentActivity implements
 		getWindow().setSoftInputMode(
 				WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 		super.onCreate(savedInstanceState);
-
-		
 		
 		setTitle(R.string.app_name_haccp);
 		setContentView(R.layout.activity_main);
@@ -300,6 +297,21 @@ public class MainActivity extends SlidingFragmentActivity implements
 				 		getMenuView(MenuFragment.points_id),
 				 		MenuActionMode.POINTS);
 	}
+	
+	@Override
+	public void onSettingsPressed() {
+		
+		toggle();
+		
+		Handler h = new Handler();
+		h.postDelayed(new Runnable() {
+			public void run() {
+				Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+				startActivity(intent);
+			}
+		}, 50);
+		
+	}
 
 	@Override
 	public void onCompanyObjectPressedListener(CompanyObject companyObject) {
@@ -318,5 +330,7 @@ public class MainActivity extends SlidingFragmentActivity implements
 		int UID = 2;
 	
 	}
+
+	
 		
 }

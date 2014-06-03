@@ -27,15 +27,20 @@ public class MenuFragment extends Fragment implements OnClickListener{
 	public interface OnPointsPressedListener{
 		public void onPointsPressed();
 	}
+	public interface OnSettingPressedListener{
+		public void onSettingsPressed();
+	}
 
 	private OnProfilePressedListener mOnProfilePressedListener;
 	private OnPointsPressedListener mOnPointsPressedListener;
+	private OnSettingPressedListener mOnSettingPressedListener;
 	
 	
 	public static final int profile_id  = 1;
 	public static final int scanner_id  = 2;
 	public static final int points_id 	= 3;
-	public static final int about_id	= 4;
+	public static final int settings_id = 4;
+	public static final int about_id	= 5;
 	
 	String[] menus;
 	TypedArray imgs;
@@ -48,6 +53,7 @@ public class MenuFragment extends Fragment implements OnClickListener{
 		super.onAttach(activity);
 		mOnProfilePressedListener = (OnProfilePressedListener)activity;
 		mOnPointsPressedListener = (OnPointsPressedListener)activity;
+		mOnSettingPressedListener = (OnSettingPressedListener)activity;
 	}
 	
 	@SuppressLint("Recycle")
@@ -112,6 +118,12 @@ public class MenuFragment extends Fragment implements OnClickListener{
 					mOnPointsPressedListener.onPointsPressed();
 				break;
 			case 3:
+				title = getResources().getString(R.string.settings);
+				if(mOnSettingPressedListener != null)
+					mOnSettingPressedListener.onSettingsPressed();
+				break;
+				
+			case 4:
 				title = getResources().getString(R.string.about_program);
 				newContent = new AboutFragment();
 				actionMode = MenuActionMode.ABOUT;

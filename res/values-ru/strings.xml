@@ -5,6 +5,7 @@
     <string name="user_profile">Профиль</string>
     <string name="about">О программе</string>
     <string name="points">Контрольные точки</string>
+    <string name="user_settings">Настройки</string>
     <string name="send">Отправить</string>
     <string name="code">Код</string>
     <string name="retry">Повторить</string>
@@ -83,4 +84,30 @@
     <string name="search_point_hint">Имя точки&#8230;</string>
     
 
+    <!-- Preferences -->
+    <string name="pref_category_sync">Синхронизация</string>
+    <string name="pref_category_sync_dialog_title">Выберите период</string>
+    <string name="pref_category_statistics">Статистика</string>
+    <string name="pref_category_statistics_dialog_title">Выберите период</string>
+    <string name="pref_category_about">О программе</string>
+    
+    <string name="pref_item_sync_frequency">Синхронизировать</string>
+      <!-- array of values-->
+    <string name="pref_sync_array_half_an_hour">каждые полчаса</string>
+    <string name="pref_sync_array_hour">каждый час</string>
+    <string name="pref_sync_array_day">каждый день</string>
+    
+    <string name="pref_item_store_statistics">Хранить статистику</string>
+       <!-- array of values-->
+    <string name="pref_statistics_array_7_days">за 7 дней</string>
+    <string name="pref_statistics_array_10_days">за 10 дней</string>
+    <string name="pref_statistics_array_30_days">за 30 дней</string>
+    <string name="pref_statistics_array_current_weak">за текущую неделю</string>
+    <string name="pref_statistics_array_current_month">за текущий месяц</string>
+    
+    <string name="pref_item_site">Сайт:</string>
+    <string name="pref_item_version">Версия:</string>
+ 
+    
+    
 </resources>

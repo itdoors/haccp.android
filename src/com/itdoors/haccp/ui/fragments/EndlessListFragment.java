@@ -61,31 +61,12 @@ public abstract class  EndlessListFragment extends SwipeRefreshListFragment impl
 	    mStreamingState = state;
 	}
 
-	/*
-	@Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-        
-    	Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            mListViewStatePosition = savedInstanceState.getInt(STATE_POSITION, -1);
-            mListViewStateTop = savedInstanceState.getInt(STATE_TOP, 0);
-        } else {
-            mListViewStatePosition = -1;
-            mListViewStateTop = 0;
-        }
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
-	
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-	         View v = getListView().getChildAt(0);
-	         int top = (v == null) ? 0 : v.getTop();
-	         outState.putInt(STATE_POSITION, getListView().getFirstVisiblePosition());
-	         outState.putInt(STATE_TOP, top);
 	         outState.putSerializable(STREAMING_STATE, mStreamingState);
 	         super.onSaveInstanceState(outState);
 	}
-	*/
+	
 	 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
