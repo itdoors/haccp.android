@@ -75,13 +75,15 @@ public class AddStatisticsActivity extends SherlockFragmentActivity implements A
 		if(mFragment != null && mFragment.isAdded()){
 			AddStatisticsFragment fragment = (AddStatisticsFragment)mFragment;
 			Action action = fragment.getActionType();
-			switch (action) {
-				case CHANGE_STATUS:
-					changeStatusPressed(fragment.getStatus());
-					break;
-				case ADD_STATISTICS:
-					onAddPressed(fragment.getValues());
-					break;
+			if(action != null){
+				switch (action) {
+					case CHANGE_STATUS:
+						changeStatusPressed(fragment.getStatus());
+						break;
+					case ADD_STATISTICS:
+						onAddPressed(fragment.getValues());
+						break;
+				}
 			}
 			
 		}

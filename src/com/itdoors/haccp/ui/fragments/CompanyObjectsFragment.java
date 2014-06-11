@@ -75,20 +75,19 @@ public class CompanyObjectsFragment extends SherlockListFragment  implements Loa
 			mListView.setSelector(R.drawable.abs__tab_indicator_ab_holo);
 			mListView.setCacheColorHint(Color.TRANSPARENT);
 			
-	        mAdapter = new SimpleCursorAdapter(
-	                getActivity(),       // Current context
-	                R.layout.list_item_company_obj,  // Layout for individual rows
-	                null,                // Cursor
-	                FROM_COLUMNS,        // Cursor columns to use
-	                TO_FIELDS,           // Layout fields to use
-	                0                    // No flags
+	        mAdapter = new SimpleCursorAdapter( getActivity(), R.layout.list_item_company_obj,
+	        		null, FROM_COLUMNS, TO_FIELDS, 0
 	        );
 	        
-	        setListAdapter(mAdapter);
-	        setEmptyText(getText(R.string.loading));
-	        getLoaderManager().initLoader(0, null, this);
 	    }
 
+	    @Override
+	    public void onActivityCreated(Bundle savedInstanceState) {
+	    	super.onActivityCreated(savedInstanceState);
+	        setListAdapter(mAdapter);
+	        getLoaderManager().initLoader(0, null, this);
+	    	
+	    }
 	    @Override
 	    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
 	    	

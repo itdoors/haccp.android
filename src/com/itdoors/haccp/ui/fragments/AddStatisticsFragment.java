@@ -67,6 +67,8 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
 	private Handler handler = new MyLoadingHandler(this);
 	private CountDownLatch allLoadsCompleted;
 	private Thread waitingThread;
+
+	private Button addBtn;
 	
 	@SuppressWarnings("unused")
 	private interface PointQuery{
@@ -223,6 +225,7 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
 		if(mGroupCharacteristicsFields != null && mStatuses != null){
 			setCharacteristicsViews(getLayoutInflater(null), (ViewGroup)getView(), mGroupCharacteristicsFields);
 			setStatusesRadioGroup(getLayoutInflater(null), (ViewGroup)getView(), mStatuses);
+			addBtn.setEnabled(true);
 		}
 		
 	}
@@ -231,19 +234,22 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		ViewGroup root = (ViewGroup)inflater.inflate(R.layout.fragment_add_statistics, container, false);
-		Button addBtn = (Button)root.findViewById(R.id.add_st_done_btn);
+		addBtn = (Button)root.findViewById(R.id.add_st_done_btn);
+		addBtn.setEnabled(false);
 		addBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if(mOnAddPressedListener != null){
 					Action action = getActionType();
-					switch (action) {
-						case CHANGE_STATUS:
-							mOnAddPressedListener.changeStatusPressed(getStatus());
-							break;
-						case ADD_STATISTICS:
-							mOnAddPressedListener.onAddPressed(getValues());
-							break;
+					if(action != null){
+						switch (action) {
+							case CHANGE_STATUS:
+								mOnAddPressedListener.changeStatusPressed(getStatus());
+								break;
+							case ADD_STATISTICS:
+								mOnAddPressedListener.onAddPressed(getValues());
+								break;
+						}
 					}
 				}
 			}
@@ -260,11 +266,14 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
 	}
 	
 	public Action getActionType(){
+		if(mRadioGroup != null){
+			final int chechedId = mRadioGroup.getCheckedRadioButtonId(); 
+			if(chechedId != -1)
+				return Action.CHANGE_STATUS;
+			else return Action.ADD_STATISTICS;
+		}
 		
-		final int chechedId = mRadioGroup.getCheckedRadioButtonId(); 
-		if(chechedId != -1)
-			return Action.CHANGE_STATUS;
-		else return Action.ADD_STATISTICS;
+		return null;
 	
 	}
 	
@@ -293,6 +302,8 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
 			waitingThread = new Thread( new MyLoadingRunnable(this) );
 			waitingThread.start();
 		
+		}else{
+			addBtn.setEnabled(true);
 		}
 	}
 	

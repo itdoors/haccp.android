@@ -1,9 +1,5 @@
 package com.itdoors.haccp.ui.fragments;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import com.itdoors.haccp.R;
 import com.itdoors.haccp.utils.Logger;
 
@@ -11,7 +7,6 @@ import android.os.Bundle;
 
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 
 import android.widget.ListView;
@@ -26,12 +21,13 @@ public abstract class  EndlessListFragment extends SwipeRefreshListFragment impl
 	
 	protected final long DELAY_TIME = 300;
 	
-	private int mListViewStatePosition;
-	private int mListViewStateTop;
+	//private int mListViewStatePosition;
+	//private int mListViewStateTop;
+	
 	private View mListViewFootter;
 	
-	protected BaseAdapter mStreamAdapter;
-	protected List<Object> mStream = new ArrayList<Object>();
+	//protected BaseAdapter mStreamAdapter;
+	//protected List<Object> mStream = new ArrayList<Object>();
 	
 	protected static enum StreamingState {	
 		INIT, LOADING, REPEAT, DONE, ERROR, COMPLETE; 
@@ -154,7 +150,7 @@ public abstract class  EndlessListFragment extends SwipeRefreshListFragment impl
     protected void onError(){
     	setState(StreamingState.ERROR);
 	}
- 	
+ 	/*
     protected void onListPackageReady(final List<? extends Object> data){
     	
     	if(data != null){
@@ -171,13 +167,14 @@ public abstract class  EndlessListFragment extends SwipeRefreshListFragment impl
 	   }
 	   mStreamAdapter.notifyDataSetChanged();
 	}
-	
+	*/
 	public void load(){
 		
 		setState(StreamingState.LOADING);
 		loadMoreResults();
 	}
 	
+	/*
     public void refresh() {
     	
     	setState(StreamingState.LOADING);
@@ -185,6 +182,7 @@ public abstract class  EndlessListFragment extends SwipeRefreshListFragment impl
         mStreamAdapter.notifyDataSetInvalidated();
         loadMoreResults();
     }
+    */
 
     private boolean streamHasMoreResults() {
     	return  mStreamingState == StreamingState.DONE;

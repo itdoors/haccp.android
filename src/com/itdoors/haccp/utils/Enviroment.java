@@ -119,4 +119,12 @@ public class Enviroment {
 	    return activeNetwork != null && activeNetwork.isConnected();
 	    
 	}
+	
+	public static void addDelay(long millis){
+		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 }

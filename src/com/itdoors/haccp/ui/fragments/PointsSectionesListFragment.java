@@ -102,26 +102,22 @@ public class PointsSectionesListFragment  extends ListFragment implements
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View root =  super.onCreateView(inflater, container, savedInstanceState);
-		root.setBackgroundResource(R.drawable.abs__ab_solid_light_holo);
-		return root;
-	}
-	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		
 		final ListView mListView = getListView();
 		mListView.setBackgroundResource(R.drawable.abs__ab_solid_light_holo);
+		mListView.setDrawSelectorOnTop(true);
 		mListView.setSelector(R.drawable.abs__tab_indicator_ab_holo);
 		mListView.setCacheColorHint(Color.TRANSPARENT);
+		
 		
 		mPointsAdapter = new MyPointsAdapter(getActivity());
 		mSectionedListAdapter = new SimpleSectionedListAdapter(getActivity(), R.layout.list_item_point_plans_header, mPointsAdapter);
 		
-		int emptyResourceId = (isInSeachMode()) ? R.string.no_matches : R.string.loading;
-		setEmptyText(getString(emptyResourceId));
+		if(isInSeachMode()){
+			int emptyResourceId = R.string.no_matches;
+			setEmptyText(getString(emptyResourceId));
+		}
 	
 	}
 
@@ -140,7 +136,7 @@ public class PointsSectionesListFragment  extends ListFragment implements
 	private void onPointsLoadFinished(Cursor cursor){
 		 if(mPointsAdapter!=null && cursor!=null) {
 			
-			    List<SimpleSectionedListAdapter.Section> sections = new ArrayList<SimpleSectionedListAdapter.Section>();
+			 	List<SimpleSectionedListAdapter.Section> sections = new ArrayList<SimpleSectionedListAdapter.Section>();
 		        cursor.moveToFirst();
 		        
 		        long previousHeaderId = -1;
@@ -193,17 +189,13 @@ public class PointsSectionesListFragment  extends ListFragment implements
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-	  	if (!isAdded()) {
-	        return;
-	    }
 	  	
-	    if (loader.getId() == PointsQuery._TOKEN) {
+		if (loader.getId() == PointsQuery._TOKEN) {
 	    	onPointsLoadFinished(cursor);
 	    }
-	    else {
-	        cursor.close();
-	    }
-	
+		else{
+			throw new IllegalArgumentException("unknown loader id: " + loader.getId());
+		}
 	}
 
 	@Override

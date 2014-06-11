@@ -44,9 +44,13 @@ import com.itdoors.haccp.loaders.RESTLoader;
 import com.itdoors.haccp.model.Point;
 import com.itdoors.haccp.model.StatisticsRecord;
 import com.itdoors.haccp.model.StatististicsItemStatus;
+import com.itdoors.haccp.model.rest.retrofit.MoreStatistics;
 import com.itdoors.haccp.parser.LoadMoreStatisticsParser;
 import com.itdoors.haccp.parser.PointStatisticsFromTimeRangeParser;
+import com.itdoors.haccp.rest.robospice_retrofit.GetStatisticsRequest;
+import com.itdoors.haccp.rest.robospice_retrofit.MySpiceService;
 import com.itdoors.haccp.ui.fragments.AttributesFragment;
+import com.itdoors.haccp.ui.fragments.NotificationDialogFragment;
 import com.itdoors.haccp.ui.fragments.StatisticsOnlineFragment;
 import com.itdoors.haccp.ui.fragments.StatisticsOfflineFragment;
 import com.itdoors.haccp.ui.fragments.SwipeRefreshListFragment;
@@ -59,6 +63,11 @@ import com.itdoors.haccp.utils.CalendarUtils;
 import com.itdoors.haccp.utils.Enviroment;
 import com.itdoors.haccp.utils.Logger;
 import com.itdoors.haccp.utils.ToastUtil;
+import com.octo.android.robospice.SpiceManager;
+import com.octo.android.robospice.persistence.DurationInMillis;
+import com.octo.android.robospice.persistence.exception.SpiceException;
+import com.octo.android.robospice.request.listener.PendingRequestListener;
+import com.octo.android.robospice.request.listener.RequestListener;
 
 public class PointDetailsActivity extends SherlockFragmentActivity implements 
 			
@@ -69,23 +78,21 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		StatisticsOnlineFragment.StatisticsListModeHolder,
 		OnTimeRangeChooseListener,
 		OnRefreshListener,
-		LoaderCallbacks<RESTLoader.RESTResponse>, TabListener
+		TabListener,
+		LoaderCallbacks<RESTLoader.RESTResponse> 
 {
 	
-	protected static final String CHOOSE_TIME_RANGE_TYPE_DIALOG 	= "com.itdoors.haccp.activities.PointDetailsActivity.CHOOSE_TIME_RANGE_TYPE_DIALOG";
-	protected static final String CHOOSE_CUSTOM_TIME_RANGE_DIALOG 	= "com.itdoors.haccp.activities.PointDetailsActivity.CHOOSE_CUSTOM_TIME_RANGE_DIALOG";
-	public static final String STATISTICS_MODE_SAVE_KEY 			= "com.itdoors.haccp.activities.PointDetailsActivity.STATISTICS_MODE_SAVE_KEY";
-	public static final String STATISTICS_FROM_TIME_SAVE_KEY 		= "com.itdoors.haccp.activities.PointDetailsActivity.STATISTICS_FROM_TIME_SAVE_KEY";
-	public static final String STATISTICS_TO_TIME_SAVE_KEY 			= "com.itdoors.haccp.activities.PointDetailsActivity.STATISTICS_TO_TIME_SAVE_KEY";
-	public static final String TITLE_SAVE_KEY 						= "com.itdoors.haccp.activities.PointDetailsActivity.TITLE_SAVE_KEY";
-	public static final String CONTROL_POINT_STATISTICS_TAG 		= "com.itdoors.haccp.activities.PointDetailsActivity.CONTROL_POINT_STATISTICS_TAG";
-	public static final String CONTROL_POINT_ATTRIBUTES_TAG			= "com.itdoors.haccp.activities.PointDetailsActivity.CONTROL_POINT_ATTRIBUTES_TAG";
-	protected static final String ARGS_PIAS_URI 					= "com.itdoors.haccp.activities.PointDetailsActivity.ARGS_PIAS_URI";
-	protected static final String ARGS_PIAS_PARAMS_URI 				= "com.itdoors.haccp.activities.PointDetailsActivity.ARGS_PIAS_PARAMS_URI";
+	private static final String CHOOSE_TIME_RANGE_TYPE_DIALOG = "com.itdoors.haccp.activities.PointDetailsActivity.CHOOSE_TIME_RANGE_TYPE_DIALOG";
+	private static final String STATISTICS_MODE_SAVE_KEY 	  = "com.itdoors.haccp.activities.PointDetailsActivity.STATISTICS_MODE_SAVE_KEY";
+	private static final String STATISTICS_FROM_TIME_SAVE_KEY = "com.itdoors.haccp.activities.PointDetailsActivity.STATISTICS_FROM_TIME_SAVE_KEY";
+	private static final String STATISTICS_TO_TIME_SAVE_KEY   = "com.itdoors.haccp.activities.PointDetailsActivity.STATISTICS_TO_TIME_SAVE_KEY";
+	private static final String TITLE_SAVE_KEY 				  = "com.itdoors.haccp.activities.PointDetailsActivity.TITLE_SAVE_KEY";
+	private static final String ARGS_PIAS_URI 				  = "com.itdoors.haccp.activities.PointDetailsActivity.ARGS_PIAS_URI";
+	private static final String ARGS_PIAS_PARAMS_URI 		  = "com.itdoors.haccp.activities.PointDetailsActivity.ARGS_PIAS_PARAMS_URI";
 	 
-	protected static final int TIME_RANGE_REQUEST = 0x0abc;
-	protected static final int POINT_STATICTIS_FROM_TIME_RANGE_CODE = 1;
-	protected static final int REFRESH_STATICTIS_CODE = 2;
+	private static final int TIME_RANGE_REQUEST = 0x0abc;
+	private static final int POINT_STATICTIS_FROM_TIME_RANGE_CODE = 101;
+	private static final int REFRESH_STATICTIS_CODE = 102;
 
 	protected static enum Mode {
 		ONLINE, OFFLINE;
@@ -103,6 +110,8 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		return intent;
 	}
 	
+	private SpiceManager spiceManager = new SpiceManager(MySpiceService.class);
+	
     private ViewPager  mViewPager;
     
     private Fragment mStatisticsFragment;
@@ -115,6 +124,68 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	private ActionMode mActionMode;
 	
 	private Mode networkMode;
+	
+	RequestListener<MoreStatistics> mStatisticsRequestListener = new RequestListener<MoreStatistics>() {
+		@Override
+		public void onRequestFailure(SpiceException exception) {
+			ToastUtil.ToastLong(getApplicationContext(), getString(R.string.failed_to_load_data));
+			refreshFailed();
+		}
+		@Override
+		public void onRequestSuccess(MoreStatistics statistics) {
+		
+			NotificationDialogFragment.newInstance("Responce:", statistics.toString()).show(getSupportFragmentManager(), "responce");
+			refreshSuccess();
+		}
+	};
+	
+	PendingRequestListener<MoreStatistics> mStatisticsPendingRequestListener = new PendingRequestListener<MoreStatistics>() {
+
+		@Override
+		public void onRequestFailure(SpiceException exception) {
+			ToastUtil.ToastLong(getApplicationContext(), getString(R.string.failed_to_load_data));
+			refreshFailed();
+		}
+
+		@Override
+		public void onRequestSuccess(MoreStatistics statistics) {
+			NotificationDialogFragment.newInstance("Responce:", statistics.toString()).show(getSupportFragmentManager(), "responce");
+			refreshSuccess();
+		}
+
+		@Override
+		public void onRequestNotFound() {
+		}
+	};
+	@Override
+	protected void onStart() {
+		spiceManager.start(this);
+		super.onStart();
+	}
+	@Override
+	protected void onResume() {
+		super.onResume();
+		//getContentResolver().unregisterContentObserver(mStatiscticsObserver);
+		spiceManager.addListenerIfPending(MoreStatistics.class, STATISTICS_CACHE_KEY, mStatisticsPendingRequestListener);
+		
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		//getContentResolver().registerContentObserver(statisticsUri, true, mStatiscticsObserver);
+	}
+	
+	
+	@Override
+	protected void onStop() {
+		spiceManager.shouldStop();
+		super.onStop();
+	}
+	
+	public SpiceManager getSpiceManager(){
+		return spiceManager;
+	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -155,6 +226,9 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
      		
 		    mViewPager.setAdapter( new PointInfoTabsAdapter(getSupportFragmentManager()));
 		    mViewPager.setOnPageChangeListener(this);
+		    mViewPager.setPageMarginDrawable(R.drawable.grey_border_inset_lr);
+            mViewPager.setPageMargin(getResources()
+                    .getDimensionPixelSize(R.dimen.page_margin_width));
 		    
 		    final ActionBar actionBar = getSupportActionBar();
             actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -198,17 +272,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	@Override
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
 	}
-	@Override
-	protected void onPause() {
-		super.onPause();
-		//getContentResolver().registerContentObserver(statisticsUri, true, mStatiscticsObserver);
-	}
 	
-	@Override
-	protected void onResume() {
-		super.onResume();
-		//getContentResolver().unregisterContentObserver(mStatiscticsObserver);
-	}
 	
 	/*
 	private ContentObserver mStatiscticsObserver = new ContentObserver(null) {
@@ -295,7 +359,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
 			View view = inflater.inflate(R.layout.fragment_replaceable, container, false);
-			setRetainInstance(true);
+			//setRetainInstance(true);
 			Logger.Logi(getClass(), "onCreateView");
 			return view;
 		}
@@ -328,6 +392,11 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 			
 			case R.id.cp_bp_params_item:
 				ToastUtil.ToastLong(getApplicationContext(), "Params");
+				{
+					Intent testIntent = new Intent(this, TestRoboActivity.class);
+					startActivity(testIntent);
+					
+				}
 				return true;
 			
 			case R.id.cp_bp_calendar_item:
@@ -586,7 +655,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
     }
 
 	
-	
+
 	@Override
 	public Loader<RESTLoader.RESTResponse> onCreateLoader(int id, Bundle args) {
 		switch (id) {
@@ -623,6 +692,9 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	public void onLoaderReset(Loader<RESTLoader.RESTResponse> loader) {
 	}
 	
+	
+	
+	
 	protected void showProgress(){
 		setSupportProgressBarIndeterminateVisibility(true);
 	}
@@ -630,28 +702,51 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		setSupportProgressBarIndeterminateVisibility(false);
 	}
 	
+	private final String STATISTICS_CACHE_KEY = "statistics";
+	private final long CACHE_EXPIRED_DURATION = 5 *  DurationInMillis.ONE_MINUTE;
+	
 	private void beginRefreshStatistics(){
 		
-		if( getIntent().getExtras() != null ){
+		{
+			if( getIntent().getExtras() != null ){
+				
+				int pointId = getIntent().getExtras().getInt(Intents.Point.UID);
+				
+				String url = Global.API_URL +"/point/" + Integer.toString(pointId) + "/statistics";
+				Uri loadPointInfoAndStatistic = Uri.parse(url);
+				
+			    Bundle args = new Bundle();
+		        args.putParcelable(ARGS_PIAS_URI, loadPointInfoAndStatistic);
+		        args.putParcelable(ARGS_PIAS_PARAMS_URI, null);
+		        
+		        
+		        Loader<Object> loader = getSupportLoaderManager().getLoader(REFRESH_STATICTIS_CODE);
+				if(  loader == null )
+					 getSupportLoaderManager().initLoader(REFRESH_STATICTIS_CODE, args, this);
+				else getSupportLoaderManager().restartLoader(REFRESH_STATICTIS_CODE, args, this);
+		      
+			}
 			
-			int pointId = getIntent().getExtras().getInt(Intents.Point.UID);
+		}
+		
+		{
+			// RoboSpice request
+			Bundle extras = getIntent().getExtras();
+			if(  extras!= null ){
+				
+				int pointId = extras.getInt(Intents.Point.UID);
+				GetStatisticsRequest request = new GetStatisticsRequest.Builder()
+										.setId(pointId)
+										.build();
+				spiceManager.execute(request, STATISTICS_CACHE_KEY, CACHE_EXPIRED_DURATION, mStatisticsRequestListener);
+					
+		}
 			
-			String url = Global.API_URL +"/point/" + Integer.toString(pointId) + "/statistics";
-			Uri loadPointInfoAndStatistic = Uri.parse(url);
-			
-		    Bundle args = new Bundle();
-	        args.putParcelable(ARGS_PIAS_URI, loadPointInfoAndStatistic);
-	        args.putParcelable(ARGS_PIAS_PARAMS_URI, null);
-	        
-	        
-	        Loader<Object> loader = getSupportLoaderManager().getLoader(REFRESH_STATICTIS_CODE);
-			if(  loader == null )
-				 getSupportLoaderManager().initLoader(REFRESH_STATICTIS_CODE, args, this);
-			else getSupportLoaderManager().restartLoader(REFRESH_STATICTIS_CODE, args, this);
-	      
 		}
 	}
 
+	
+	
 	private void beginStatisticsFromTimeStampLoading(String fromUnixTimeStamp, String toUnixTimeStamp){
 		
 		this.fromTimeStatisticsTimeStamp = fromUnixTimeStamp;
@@ -659,6 +754,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		
 		if(getIntent().getExtras() == null) 
 			return;
+		
 		
 		int pointId = getIntent().getExtras().getInt(Intents.Point.UID);
 		String url = Global.API_URL + "/point/" + Integer.toString(pointId) + 
@@ -677,6 +773,8 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 			 getSupportLoaderManager().initLoader(POINT_STATICTIS_FROM_TIME_RANGE_CODE, args, this);
 		else getSupportLoaderManager().restartLoader(POINT_STATICTIS_FROM_TIME_RANGE_CODE, args, this);
 	
+		
+		
 	}
 	
 	private void onStaticsFromTimeRangeLoadFinished (RESTLoader.RESTResponse data){

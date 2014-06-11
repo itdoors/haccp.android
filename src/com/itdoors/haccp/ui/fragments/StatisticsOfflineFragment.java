@@ -42,9 +42,7 @@ public class StatisticsOfflineFragment extends SwipeRefreshListFragment implemen
 		LoaderManager.LoaderCallbacks<Cursor>{
 	
 	private OnContextMenuItemPressedListener mOnContextMenuItemPressedListener;
-	
 	private CursorAdapter mStatisticsAdapter;
-	
 	private OnRefreshListener mOnRefreshListener;
 	//private PullToRefreshLayout mPullToRefreshLayout;
 	

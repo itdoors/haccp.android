@@ -26,13 +26,13 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import com.itdoors.haccp.utils.Enviroment;
 import com.itdoors.haccp.utils.Logger;
 
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
-import android.util.Log;
 
 public class RESTLoader extends AsyncTaskLoader<RESTLoader.RESTResponse> {
     

@@ -3,6 +3,7 @@ package com.itdoors.haccp.ui.fragments;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +22,6 @@ import com.itdoors.haccp.parser.LoadMoreStatisticsParser.Content;
 import com.itdoors.haccp.ui.activities.PointDetailsActivity;
 import com.itdoors.haccp.ui.interfaces.OnContextMenuItemPressedListener;
 import com.itdoors.haccp.ui.interfaces.OnLongStatisticsItemPressedListener;
-import com.itdoors.haccp.utils.ApiLevel;
 import com.itdoors.haccp.utils.LoadActivityUtils;
 import com.itdoors.haccp.utils.Logger;
 
@@ -52,16 +52,16 @@ import android.widget.TextView;
 
 public class StatisticsOnlineFragment extends EndlessListFragment implements LoaderCallbacks<RESTLoader.RESTResponse>  {
 
-    protected static final String ARGS_PIAS_URI 			 = "com.itdoord.haccp.fragments.StatisticsFragment.ARGS_PIAS_URI";
-	protected static final String ARGS_PIAS_PARAMS_URI 		 = "com.itdoord.haccp.fragments.StatisticsFragment.ARGS_PIAS_PARAMS_URI";
+    protected static final String ARGS_PIAS_URI 			 = "com.itdoord.haccp.fragments.StatisticsOnlineFragment.ARGS_PIAS_URI";
+	protected static final String ARGS_PIAS_PARAMS_URI 		 = "com.itdoord.haccp.fragments.StatisticsOnlineFragment.ARGS_PIAS_PARAMS_URI";
 	
-	protected static final String ARGS_DONT_START 			 = "com.itdoord.haccp.fragments.StatisticsFragment.ARGS_DONT_START";
-	protected static final String ARGS_HAS_PRELOADED_CONTENT = "com.itdoord.haccp.fragments.StatisticsFragment.ARGS_HAS_PRELOADED_CONTENT";
-	protected static final String ARGS_PRELOADED_CONTENT 	 = "com.itdoord.haccp.fragments.StatisticsFragment.ARGS_PRELOADED_CONTENT";
-	protected static final String ARGS_HAS_MORE 			 = "com.itdoord.haccp.fragments.StatisticsFragment.ARGS_HAS_MORE";
-	protected static final String ARGS_ACTION 				 = "com.itdoord.haccp.fragments.StatisticsFragment.ARGS_ACTION";
+	protected static final String ARGS_DONT_START 			 = "com.itdoord.haccp.fragments.StatisticsOnlineFragment.ARGS_DONT_START";
+	protected static final String ARGS_HAS_PRELOADED_CONTENT = "com.itdoord.haccp.fragments.StatisticsOnlineFragment.ARGS_HAS_PRELOADED_CONTENT";
+	protected static final String ARGS_PRELOADED_CONTENT 	 = "com.itdoord.haccp.fragments.StatisticsOnlineFragment.ARGS_PRELOADED_CONTENT";
+	protected static final String ARGS_HAS_MORE 			 = "com.itdoord.haccp.fragments.StatisticsOnlineFragment.ARGS_HAS_MORE";
+	protected static final String ARGS_ACTION 				 = "com.itdoord.haccp.fragments.StatisticsOnlineFragment.ARGS_ACTION";
 	
-	private static final String SAVE_PRELOADED_CONTENT_SET   = "com.itdoord.haccp.fragments.StatisticsFragment.SAVE_PRELOADED_CONTENT_SET";
+	private static final String SAVE_PRELOADED_CONTENT_SET   = "com.itdoord.haccp.fragments.StatisticsOnlineFragment.SAVE_PRELOADED_CONTENT_SET";
 	
 	private static final int STATICTIS_MORE_CODE   = 1;
 	
@@ -100,7 +100,9 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
 	
 	private OnRefreshListener mOnRefreshListener;
 	
+	
 	private boolean isPreLoadedContentSet = false;
+	private StatisticListAdapter mStreamAdapter;
 	
 	public static StatisticsOnlineFragment newInstance(boolean dontStart) {
 		StatisticsOnlineFragment f = new StatisticsOnlineFragment();
@@ -136,12 +138,12 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
 	@Override
 	protected void loadMoreResults() {
 		
-		if(mStream != null ){
+		if(mStreamAdapter != null ){
 			
 			int lastId = -1;
-			if(!mStream.isEmpty()){
-				int position = mStream.size() - 1;
-				StatisticsRecord last = (StatisticsRecord)mStream.get(position);
+			if(!mStreamAdapter.isEmpty()){
+				int position = mStreamAdapter.getCount() - 1;
+				StatisticsRecord last = (StatisticsRecord)mStreamAdapter.getItem(position);
 				lastId = last.getId();
 			}
 			if(mStatisticsListModeHolder != null){
@@ -193,10 +195,9 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
         	LoaderManager lm = getActivity().getSupportLoaderManager();
         	Loader<RESTLoader.RESTResponse> loader = lm.getLoader(STATICTIS_MORE_CODE);
 			
-        	if(  loader == null ) 
-        		 lm.initLoader(STATICTIS_MORE_CODE, args, this);
-        	else 
-        		 lm.restartLoader(STATICTIS_MORE_CODE, args, this);
+        	if(  loader == null )
+        			 lm.initLoader(STATICTIS_MORE_CODE, args, this);
+        		else lm.restartLoader(STATICTIS_MORE_CODE, args, this);
         }
 	}
 	
@@ -219,18 +220,29 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
         
         if(getActivity() != null){
         	
-        	Loader<Object> loader = getActivity().getSupportLoaderManager().getLoader(STATICTIS_MORE_CODE);
-			if(  loader == null )
-				 getActivity().getSupportLoaderManager().initLoader(STATICTIS_MORE_CODE, args, this);
-			else getActivity().getSupportLoaderManager().restartLoader(STATICTIS_MORE_CODE, args, this);
+        	LoaderManager lm = getActivity().getSupportLoaderManager();
+        	Loader<RESTLoader.RESTResponse> loader = lm.getLoader(STATICTIS_MORE_CODE);
+        	
+        	if(  loader == null )
+        			lm.initLoader(STATICTIS_MORE_CODE, args, this);
+        	else 
+        			lm.restartLoader(STATICTIS_MORE_CODE, args, this);
+        	}
         
-        }
 	}
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putBoolean(SAVE_PRELOADED_CONTENT_SET, isPreLoadedContentSet);
 	}
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		//LoaderManager.enableDebugLogging(true);
+		
+	}
+	
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
@@ -296,11 +308,11 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
 		listView.setDrawSelectorOnTop(true);
 		listView.setTranscriptMode(ListView.TRANSCRIPT_MODE_DISABLED);
 		
-		mStreamAdapter =  new StatisticListAdapter(getActivity(), mStream);
+		mStreamAdapter = new StatisticListAdapter(getActivity());
 		setListAdapter(mStreamAdapter);
 		registerForContextMenu(getListView());
 		
-		if(mStream != null && mStream.isEmpty() && !isDontStartInArgs()){
+		if(mStreamAdapter.isEmpty() && !isDontStartInArgs()){
 			
 			fillStatistics();
 		}
@@ -349,26 +361,31 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
 	private static class StatisticListAdapter extends BaseAdapter{
 			 
 		private LayoutInflater mLayoutInflater;
-		private List<Object> mStream;
 		private Map<StatististicsItemStatus, String> statusesMap;
-
-		public StatisticListAdapter(Context context, List<Object> stream) {
-			mStream = stream;
+		private List<Object> items = new ArrayList<Object>();
+		
+		public StatisticListAdapter(Context context) {
 			mLayoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			statusesMap = PointDetailsActivity.getStatusesMap(context);
 		}
 		
 		@Override
 		public int getCount() {
-			return mStream.size();
+			return items.size();
 		}
 		@Override
 		public Object getItem(int position) {
-			return mStream.get(position);
+			return items.get(position);
 		}
 		@Override
 		public long getItemId(int position) {
 			return position;
+		}
+		public void clear(){
+			items.clear();
+		}
+		public void addAll(Collection<? extends Object> collection){
+			items.addAll(collection);
 		}
 		
 		@SuppressLint("SimpleDateFormat")
@@ -393,9 +410,9 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
 				holder = (ViewHolder)convertView.getTag();
 			}
 			
-			if(!mStream.isEmpty()){
+			if(!items.isEmpty()){
 				
-				StatisticsRecord statistics = (StatisticsRecord)mStream.get(position);
+				StatisticsRecord statistics = (StatisticsRecord)items.get(position);
 				if(statistics == null)	return convertView;
 				
 				double value = statistics.getValue();
@@ -439,13 +456,10 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
 	
 	public void restoreStatistics(List<StatisticsRecord> records){
 	
-		mStream.addAll(records);
+		mStreamAdapter.addAll(records);
 		mStreamAdapter.notifyDataSetChanged();
 		
-		if(records != null && !records.isEmpty())
-			LoadActivityUtils.removeEmptyViewIfExist(this);
-		else
-			LoadActivityUtils.addEmptyViewIfNotExist(this, getString(R.string.no_statistic_items));
+		addOrRemoveEmptyView(records);
 	}
 	
 	public void fillStatistics(){
@@ -455,78 +469,56 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
 	
 	public void fillStatistics(List<StatisticsRecord> records, boolean hasMoreItems) {
 		
-		mStream.addAll(records);
+		mStreamAdapter.addAll(records);
 		mStreamAdapter.notifyDataSetChanged();
 	
 		setState(hasMoreItems ? StreamingState.LOADING : StreamingState.COMPLETE);
-		
-		if(getStreamingState() == StreamingState.LOADING)
-			load();
-		
+		if(getStreamingState() == StreamingState.LOADING) load();
 		if(records == null || records.isEmpty())
-			LoadActivityUtils.addEmptyViewIfNotExist(this, getString(R.string.no_statistic_items));
+		 LoadActivityUtils.addEmptyViewIfNotExist(this, getString(R.string.no_statistic_items));
 		
 	}
 	
 	public void updateStatisticsAfterAddRequestSuccess( List<StatisticsRecord> records, Boolean hasMoreStatiscticItems) {
 		
-		mStream.clear();
-		mStream.addAll(records);
+		mStreamAdapter.clear();
+		mStreamAdapter.addAll(records);
 		mStreamAdapter.notifyDataSetChanged();
 		
-		if(records != null && !records.isEmpty())
-			LoadActivityUtils.removeEmptyViewIfExist(this);
-		else
-			LoadActivityUtils.addEmptyViewIfNotExist(this, getString(R.string.no_statistic_items));
+		addOrRemoveEmptyView(records);
 	}
 
 	public void updateStatisticsAfterTimeRangeLoadSuccess(List<StatisticsRecord> records, Boolean hasMoreStatiscticItems) {
 		
-		mStream.clear();
-		mStream.addAll(records);
+		mStreamAdapter.clear();
+		mStreamAdapter.addAll(records);
 		mStreamAdapter.notifyDataSetChanged();
 		
 		setState(hasMoreStatiscticItems ? StreamingState.LOADING : StreamingState.COMPLETE);
-		
-		if(getStreamingState() == StreamingState.LOADING)
-			load();
-		
-		if(records != null && !records.isEmpty())
-			LoadActivityUtils.removeEmptyViewIfExist(this);
-		else
-			LoadActivityUtils.addEmptyViewIfNotExist(this, getString(R.string.no_statistic_items));
+		if(getStreamingState() == StreamingState.LOADING) load();
+		addOrRemoveEmptyView(records);
 	}
 	
 	public void updateStatisticsAfterRefreshSuccess(List<StatisticsRecord> records, Boolean hasMoreStatiscticItems) {
 		
-		mStream.clear();
-		mStream.addAll(records);
+		mStreamAdapter.clear();
+		mStreamAdapter.addAll(records);
 		mStreamAdapter.notifyDataSetChanged();
 		
 		setState(hasMoreStatiscticItems ? StreamingState.LOADING : StreamingState.COMPLETE);
-		
-		if(getStreamingState() == StreamingState.LOADING)
-			load();
-		
-		if(records != null && !records.isEmpty())
-			LoadActivityUtils.removeEmptyViewIfExist(this);
-		else
-			LoadActivityUtils.addEmptyViewIfNotExist(this, getString(R.string.no_statistic_items));
-		
-		//if(mPullToRefreshLayout != null) 
-			//mPullToRefreshLayout.setRefreshComplete();
+		if(getStreamingState() == StreamingState.LOADING) load();
+		addOrRemoveEmptyView(records);
 	}
 	
-	/*
-	public void refreshReshFailed() {
-		if(mPullToRefreshLayout != null) 
-			mPullToRefreshLayout.setRefreshComplete();
+	private void addOrRemoveEmptyView(List<StatisticsRecord> records){
+		if(records != null && !records.isEmpty())
+			 LoadActivityUtils.removeEmptyViewIfExist(this);
+		else LoadActivityUtils.addEmptyViewIfNotExist(this, getString(R.string.no_statistic_items));
 	}
-	*/
 
 	public void clearStatistics() {
 		setState(StreamingState.INIT);
-		mStream.clear();
+		mStreamAdapter.clear();
 		mStreamAdapter.notifyDataSetChanged();
 		LoadActivityUtils.addEmptyViewIfNotExist(this, getString(R.string.no_statistic_items));
 	}
@@ -607,6 +599,12 @@ public class StatisticsOnlineFragment extends EndlessListFragment implements Loa
         }
 	}
 	
+	protected void onListPackageReady(Collection<? extends Object> collection){
+    	if(collection != null){
+    		mStreamAdapter.addAll(collection);
+     	   	mStreamAdapter.notifyDataSetChanged();
+    	}
+	}
 	private void tryExponetialBackOff(){
 		// simple exponential back-off
     	retryInterval = 2 * retryInterval < MAX_RETRY_INTERVAL ? 2 * retryInterval : MAX_RETRY_INTERVAL;

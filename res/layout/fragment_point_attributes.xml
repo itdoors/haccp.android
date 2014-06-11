@@ -10,8 +10,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" 
-        android:paddingLeft="10dp"
-        android:paddingRight="20dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         >
@@ -68,7 +68,7 @@
                 android:singleLine="true"
                 android:text="@string/installation_date"
                 android:textColor="@android:color/black"
-                android:textSize="15sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -82,6 +82,7 @@
                 android:paddingTop="2dp"
                 android:singleLine="false"
                 android:textColor="@android:color/black"
+                android:typeface="serif"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -100,7 +101,7 @@
                 android:singleLine="true"
                 android:text="@string/who_set"
                 android:textColor="@android:color/black"
-                android:textSize="15sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -114,6 +115,7 @@
                 android:paddingTop="2dp"
                 android:singleLine="false"
                 android:textColor="@android:color/black"
+                android:typeface="serif"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -132,7 +134,7 @@
                 android:singleLine="true"
                 android:text="@string/point_type"
                 android:textColor="@android:color/black"
-                android:textSize="15sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -146,6 +148,7 @@
                 android:paddingTop="2dp"
                 android:singleLine="false"
                 android:textColor="@android:color/black"
+                android:typeface="serif"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -165,7 +168,7 @@
                 android:singleLine="true"
                 android:text="@string/multi_barrier_level"
                 android:textColor="@android:color/black"
-                android:textSize="15sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -179,6 +182,7 @@
                 android:paddingTop="2dp"
                 android:singleLine="false"
                 android:textColor="@android:color/black"
+                android:typeface="serif"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -198,7 +202,7 @@
                 android:singleLine="true"
                 android:text="@string/object"
                 android:textColor="@android:color/black"
-                android:textSize="15sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -212,6 +216,7 @@
                 android:paddingTop="2dp"
                 android:singleLine="false"
                 android:textColor="@android:color/black"
+                android:typeface="serif"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -231,7 +236,7 @@
                 android:singleLine="true"
                 android:text="@string/status"
                 android:textColor="@android:color/black"
-                android:textSize="15sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 			<TextView
                 android:id="@+id/cp_attr_status"
@@ -244,6 +249,7 @@
                 android:paddingTop="2dp"
                 android:singleLine="false"
                 android:textColor="@android:color/black"
+                android:typeface="serif"
                 android:textSize="16sp" />
            
         </LinearLayout>

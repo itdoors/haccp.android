@@ -2,10 +2,10 @@ package com.itdoors.haccp;
 
 public class Global {
 
-	private static String API_VERSION_CODE  = "v1";
-	private static String URL = "http://haccp.itdoors.com.ua/api/";
+	public static String BASE_URL = "http://haccp.itdoors.com.ua";
 	
-	public static String API_URL = URL + API_VERSION_CODE;
+	private static String API_VERSION_CODE  = "v1";
+	public static String API_URL = BASE_URL + "/api/" + API_VERSION_CODE;
 	
 	public static boolean loggingEnabled = true;
 	public static boolean imgLoggingEnabled = false;

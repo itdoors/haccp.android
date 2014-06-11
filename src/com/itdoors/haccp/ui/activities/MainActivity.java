@@ -30,7 +30,6 @@ import com.itdoors.haccp.ui.interfaces.SetQRCallback;
 import com.itdoors.haccp.ui.interfaces.TakeQRCallback;
 import com.itdoors.haccp.ui.interfaces.TakeQRListener;
 import com.itdoors.haccp.utils.Enviroment;
-import com.itdoors.haccp.utils.Logger;
 import com.itdoors.haccp.utils.ToastUtil;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
@@ -234,7 +233,7 @@ public class MainActivity extends SlidingFragmentActivity implements
 		setTitle(title);
 		getSlidingMenu().setSelectedView(selectedView);
 	}
-	
+
 	@Override
 	public void setTakeCodeFromCameraCallBack(TakeQRCallback callback) {
 		this.mTakeCodeFromCameraCallback = callback;
@@ -310,7 +309,7 @@ public class MainActivity extends SlidingFragmentActivity implements
 				startActivity(intent);
 			}
 		}, 50);
-		
+	
 	}
 
 	@Override

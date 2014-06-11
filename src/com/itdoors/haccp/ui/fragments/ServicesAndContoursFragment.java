@@ -101,6 +101,7 @@ public class ServicesAndContoursFragment extends ListFragment implements
 		mListView.setBackgroundResource(R.drawable.abs__ab_solid_light_holo);
 		mListView.setSelector(R.drawable.abs__tab_indicator_ab_holo);
 		mListView.setCacheColorHint(Color.TRANSPARENT);
+		mListView.setDrawSelectorOnTop(true);
 		//mListView.setEmptyView(ContextUtils.getEmptyListView(getActivity()));
 
 		
@@ -119,7 +120,7 @@ public class ServicesAndContoursFragment extends ListFragment implements
 				CONTOUR_TO_FIELDS, 
 				0);
 		
-		setEmptyText(getText(R.string.loading));
+		//setEmptyText(getText(R.string.loading));
 		mSectionedListAdapter = new SectionedListAdapter(getActivity(), mServiceSimpleCursorAdapter, mContourSimpleCursorAdapter);
 	}
 
@@ -180,18 +181,12 @@ public class ServicesAndContoursFragment extends ListFragment implements
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-		  	if (!isAdded()) {
-	            return;
-	        }
-		  	
 	        if (loader.getId() == ContoursByServicesQuery._TOKEN) {
 	        	onContoursLoadfinished(cursor);
 	        }else if (loader.getId() == ServicesQuery._TOKEN) {
 	        	onServicesLoadFinished(cursor);
-	        } else {
-	            cursor.close();
 	        }
-	
+	        else throw new IllegalArgumentException("unknown loader id: " + loader.getId());
 	}
 
 	@Override

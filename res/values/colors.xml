@@ -15,6 +15,7 @@
     <color name="swipe_second">#FF8000</color>
     <color name="swipe_third">#FF4000</color>
     <color name="swipe_fourth">#FF0000</color>
+    <color name="view_pager_margin_gray">#E9E7E7</color>
     
     <color name="help_button_view">#ffcccccc</color>
  <!-- help button view background color -->
