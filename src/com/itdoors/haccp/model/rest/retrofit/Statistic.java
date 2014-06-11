@@ -2,14 +2,18 @@
 package com.itdoors.haccp.model.rest.retrofit;
 
 
+import java.io.Serializable;
+
 import com.google.gson.annotations.Expose;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public class Statistic {
+public class Statistic implements Serializable{
 
-    @Expose
+	private static final long serialVersionUID = -2273511950533524818L;
+	
+	@Expose
     private Integer id;
     @Expose
     private String value;

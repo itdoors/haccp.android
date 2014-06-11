@@ -48,7 +48,6 @@
         </activity>
         <activity android:name="com.itdoors.haccp.ui.activities.PointDetailsActivity" />
         <activity android:name="com.itdoors.haccp.ui.activities.CalendarActivity" />
-        <activity android:name="com.itdoors.haccp.ui.activities.TestRoboActivity" />
         <activity android:name="com.itdoors.haccp.ui.activities.AddStatisticsActivity" />
         <activity android:name="com.itdoors.haccp.ui.activities.SettingsActivity" />
         <activity android:name="com.itdoors.haccp.ui.activities.PointsListActivity">

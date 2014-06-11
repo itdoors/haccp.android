@@ -7,27 +7,18 @@ import android.os.Bundle;
 
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.Button;
 
 import android.widget.ListView;
 
 public abstract class  EndlessListFragment extends SwipeRefreshListFragment implements AbsListView.OnScrollListener{
 
-	//protected static final String STATE_POSITION 			= "com.itdoors.haccp.fragments.EndlessListFragment.STATE_POSITION";
-	//protected static final String STATE_TOP 				= "com.itdoors.haccp.fragments.EndlessListFragment.STATE_TOP";
 	protected static final String STREAMING_STATE 			= "com.itdoors.haccp.fragments.EndlessListFragment.LOADING_STATE";
 	protected static final String HAS_MORE_ITEMS_TO_LOAD 	= "com.itdoors.haccp.fragments.EndlessListFragment.HAS_MORE_ITEMS_TO_LOAD";
 	protected static final String FIRST_LOAD 			 	= "com.itdoors.haccp.fragments.EndlessListFragment.FIRST_LOAD";
 	
 	protected final long DELAY_TIME = 300;
 	
-	//private int mListViewStatePosition;
-	//private int mListViewStateTop;
-	
 	private View mListViewFootter;
-	
-	//protected BaseAdapter mStreamAdapter;
-	//protected List<Object> mStream = new ArrayList<Object>();
 	
 	protected static enum StreamingState {	
 		INIT, LOADING, REPEAT, DONE, ERROR, COMPLETE; 
@@ -53,14 +44,15 @@ public abstract class  EndlessListFragment extends SwipeRefreshListFragment impl
 	    setHasOptionsMenu(false);
 	    
 	    StreamingState state = StreamingState.INIT;
-	    if(savedInstanceState != null)	 state = (StreamingState)savedInstanceState.getSerializable(STREAMING_STATE);
+	    if(savedInstanceState != null)
+	    	state = (StreamingState)savedInstanceState.getSerializable(STREAMING_STATE);
 	    mStreamingState = state;
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-	         outState.putSerializable(STREAMING_STATE, mStreamingState);
-	         super.onSaveInstanceState(outState);
+	   outState.putSerializable(STREAMING_STATE, mStreamingState);
+	   super.onSaveInstanceState(outState);
 	}
 	
 	 
@@ -68,19 +60,19 @@ public abstract class  EndlessListFragment extends SwipeRefreshListFragment impl
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
-        final ListView listView = getListView();
-        listView.setOnScrollListener(this);
-		mListViewFootter = (View) getActivity().getLayoutInflater().inflate(
-                			R.layout.list_item_load_more_or_retry_or_complete, null, false);
-  		
-    	Button retryBtn = (Button)mListViewFootter.findViewById(R.id.retry_btn);
-        retryBtn.setOnClickListener(new View.OnClickListener() {
+        mListViewFootter = (View) getActivity().getLayoutInflater().inflate(
+			R.layout.list_item_load_more_or_retry_or_complete, null, false);
+  		mListViewFootter.findViewById(R.id.retry_btn).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				retry();
+				load();
 			}
 		});
-        changeFooterState();
+        
+  		changeFooterState();
+        
+        final ListView listView = getListView();
+        listView.setOnScrollListener(this);
         listView.addFooterView(mListViewFootter, null, false);
 	}
     
@@ -150,48 +142,16 @@ public abstract class  EndlessListFragment extends SwipeRefreshListFragment impl
     protected void onError(){
     	setState(StreamingState.ERROR);
 	}
- 	/*
-    protected void onListPackageReady(final List<? extends Object> data){
-    	
-    	if(data != null){
-    		Iterator<? extends Object> iterator = data.iterator();
-			while(iterator.hasNext()){
-				mStream.add((Object)iterator.next());
-			}
-    	}
- 	   if(mStreamingState == StreamingState.COMPLETE){
-		 	if (mListViewStatePosition != -1 ) {
-	         	getListView().setSelectionFromTop(mListViewStatePosition, mListViewStateTop);
-	         	mListViewStatePosition = -1;
-	     	}
-	   }
-	   mStreamAdapter.notifyDataSetChanged();
-	}
-	*/
+ 	
 	public void load(){
-		
 		setState(StreamingState.LOADING);
 		loadMoreResults();
 	}
 	
-	/*
-    public void refresh() {
-    	
-    	setState(StreamingState.LOADING);
-        mStream.clear();
-        mStreamAdapter.notifyDataSetInvalidated();
-        loadMoreResults();
-    }
-    */
-
     private boolean streamHasMoreResults() {
     	return  mStreamingState == StreamingState.DONE;
     }
-      	  
-	public void retry(){
-	  load();
-	}
-	
+    
 	@Override
 	public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 	  if (visibleItemCount != 0 && firstVisibleItem + visibleItemCount >= totalItemCount && streamHasMoreResults()) {

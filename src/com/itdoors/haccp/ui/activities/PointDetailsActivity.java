@@ -7,20 +7,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONException;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.LayoutInflater;
@@ -39,18 +34,13 @@ import com.actionbarsherlock.view.MenuItem;
 import com.itdoors.haccp.Global;
 import com.itdoors.haccp.Intents;
 import com.itdoors.haccp.R;
-import com.itdoors.haccp.exceptions.ServerFailedException;
-import com.itdoors.haccp.loaders.RESTLoader;
 import com.itdoors.haccp.model.Point;
-import com.itdoors.haccp.model.StatisticsRecord;
 import com.itdoors.haccp.model.StatististicsItemStatus;
 import com.itdoors.haccp.model.rest.retrofit.MoreStatistics;
-import com.itdoors.haccp.parser.LoadMoreStatisticsParser;
-import com.itdoors.haccp.parser.PointStatisticsFromTimeRangeParser;
+import com.itdoors.haccp.model.rest.retrofit.Statistic;
 import com.itdoors.haccp.rest.robospice_retrofit.GetStatisticsRequest;
 import com.itdoors.haccp.rest.robospice_retrofit.MySpiceService;
 import com.itdoors.haccp.ui.fragments.AttributesFragment;
-import com.itdoors.haccp.ui.fragments.NotificationDialogFragment;
 import com.itdoors.haccp.ui.fragments.StatisticsOnlineFragment;
 import com.itdoors.haccp.ui.fragments.StatisticsOfflineFragment;
 import com.itdoors.haccp.ui.fragments.SwipeRefreshListFragment;
@@ -78,8 +68,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		StatisticsOnlineFragment.StatisticsListModeHolder,
 		OnTimeRangeChooseListener,
 		OnRefreshListener,
-		TabListener,
-		LoaderCallbacks<RESTLoader.RESTResponse> 
+		TabListener
 {
 	
 	private static final String CHOOSE_TIME_RANGE_TYPE_DIALOG = "com.itdoors.haccp.activities.PointDetailsActivity.CHOOSE_TIME_RANGE_TYPE_DIALOG";
@@ -87,13 +76,9 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	private static final String STATISTICS_FROM_TIME_SAVE_KEY = "com.itdoors.haccp.activities.PointDetailsActivity.STATISTICS_FROM_TIME_SAVE_KEY";
 	private static final String STATISTICS_TO_TIME_SAVE_KEY   = "com.itdoors.haccp.activities.PointDetailsActivity.STATISTICS_TO_TIME_SAVE_KEY";
 	private static final String TITLE_SAVE_KEY 				  = "com.itdoors.haccp.activities.PointDetailsActivity.TITLE_SAVE_KEY";
-	private static final String ARGS_PIAS_URI 				  = "com.itdoors.haccp.activities.PointDetailsActivity.ARGS_PIAS_URI";
-	private static final String ARGS_PIAS_PARAMS_URI 		  = "com.itdoors.haccp.activities.PointDetailsActivity.ARGS_PIAS_PARAMS_URI";
 	 
 	private static final int TIME_RANGE_REQUEST = 0x0abc;
-	private static final int POINT_STATICTIS_FROM_TIME_RANGE_CODE = 101;
-	private static final int REFRESH_STATICTIS_CODE = 102;
-
+	
 	protected static enum Mode {
 		ONLINE, OFFLINE;
 	}
@@ -125,7 +110,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	
 	private Mode networkMode;
 	
-	RequestListener<MoreStatistics> mStatisticsRequestListener = new RequestListener<MoreStatistics>() {
+	RequestListener<MoreStatistics> mStatisticsRefreshRequestListener = new RequestListener<MoreStatistics>() {
 		@Override
 		public void onRequestFailure(SpiceException exception) {
 			ToastUtil.ToastLong(getApplicationContext(), getString(R.string.failed_to_load_data));
@@ -134,12 +119,14 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		@Override
 		public void onRequestSuccess(MoreStatistics statistics) {
 		
-			NotificationDialogFragment.newInstance("Responce:", statistics.toString()).show(getSupportFragmentManager(), "responce");
-			refreshSuccess();
+			PointDetailsActivity.this.mStatisticFragmentMode = MODE.GENERAL;
+    		updateStatisticsAfterRefreshSuccess(statistics);
+    		//NotificationDialogFragment.newInstance("Responce:", statistics.toString()).show(getSupportFragmentManager(), "responce");
+			//refreshSuccess();
 		}
 	};
 	
-	PendingRequestListener<MoreStatistics> mStatisticsPendingRequestListener = new PendingRequestListener<MoreStatistics>() {
+	PendingRequestListener<MoreStatistics> mStatisticsRefreshPendingRequestListener = new PendingRequestListener<MoreStatistics>() {
 
 		@Override
 		public void onRequestFailure(SpiceException exception) {
@@ -149,7 +136,9 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 
 		@Override
 		public void onRequestSuccess(MoreStatistics statistics) {
-			NotificationDialogFragment.newInstance("Responce:", statistics.toString()).show(getSupportFragmentManager(), "responce");
+			PointDetailsActivity.this.mStatisticFragmentMode = MODE.GENERAL;
+    		updateStatisticsAfterRefreshSuccess(statistics);
+			//NotificationDialogFragment.newInstance("Responce:", statistics.toString()).show(getSupportFragmentManager(), "responce");
 			refreshSuccess();
 		}
 
@@ -157,6 +146,47 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		public void onRequestNotFound() {
 		}
 	};
+	
+	RequestListener<MoreStatistics> mStatisticsFromTimeRangeRequestListener = new RequestListener<MoreStatistics>() {
+		@Override
+		public void onRequestFailure(SpiceException exception) {
+			ToastUtil.ToastLong(getApplicationContext(), getString(R.string.failed_to_load_data));
+			refreshFailed();
+		}
+		@Override
+		public void onRequestSuccess(MoreStatistics statistics) {
+		
+			PointDetailsActivity.this.mStatisticFragmentMode = MODE.FROM_TIME_RANGE;
+    		updateStatisticsAfterTimeRangeLoadSuccess(statistics);
+			//NotificationDialogFragment.newInstance("Responce:", statistics.toString()).show(getSupportFragmentManager(), "responce");
+			refreshSuccess();
+		}
+	};
+	
+	PendingRequestListener<MoreStatistics> mStatisticsFromTimeRangePendingRequestListener = new PendingRequestListener<MoreStatistics>() {
+
+		@Override
+		public void onRequestFailure(SpiceException exception) {
+			ToastUtil.ToastLong(getApplicationContext(), getString(R.string.failed_to_load_data));
+			refreshFailed();
+		}
+
+		@Override
+		public void onRequestSuccess(MoreStatistics statistics) {
+			PointDetailsActivity.this.mStatisticFragmentMode = MODE.FROM_TIME_RANGE;
+    		updateStatisticsAfterTimeRangeLoadSuccess(statistics);
+			//NotificationDialogFragment.newInstance("Responce:", statistics.toString()).show(getSupportFragmentManager(), "responce");
+			refreshSuccess();
+		}
+
+		@Override
+		public void onRequestNotFound() {
+		}
+	};
+	
+	
+	
+	
 	@Override
 	protected void onStart() {
 		spiceManager.start(this);
@@ -166,7 +196,13 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	protected void onResume() {
 		super.onResume();
 		//getContentResolver().unregisterContentObserver(mStatiscticsObserver);
-		spiceManager.addListenerIfPending(MoreStatistics.class, STATISTICS_CACHE_KEY, mStatisticsPendingRequestListener);
+		
+		if(getIntent().getExtras() != null){
+			int id = getIntent().getExtras().getInt(Intents.Point.UID);
+			spiceManager.addListenerIfPending(MoreStatistics.class, getRefreshCacheKey(id), mStatisticsRefreshPendingRequestListener);
+			spiceManager.addListenerIfPending(MoreStatistics.class, getFromTimeCacheKey(id, fromTimeStatisticsTimeStamp, toTimeStatisticsTimeStamp), mStatisticsFromTimeRangePendingRequestListener);
+		}
+		
 		
 	}
 	
@@ -218,7 +254,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		}
 		
 		setTitle(title);
-		setContentView(R.layout.activity_control_point_v1);
+		setContentView(R.layout.activity_control_point);
 		
 		mViewPager = (ViewPager)findViewById(R.id.cp_pager);
         
@@ -392,11 +428,6 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 			
 			case R.id.cp_bp_params_item:
 				ToastUtil.ToastLong(getApplicationContext(), "Params");
-				{
-					Intent testIntent = new Intent(this, TestRoboActivity.class);
-					startActivity(testIntent);
-					
-				}
 				return true;
 			
 			case R.id.cp_bp_calendar_item:
@@ -525,24 +556,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	public void onDeleteStaticticsItemContextMenuPressed(int position) {
 		ToastUtil.ToastLong(getApplicationContext(), getString(R.string.delete) + ":" + position);
 	}	
-/*
-	@Override
-	public void onRefreshStarted(View view) {
-		if(networkMode == Mode.ONLINE){
-			beginRefreshStatistics();
-		}
-		else{
-			if(Enviroment.isNetworkAvaliable(this)){
-				beginRefreshStatistics();
-			}
-			else{
-				ToastUtil.ToastLong(getApplicationContext(), getString(R.string.not_avalieble_without_any_interent_connection));
-				refreshFailed();
-			}
-		}
-	}
-	*/
-	
+
 	// Swipe refresh support.v4 rev.19.1;
 	@Override
 	public void onRefresh() {
@@ -656,43 +670,6 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 
 	
 
-	@Override
-	public Loader<RESTLoader.RESTResponse> onCreateLoader(int id, Bundle args) {
-		switch (id) {
-			case POINT_STATICTIS_FROM_TIME_RANGE_CODE:
-			case REFRESH_STATICTIS_CODE:
-				if (args != null && args.containsKey(ARGS_PIAS_URI) && args.containsKey(ARGS_PIAS_PARAMS_URI)) {
-		            
-					Uri    action = args.getParcelable(ARGS_PIAS_URI);
-		            Bundle params = args.getParcelable(ARGS_PIAS_PARAMS_URI);
-		            return new RESTLoader(this, RESTLoader.HTTPVerb.GET, action, params);
-		        }
-				else{
-					throw new IllegalArgumentException("params did't contain " + ARGS_PIAS_URI +" or " +  ARGS_PIAS_PARAMS_URI);
-				}
-				
-			default:
-				throw new IllegalArgumentException("unknown loader id : " + id);
-		}
-	}
-
-	@Override
-	public void onLoadFinished(Loader<RESTLoader.RESTResponse> loader, RESTLoader.RESTResponse data) {
-		    switch (loader.getId()) {
-		    	case POINT_STATICTIS_FROM_TIME_RANGE_CODE:
-	        		onStaticsFromTimeRangeLoadFinished(data);
-	        		break;
-	        	case REFRESH_STATICTIS_CODE:
-	        		onRefreshFinished(data);
-	        		break;
-	    	}
-	}
-	
-	@Override
-	public void onLoaderReset(Loader<RESTLoader.RESTResponse> loader) {
-	}
-	
-	
 	
 	
 	protected void showProgress(){
@@ -702,160 +679,53 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		setSupportProgressBarIndeterminateVisibility(false);
 	}
 	
-	private final String STATISTICS_CACHE_KEY = "statistics";
-	private final long CACHE_EXPIRED_DURATION = 5 *  DurationInMillis.ONE_MINUTE;
+	private static final String STATISTICS_REFRESH_CACHE_KEY = "statistics_refresh";
+	private static final String STATISTICS_FROM_TIME_RANGE_CACHE_KEY = "statistics_from_time_range";
+	
+	private static String getRefreshCacheKey(int id){
+		return STATISTICS_REFRESH_CACHE_KEY +"_" + id;
+	}
+	
+	private static String getFromTimeCacheKey(int id, String from, String to){
+		return STATISTICS_FROM_TIME_RANGE_CACHE_KEY + "_" + id + "_" + from + "_" + to;
+	}
+	
 	
 	private void beginRefreshStatistics(){
-		
-		{
-			if( getIntent().getExtras() != null ){
-				
-				int pointId = getIntent().getExtras().getInt(Intents.Point.UID);
-				
-				String url = Global.API_URL +"/point/" + Integer.toString(pointId) + "/statistics";
-				Uri loadPointInfoAndStatistic = Uri.parse(url);
-				
-			    Bundle args = new Bundle();
-		        args.putParcelable(ARGS_PIAS_URI, loadPointInfoAndStatistic);
-		        args.putParcelable(ARGS_PIAS_PARAMS_URI, null);
-		        
-		        
-		        Loader<Object> loader = getSupportLoaderManager().getLoader(REFRESH_STATICTIS_CODE);
-				if(  loader == null )
-					 getSupportLoaderManager().initLoader(REFRESH_STATICTIS_CODE, args, this);
-				else getSupportLoaderManager().restartLoader(REFRESH_STATICTIS_CODE, args, this);
-		      
-			}
-			
-		}
-		
-		{
-			// RoboSpice request
-			Bundle extras = getIntent().getExtras();
-			if(  extras!= null ){
-				
-				int pointId = extras.getInt(Intents.Point.UID);
-				GetStatisticsRequest request = new GetStatisticsRequest.Builder()
-										.setId(pointId)
-										.build();
-				spiceManager.execute(request, STATISTICS_CACHE_KEY, CACHE_EXPIRED_DURATION, mStatisticsRequestListener);
-					
-		}
-			
+		// RoboSpice request
+		Bundle extras = getIntent().getExtras();
+		if(  extras!= null ){
+			int pointId = extras.getInt(Intents.Point.UID);
+			GetStatisticsRequest request = new GetStatisticsRequest.Builder().setId(pointId).build();
+			spiceManager.execute(request, getRefreshCacheKey(pointId), DurationInMillis.ONE_MINUTE, mStatisticsRefreshRequestListener);
 		}
 	}
-
-	
 	
 	private void beginStatisticsFromTimeStampLoading(String fromUnixTimeStamp, String toUnixTimeStamp){
 		
 		this.fromTimeStatisticsTimeStamp = fromUnixTimeStamp;
 		this.toTimeStatisticsTimeStamp = toUnixTimeStamp;
 		
-		if(getIntent().getExtras() == null) 
-			return;
-		
-		
-		int pointId = getIntent().getExtras().getInt(Intents.Point.UID);
-		String url = Global.API_URL + "/point/" + Integer.toString(pointId) + 
-									  "/statistics/" + fromUnixTimeStamp +"/" + toUnixTimeStamp;
-		
-		Uri loadStatistic = Uri.parse(url);
-		
-	    Bundle args = new Bundle();
-        args.putParcelable(ARGS_PIAS_URI, loadStatistic);
-        args.putParcelable(ARGS_PIAS_PARAMS_URI, null);
-        
-        showProgress();
-        
-        Loader<Object> loader = getSupportLoaderManager().getLoader(POINT_STATICTIS_FROM_TIME_RANGE_CODE);
-		if(  loader == null )
-			 getSupportLoaderManager().initLoader(POINT_STATICTIS_FROM_TIME_RANGE_CODE, args, this);
-		else getSupportLoaderManager().restartLoader(POINT_STATICTIS_FROM_TIME_RANGE_CODE, args, this);
-	
-		
-		
+		Bundle extras = getIntent().getExtras();
+		if( extras != null){ 
+			int pointId = extras.getInt(Intents.Point.UID);
+			GetStatisticsRequest request = new GetStatisticsRequest.Builder().setId(pointId).setStartDate(fromUnixTimeStamp).setEndDate(toUnixTimeStamp).build();
+			spiceManager.execute(request, getFromTimeCacheKey(pointId, fromUnixTimeStamp, toUnixTimeStamp), DurationInMillis.ONE_MINUTE, mStatisticsFromTimeRangeRequestListener);
+		}
 	}
 	
-	private void onStaticsFromTimeRangeLoadFinished (RESTLoader.RESTResponse data){
-		
-		int    code = data.getCode();
-        String json = data.getData();
-        hideProgress();
-        if (code == 200) {
-        	PointStatisticsFromTimeRangeParser parser = new PointStatisticsFromTimeRangeParser();
-        	try {
-				final Object content = parser.parse(json);
-				final com.itdoors.haccp.parser.PointStatisticsFromTimeRangeParser.Content loadedContent = (com.itdoors.haccp.parser.PointStatisticsFromTimeRangeParser.Content)content;
-	    		this.mStatisticFragmentMode = MODE.FROM_TIME_RANGE;
-	    		//Show result in short and details fragments
-	    		updateStatisticsAfterTimeRangeLoadSuccess(loadedContent);
-        	}
-        	catch (JSONException e) {
-        		ToastUtil.ToastLong(getApplicationContext(), "JSONException.");
-				e.printStackTrace();
-			}
-        	catch (ServerFailedException e) {
-        		ToastUtil.ToastLong(getApplicationContext(), "ServerFailedException.");
-    	        e.printStackTrace();
-    		}
-        }
-        else {
-        	Logger.Logi(getClass(), "code: " + code +"; json: " + json);
-        	ToastUtil.ToastLong(getApplicationContext(), getString(R.string.failed_to_load_data));
-        }
-	}
-	
-	private void onRefreshFinished(RESTLoader.RESTResponse data){
-		
-		int    code = data.getCode();
-        String json = data.getData();
-        
-        boolean failed = false;
-        if (code == 200) {
-        	LoadMoreStatisticsParser parser = new LoadMoreStatisticsParser();
-        	try {
-				final Object content = parser.parse(json);
-				com.itdoors.haccp.parser.LoadMoreStatisticsParser.Content loadedContent = (com.itdoors.haccp.parser.LoadMoreStatisticsParser.Content)content;
-				
-	    		this.mStatisticFragmentMode = MODE.GENERAL;
-	    		updateStatisticsAfterRefreshSuccess(loadedContent);
-        	}
-        	catch (JSONException e) {
-				failed = true;
-        		ToastUtil.ToastLong(getApplicationContext(), "JSONException.");
-				e.printStackTrace();
-			}
-        	catch (ServerFailedException e) {
-        		failed = true;
-        		ToastUtil.ToastLong(getApplicationContext(), "ServerFailedException.");
-    	        e.printStackTrace();
-    		}
-       }
-       else {
-    	    failed = true;
-       		Logger.Logi(getClass(), "code: " + code +"; json: " + json);
-       		ToastUtil.ToastLong(getApplicationContext(), getString(R.string.failed_to_load_data));
-       }
-       if(failed){
-    	   refreshFailed();
-       }
-       
-	}
-	
-	protected void updateStatisticsAfterTimeRangeLoadSuccess(com.itdoors.haccp.parser.PointStatisticsFromTimeRangeParser.Content content){
+	protected void updateStatisticsAfterTimeRangeLoadSuccess(MoreStatistics content){
 		if(mStatisticsFragment != null){
 			if(networkMode == Mode.ONLINE){
 				StatisticsOnlineFragment fragment = (StatisticsOnlineFragment) ((ReplaceableFragment)mStatisticsFragment).getFragment();
-				fragment.updateStatisticsAfterTimeRangeLoadSuccess(content.records, content.hasMoreStatiscticItems);
+				fragment.updateStatisticsAfterTimeRangeLoadSuccess(content.getStatistics(), content.getMore());
 			}
 			else{
 				ReplaceableFragment fragment = (ReplaceableFragment)mStatisticsFragment;
     			StatisticsOnlineFragment newFragment = StatisticsOnlineFragment.newInstance(
-    					
     					StatisticsOnlineFragment.ACTION_UPDATE_AFTER_TIME_RANGE_WITH_PRELOADED_CONTENT_CODE, 
-    					(ArrayList<StatisticsRecord>)content.records, 
-    					content.hasMoreStatiscticItems
+    					(ArrayList<Statistic>)content.getStatistics(), 
+    					content.getMore()
     			);
     			
     			fragment.replaceInside(newFragment);
@@ -864,29 +734,31 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		}
 	}
 	
-	protected void updateStatisticsAfterRefreshSuccess(com.itdoors.haccp.parser.LoadMoreStatisticsParser.Content content){
-			if(mStatisticsFragment != null){
-				if(networkMode == Mode.ONLINE){
-					
-					StatisticsOnlineFragment fragment = (StatisticsOnlineFragment) ((ReplaceableFragment)mStatisticsFragment).getFragment();
-					(fragment).updateStatisticsAfterRefreshSuccess(content.records, content.hasMoreStatiscticItems);
-					refreshSuccess();
-				}
-				else{
-					ReplaceableFragment fragment = (ReplaceableFragment)mStatisticsFragment;
-	    			StatisticsOnlineFragment newFragment = StatisticsOnlineFragment.newInstance(
-	    					
-	    					StatisticsOnlineFragment.ACTION_UPDATE_AFTER_TIME_RANGE_WITH_PRELOADED_CONTENT_CODE, 
-	    					(ArrayList<StatisticsRecord>)content.records, 
-	    					content.hasMoreStatiscticItems
-	    			);
-	    			
-	    			fragment.replaceInside(newFragment);
-	    			networkMode = Mode.ONLINE;	
-				}
+	protected void updateStatisticsAfterRefreshSuccess(MoreStatistics content){
+		if(mStatisticsFragment != null){
+			if(networkMode == Mode.ONLINE){
+				
+				StatisticsOnlineFragment fragment = (StatisticsOnlineFragment) ((ReplaceableFragment)mStatisticsFragment).getFragment();
+				(fragment).updateStatisticsAfterRefreshSuccess(content.getStatistics(), content.getMore());
+				refreshSuccess();
 			}
-			
-	}
+			else{
+				
+				ReplaceableFragment fragment = (ReplaceableFragment)mStatisticsFragment;
+    			StatisticsOnlineFragment newFragment = StatisticsOnlineFragment.newInstance(
+    					StatisticsOnlineFragment.ACTION_UPDATE_AFTER_TIME_RANGE_WITH_PRELOADED_CONTENT_CODE, 
+    					(ArrayList<Statistic>)content.getStatistics(), 
+    					content.getMore()
+    			);
+    			
+    			fragment.replaceInside(newFragment);
+    			networkMode = Mode.ONLINE;	
+			}
+		}
+		
+}
+	
+	
 	
 	protected void refreshFailed(){
 		if(mStatisticsFragment != null){
@@ -940,5 +812,24 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		
 	}
 
+	public static StatististicsItemStatus getStatus(String v, String t, String b){
+		
+		try{
+			
+			Double value = Double.parseDouble(v);
+			Double top = Double.parseDouble(t);
+			Double bottom = Double.parseDouble(b);
+			
+			return getStatus(value, top, bottom);
+				
+		}
+		catch (NumberFormatException e){
+			e.printStackTrace();
+			return null;
+		
+		}
+		
+		
+	}
 	
 }

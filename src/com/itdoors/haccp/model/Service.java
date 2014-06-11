@@ -43,7 +43,7 @@ public class Service implements Serializable{
 	public boolean equals(Object o) {
 		
 		if(this == o) return true;
-		if(!(o instanceof Company)) return false;
+		if(!(o instanceof Service)) return false;
 		Service service = (Service)o;
 		return service.id == id && 
 			   (name == null ? service.name == null : name.equals(service.name));
