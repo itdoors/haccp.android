@@ -7,7 +7,6 @@ import com.itdoors.haccp.Global;
 import com.itdoors.haccp.Intents;
 import com.itdoors.haccp.R;
 import com.itdoors.haccp.provider.HaccpContract;
-import com.itdoors.haccp.utils.Logger;
 
 import android.annotation.SuppressLint;
 import android.database.Cursor;
@@ -92,7 +91,6 @@ public class AttributesFragment extends Fragment implements  LoaderCallbacks<Cur
 			String monitoringObject = cursor.getString(PointQuery.PLANS_NAME) == null ? "-" : cursor.getString(PointQuery.PLANS_NAME);
 			String status = cursor.getString(PointQuery.STATUS_NAME) == null ? "-" : cursor.getString(PointQuery.STATUS_NAME);
 			
-			Logger.Loge(getClass(), "status: " + (status == null ? "null" : status ));
 			
 			((TextView)getView().findViewById(R.id.cp_attr_point_number)).setText(number);
 			((TextView)getView().findViewById(R.id.cp_attr_inst_date)).setText(instDate);

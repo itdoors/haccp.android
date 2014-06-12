@@ -41,6 +41,7 @@ import com.itdoors.haccp.model.rest.retrofit.Statistic;
 import com.itdoors.haccp.rest.robospice_retrofit.GetStatisticsRequest;
 import com.itdoors.haccp.rest.robospice_retrofit.MySpiceService;
 import com.itdoors.haccp.ui.fragments.AttributesFragment;
+import com.itdoors.haccp.ui.fragments.NotificationDialogFragment;
 import com.itdoors.haccp.ui.fragments.StatisticsOnlineFragment;
 import com.itdoors.haccp.ui.fragments.StatisticsOfflineFragment;
 import com.itdoors.haccp.ui.fragments.SwipeRefreshListFragment;
@@ -72,11 +73,14 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 {
 	
 	private static final String CHOOSE_TIME_RANGE_TYPE_DIALOG = "com.itdoors.haccp.activities.PointDetailsActivity.CHOOSE_TIME_RANGE_TYPE_DIALOG";
+	private static final String STATISTCICS_FRAGMENT_SAVE_KEY = "com.itdoors.haccp.activities.PointDetailsActivity.STATISTCICS_FRAGMENT_SAVE_KEY"; 
 	private static final String STATISTICS_MODE_SAVE_KEY 	  = "com.itdoors.haccp.activities.PointDetailsActivity.STATISTICS_MODE_SAVE_KEY";
 	private static final String STATISTICS_FROM_TIME_SAVE_KEY = "com.itdoors.haccp.activities.PointDetailsActivity.STATISTICS_FROM_TIME_SAVE_KEY";
 	private static final String STATISTICS_TO_TIME_SAVE_KEY   = "com.itdoors.haccp.activities.PointDetailsActivity.STATISTICS_TO_TIME_SAVE_KEY";
 	private static final String TITLE_SAVE_KEY 				  = "com.itdoors.haccp.activities.PointDetailsActivity.TITLE_SAVE_KEY";
-	 
+	
+	private static final String NETWORK_MODE_SAVE_KEY 		  = "com.itdoors.haccp.activities.PointDetailsActivity.NETWORK_MODE_SAVE_KEY"; 
+	
 	private static final int TIME_RANGE_REQUEST = 0x0abc;
 	
 	protected static enum Mode {
@@ -102,8 +106,8 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
     private Fragment mStatisticsFragment;
     
 	private StatisticsOnlineFragment.MODE mStatisticFragmentMode;
-	private String fromTimeStatisticsTimeStamp;
-	private String toTimeStatisticsTimeStamp;
+	private String fromTimeStamp;
+	private String toTimeStamp;
     
 	@SuppressWarnings("unused")
 	private ActionMode mActionMode;
@@ -119,14 +123,15 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		@Override
 		public void onRequestSuccess(MoreStatistics statistics) {
 		
+			PointDetailsActivity.this.networkMode = Mode.ONLINE;
 			PointDetailsActivity.this.mStatisticFragmentMode = MODE.GENERAL;
     		updateStatisticsAfterRefreshSuccess(statistics);
-    		//NotificationDialogFragment.newInstance("Responce:", statistics.toString()).show(getSupportFragmentManager(), "responce");
+    		NotificationDialogFragment.newInstance("Responce:", statistics.toString()).show(getSupportFragmentManager(), "responce");
 			//refreshSuccess();
 		}
 	};
 	
-	PendingRequestListener<MoreStatistics> mStatisticsRefreshPendingRequestListener = new PendingRequestListener<MoreStatistics>() {
+	PendingRequestListener<MoreStatistics> mRefreshPendingRequestListener = new PendingRequestListener<MoreStatistics>() {
 
 		@Override
 		public void onRequestFailure(SpiceException exception) {
@@ -136,9 +141,10 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 
 		@Override
 		public void onRequestSuccess(MoreStatistics statistics) {
+			PointDetailsActivity.this.networkMode = Mode.ONLINE;
 			PointDetailsActivity.this.mStatisticFragmentMode = MODE.GENERAL;
     		updateStatisticsAfterRefreshSuccess(statistics);
-			//NotificationDialogFragment.newInstance("Responce:", statistics.toString()).show(getSupportFragmentManager(), "responce");
+			NotificationDialogFragment.newInstance("Responce:", statistics.toString()).show(getSupportFragmentManager(), "responce");
 			refreshSuccess();
 		}
 
@@ -158,12 +164,11 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		
 			PointDetailsActivity.this.mStatisticFragmentMode = MODE.FROM_TIME_RANGE;
     		updateStatisticsAfterTimeRangeLoadSuccess(statistics);
-			//NotificationDialogFragment.newInstance("Responce:", statistics.toString()).show(getSupportFragmentManager(), "responce");
 			refreshSuccess();
 		}
 	};
 	
-	PendingRequestListener<MoreStatistics> mStatisticsFromTimeRangePendingRequestListener = new PendingRequestListener<MoreStatistics>() {
+	PendingRequestListener<MoreStatistics> mFromTimeRangePendingRequestListener = new PendingRequestListener<MoreStatistics>() {
 
 		@Override
 		public void onRequestFailure(SpiceException exception) {
@@ -175,7 +180,6 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		public void onRequestSuccess(MoreStatistics statistics) {
 			PointDetailsActivity.this.mStatisticFragmentMode = MODE.FROM_TIME_RANGE;
     		updateStatisticsAfterTimeRangeLoadSuccess(statistics);
-			//NotificationDialogFragment.newInstance("Responce:", statistics.toString()).show(getSupportFragmentManager(), "responce");
 			refreshSuccess();
 		}
 
@@ -184,34 +188,21 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		}
 	};
 	
-	
-	
-	
 	@Override
 	protected void onStart() {
 		spiceManager.start(this);
 		super.onStart();
 	}
+	
 	@Override
 	protected void onResume() {
 		super.onResume();
-		//getContentResolver().unregisterContentObserver(mStatiscticsObserver);
-		
 		if(getIntent().getExtras() != null){
 			int id = getIntent().getExtras().getInt(Intents.Point.UID);
-			spiceManager.addListenerIfPending(MoreStatistics.class, getRefreshCacheKey(id), mStatisticsRefreshPendingRequestListener);
-			spiceManager.addListenerIfPending(MoreStatistics.class, getFromTimeCacheKey(id, fromTimeStatisticsTimeStamp, toTimeStatisticsTimeStamp), mStatisticsFromTimeRangePendingRequestListener);
+			spiceManager.addListenerIfPending(MoreStatistics.class, GetStatisticsRequest.getCacheKey(id), mRefreshPendingRequestListener);
+			spiceManager.addListenerIfPending(MoreStatistics.class, GetStatisticsRequest.getCacheKey(id, fromTimeStamp, toTimeStamp), mFromTimeRangePendingRequestListener);
 		}
-		
-		
 	}
-	
-	@Override
-	protected void onPause() {
-		super.onPause();
-		//getContentResolver().registerContentObserver(statisticsUri, true, mStatiscticsObserver);
-	}
-	
 	
 	@Override
 	protected void onStop() {
@@ -233,23 +224,20 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		
 		mStatisticFragmentMode = MODE.GENERAL;
 		String title = getResources().getString(R.string.control_point);
-		
-		networkMode = Enviroment.isNetworkAvaliable(this) ? Mode.ONLINE : Mode.OFFLINE;
+		boolean isNetworkAlive = Enviroment.isNetworkAvaliable(this);
+		networkMode = isNetworkAlive ? Mode.ONLINE : Mode.OFFLINE;
 		
 		if (savedInstanceState != null){
 			
+			networkMode = (Mode)savedInstanceState.getSerializable(NETWORK_MODE_SAVE_KEY);
 			mStatisticFragmentMode = (MODE)savedInstanceState.getSerializable(STATISTICS_MODE_SAVE_KEY);
-			fromTimeStatisticsTimeStamp = savedInstanceState.getString(STATISTICS_FROM_TIME_SAVE_KEY);
-			toTimeStatisticsTimeStamp = savedInstanceState.getString(STATISTICS_TO_TIME_SAVE_KEY);
+			fromTimeStamp = savedInstanceState.getString(STATISTICS_FROM_TIME_SAVE_KEY);
+			toTimeStamp = savedInstanceState.getString(STATISTICS_TO_TIME_SAVE_KEY);
 			title = savedInstanceState.getString(TITLE_SAVE_KEY);
 			
 			if (mStatisticsFragment == null) {
-			 	if(networkMode == Mode.ONLINE)
-			 		mStatisticsFragment = (ReplaceableFragment) getSupportFragmentManager()
-		                  .getFragment(savedInstanceState, "statistics_stream_fragment");
-			 	else
-			 		mStatisticsFragment = (ReplaceableFragment) getSupportFragmentManager()
-			 			.getFragment(savedInstanceState, "statistics_database_fragment");
+			 	mStatisticsFragment = (ReplaceableFragment) getSupportFragmentManager()
+			 			.getFragment(savedInstanceState, STATISTCICS_FRAGMENT_SAVE_KEY);
 			}
 		}
 		
@@ -274,11 +262,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
             actionBar.addTab(actionBar.newTab()
                     .setText(R.string.attributes)
                     .setTabListener(this));
-           
-		   // mViewPager.setPageMarginDrawable(R.drawable.grey_border_inset_lr);
-           // mViewPager.setPageMargin(getResources()
-           //         .getDimensionPixelSize(R.dimen.page_margin_width));
-		   	
+          	
         }
 		
 		ViewGroup bottomPanel = (ViewGroup)findViewById(R.id.cp_bottom_panel);
@@ -309,16 +293,6 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
 	}
 	
-	
-	/*
-	private ContentObserver mStatiscticsObserver = new ContentObserver(null) {
-		public void onChange(boolean selfChange) {
-			if(networkMode == Mode.ONLINE && Enviroment.isNetworkAvaliable(PointDetailsActivity.this))
-				beginRefreshStatistics();
-		};
-	};
-	*/
-	
 	static class DummyTabFactory implements TabHost.TabContentFactory {
 		private final Context mContext;
 	
@@ -343,13 +317,18 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		
 		@Override
 		public Fragment getItem(int position) {
+			
 			switch (position) {
 			
-				case 0: return ( mStatisticsFragment = 
+				case 0: {
+					
+					Logger.Loge(getClass(), "getItem, netwok is online: " + (networkMode == Mode.ONLINE) );
+					return ( mStatisticsFragment = 
 									(networkMode == Mode.ONLINE) 
 										? ReplaceableFragment.newInstance(StatisticsOnlineFragment.class)
 										: ReplaceableFragment.newInstance(StatisticsOfflineFragment.class));
-			
+				}
+				
 				case 1:	return new AttributesFragment();
 			};
 			return new Fragment();
@@ -364,8 +343,6 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	
 	public static class ReplaceableFragment extends Fragment{
 	
-		private Fragment mInsideFragment;
-		
 		public static ReplaceableFragment newInstance(Class<?> _class){
 			
 			ReplaceableFragment f = new ReplaceableFragment();
@@ -375,18 +352,20 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 			return f;
 		
 		}
-		
+
 		@Override
 		public void onActivityCreated(Bundle savedInstanceState) {
 			super.onActivityCreated(savedInstanceState);
 			
 			FragmentManager fm = getChildFragmentManager();
-			mInsideFragment = fm.findFragmentByTag("insideFragment");
-			if(mInsideFragment == null && getArguments() != null){
+			Fragment insideFragment = fm.findFragmentByTag("insideFragment");
+			if(insideFragment == null && getArguments() != null){
+				
+				Logger.Loge(getClass(), "create inside fragment");
 				Class<?> clazz = (Class<?>)getArguments().getSerializable("class");
-				mInsideFragment = Fragment.instantiate(getActivity(), clazz.getName());
+				insideFragment = Fragment.instantiate(getActivity(), clazz.getName());
 				fm.beginTransaction()
-					.add(R.id.root_frame, mInsideFragment, "insideFragment")
+					.add(R.id.root_frame, insideFragment, "insideFragment")
 					.commit();
 			}
 		}
@@ -401,7 +380,6 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		}
 	
 		public void replaceInside(Fragment fragment){
-			mInsideFragment = fragment;
 			getChildFragmentManager()
 					.beginTransaction()
 					.replace(R.id.root_frame, fragment, "insideFragment")
@@ -409,7 +387,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		}
 		
 		public Fragment getFragment(){
-			return mInsideFragment;
+			return getChildFragmentManager().findFragmentByTag("insideFragment");
 		}
 		
 	}
@@ -463,19 +441,14 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
     
     @Override
 	public void onSaveInstanceState(Bundle outState) {
-		
 		super.onSaveInstanceState(outState);
+		outState.putSerializable(NETWORK_MODE_SAVE_KEY, networkMode);
 		outState.putSerializable(STATISTICS_MODE_SAVE_KEY, mStatisticFragmentMode);
-		outState.putString(STATISTICS_FROM_TIME_SAVE_KEY, fromTimeStatisticsTimeStamp);
-		outState.putString(STATISTICS_TO_TIME_SAVE_KEY, toTimeStatisticsTimeStamp);
+		outState.putString(STATISTICS_FROM_TIME_SAVE_KEY, fromTimeStamp);
+		outState.putString(STATISTICS_TO_TIME_SAVE_KEY, toTimeStamp);
 		outState.putString(TITLE_SAVE_KEY, getTitle().toString());
-		
 		if (mStatisticsFragment != null) {
-			if(networkMode == Mode.ONLINE)
-				 getSupportFragmentManager().putFragment(outState, "statistics_stream_fragment",
-						mStatisticsFragment);
-			else getSupportFragmentManager().putFragment(outState, "statistics_database_fragment", 
-						mStatisticsFragment);
+			 getSupportFragmentManager().putFragment(outState, STATISTCICS_FRAGMENT_SAVE_KEY, mStatisticsFragment);
 	    }
 	}
 
@@ -493,7 +466,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	    		String toTimeStampStr = CalendarUtils.inUsualDateFromat(toTimeStamp);
 	    				
 	    		ToastUtil.ToastLong(getApplicationContext(), getString(R.string.from) + " : " + fromTimeStampStr + ", " + getString(R.string.to) + " : " + toTimeStampStr);
-	    		beginStatisticsFromTimeStampLoading(fromTimeStamp, toTimeStamp);
+	    		loadStatisticsFromTimeRange(fromTimeStamp, toTimeStamp);
 	    	
 	    	}
 	    }
@@ -506,12 +479,12 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 
 	@Override
 	public String getFromTimeInTimeStamp() {
-		return fromTimeStatisticsTimeStamp;
+		return fromTimeStamp;
 	}
 
 	@Override
 	public String getToTimeInTimeStamp() {
-		return toTimeStatisticsTimeStamp;
+		return toTimeStamp;
 	}
 
 	private final class StatisticsActionMode implements ActionMode.Callback {
@@ -561,11 +534,11 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	@Override
 	public void onRefresh() {
 		if(networkMode == Mode.ONLINE){
-			beginRefreshStatistics();
+			refreshStatistics();
 		}
 		else{
 			if(Enviroment.isNetworkAvaliable(this)){
-				beginRefreshStatistics();
+				refreshStatistics();
 			}
 			else{
 				ToastUtil.ToastLong(getApplicationContext(), getString(R.string.not_avalieble_without_any_interent_connection));
@@ -646,7 +619,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	    		
 	    		ToastUtil.ToastLong(getApplicationContext(), toastMess);
 	    		
-	    		beginStatisticsFromTimeStampLoading(fromUnixTimeStamp, toUnixTimeStamp);
+	    		loadStatisticsFromTimeRange(fromUnixTimeStamp, toUnixTimeStamp);
 				
 			}
 			else{
@@ -679,38 +652,25 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		setSupportProgressBarIndeterminateVisibility(false);
 	}
 	
-	private static final String STATISTICS_REFRESH_CACHE_KEY = "statistics_refresh";
-	private static final String STATISTICS_FROM_TIME_RANGE_CACHE_KEY = "statistics_from_time_range";
-	
-	private static String getRefreshCacheKey(int id){
-		return STATISTICS_REFRESH_CACHE_KEY +"_" + id;
-	}
-	
-	private static String getFromTimeCacheKey(int id, String from, String to){
-		return STATISTICS_FROM_TIME_RANGE_CACHE_KEY + "_" + id + "_" + from + "_" + to;
-	}
-	
-	
-	private void beginRefreshStatistics(){
-		// RoboSpice request
+	private void refreshStatistics(){
 		Bundle extras = getIntent().getExtras();
 		if(  extras!= null ){
 			int pointId = extras.getInt(Intents.Point.UID);
 			GetStatisticsRequest request = new GetStatisticsRequest.Builder().setId(pointId).build();
-			spiceManager.execute(request, getRefreshCacheKey(pointId), DurationInMillis.ONE_MINUTE, mStatisticsRefreshRequestListener);
+			spiceManager.execute(request, request.getCacheKey(), DurationInMillis.ONE_MINUTE, mStatisticsRefreshRequestListener);
 		}
 	}
 	
-	private void beginStatisticsFromTimeStampLoading(String fromUnixTimeStamp, String toUnixTimeStamp){
+	private void loadStatisticsFromTimeRange(String fromUnixTimeStamp, String toUnixTimeStamp){
 		
-		this.fromTimeStatisticsTimeStamp = fromUnixTimeStamp;
-		this.toTimeStatisticsTimeStamp = toUnixTimeStamp;
+		this.fromTimeStamp = fromUnixTimeStamp;
+		this.toTimeStamp = toUnixTimeStamp;
 		
 		Bundle extras = getIntent().getExtras();
 		if( extras != null){ 
 			int pointId = extras.getInt(Intents.Point.UID);
 			GetStatisticsRequest request = new GetStatisticsRequest.Builder().setId(pointId).setStartDate(fromUnixTimeStamp).setEndDate(toUnixTimeStamp).build();
-			spiceManager.execute(request, getFromTimeCacheKey(pointId, fromUnixTimeStamp, toUnixTimeStamp), DurationInMillis.ONE_MINUTE, mStatisticsFromTimeRangeRequestListener);
+			spiceManager.execute(request, request.getCacheKey(), DurationInMillis.ONE_MINUTE, mStatisticsFromTimeRangeRequestListener);
 		}
 	}
 	
@@ -723,7 +683,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 			else{
 				ReplaceableFragment fragment = (ReplaceableFragment)mStatisticsFragment;
     			StatisticsOnlineFragment newFragment = StatisticsOnlineFragment.newInstance(
-    					StatisticsOnlineFragment.ACTION_UPDATE_AFTER_TIME_RANGE_WITH_PRELOADED_CONTENT_CODE, 
+    					StatisticsOnlineFragment.TIME_RANGE_ACTION, 
     					(ArrayList<Statistic>)content.getStatistics(), 
     					content.getMore()
     			);
@@ -746,7 +706,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 				
 				ReplaceableFragment fragment = (ReplaceableFragment)mStatisticsFragment;
     			StatisticsOnlineFragment newFragment = StatisticsOnlineFragment.newInstance(
-    					StatisticsOnlineFragment.ACTION_UPDATE_AFTER_TIME_RANGE_WITH_PRELOADED_CONTENT_CODE, 
+    					StatisticsOnlineFragment.REFRESH_ACTION, 
     					(ArrayList<Statistic>)content.getStatistics(), 
     					content.getMore()
     			);

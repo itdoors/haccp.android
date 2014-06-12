@@ -44,7 +44,6 @@ public class StatisticsOfflineFragment extends SwipeRefreshListFragment implemen
 	private OnContextMenuItemPressedListener mOnContextMenuItemPressedListener;
 	private CursorAdapter mStatisticsAdapter;
 	private OnRefreshListener mOnRefreshListener;
-	//private PullToRefreshLayout mPullToRefreshLayout;
 	
 	@Override
 	public void onAttach(Activity activity) {
@@ -80,17 +79,6 @@ public class StatisticsOfflineFragment extends SwipeRefreshListFragment implemen
 		registerForContextMenu(getListView());
 		mStatisticsAdapter = new MyStatisticsAdapter(getActivity());
 		
-		/*
-		// Adding pullToRefresh 
-	    ViewGroup viewGroup = (ViewGroup) view;
-        mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
-        ActionBarPullToRefresh.from(getActivity())
-                .insertLayoutInto(viewGroup)
-                .theseChildrenArePullable(android.R.id.list)
-                .listener(mOnRefreshListener)
-                .setup(mPullToRefreshLayout);
-	*/
-		
 		setOnRefreshListener(mOnRefreshListener);
 		setColorScheme(R.color.swipe_first, R.color.swipe_second, R.color.swipe_third, R.color.swipe_fourth);
 		
@@ -103,12 +91,7 @@ public class StatisticsOfflineFragment extends SwipeRefreshListFragment implemen
 		getLoaderManager().initLoader(0, null, this);
 		Logger.Logi(getClass(), "onViewCreated");
 	}
-	/*
-	public void refreshReshFailed() {
-		if(mPullToRefreshLayout != null) 
-			mPullToRefreshLayout.setRefreshComplete();
-	}
-	*/
+
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle data) {
 		int pointID  = getActivity().getIntent().getIntExtra(Intents.Point.UID, -1);
