@@ -66,17 +66,42 @@ public class Characteristic implements Serializable{
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+    	return new ToStringBuilder(this).append("id",id)
+    			.append("name", name)
+    			.append("unit", unit)
+    			.append("criticalValueBottom", criticalValueBottom)
+    			.append("criticalValueBottom", criticalValueTop)
+    			.toString();
     }
 
     @Override
     public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this);
+    	return new HashCodeBuilder()
+	    	.append(id)
+	    	.append(name)
+	    	.append(unit)
+	    	.append(criticalValueBottom)
+	    	.append(criticalValueTop)
+	    	.hashCode();
     }
 
     @Override
     public boolean equals(Object other) {
-        return EqualsBuilder.reflectionEquals(this, other);
+    
+    	if(other == this)
+    		return true;
+    	if(!(other instanceof Characteristic))
+    		return false;
+    	
+    	Characteristic myOther = (Characteristic)other;
+    	
+    	return new EqualsBuilder()
+    		.append(id, myOther.id)
+    		.append(name, myOther.name)
+    		.append(unit, myOther.unit)
+    		.append(criticalValueBottom, myOther.criticalValueBottom)
+    		.append(criticalValueTop, myOther.criticalValueTop)
+    		.isEquals();
     }
 
 }

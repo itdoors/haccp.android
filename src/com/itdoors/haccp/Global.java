@@ -8,7 +8,6 @@ public class Global {
 	public static String API_URL = BASE_URL + "/api/" + API_VERSION_CODE;
 	
 	public static boolean loggingEnabled = true;
-	public static boolean imgLoggingEnabled = false;
 	
 	public static String dateFormat = "yyyy-MM-dd";
 	public static String usualDateFromat = "dd.MM.yyyy";

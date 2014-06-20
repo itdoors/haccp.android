@@ -162,5 +162,10 @@ public abstract class  EndlessListFragment extends SwipeRefreshListFragment impl
 	@Override
 	public void onScrollStateChanged(AbsListView listView, int scrollState) {}
 
+	@Override
+	public void onDestroyView() {
+		mListViewFootter = null;
+		super.onDestroyView();
+	}
 }
 

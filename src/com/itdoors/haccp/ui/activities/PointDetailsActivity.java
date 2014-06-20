@@ -7,43 +7,48 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.http.util.LangUtils;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.TabHost;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.commonsware.cwac.pager.PageDescriptor;
+import com.commonsware.cwac.pager.SimplePageDescriptor;
+import com.commonsware.cwac.pager.v4.ArrayPagerAdapter;
 import com.itdoors.haccp.Global;
 import com.itdoors.haccp.Intents;
 import com.itdoors.haccp.R;
 import com.itdoors.haccp.model.Point;
 import com.itdoors.haccp.model.StatististicsItemStatus;
 import com.itdoors.haccp.model.rest.retrofit.MoreStatistics;
-import com.itdoors.haccp.model.rest.retrofit.Statistic;
 import com.itdoors.haccp.rest.robospice_retrofit.GetStatisticsRequest;
 import com.itdoors.haccp.rest.robospice_retrofit.MySpiceService;
 import com.itdoors.haccp.ui.fragments.AttributesFragment;
-import com.itdoors.haccp.ui.fragments.NotificationDialogFragment;
-import com.itdoors.haccp.ui.fragments.StatisticsOnlineFragment;
 import com.itdoors.haccp.ui.fragments.StatisticsOfflineFragment;
+import com.itdoors.haccp.ui.fragments.StatisticsOnlineFragment;
 import com.itdoors.haccp.ui.fragments.SwipeRefreshListFragment;
 import com.itdoors.haccp.ui.fragments.TimeRangeDialogFragment;
 import com.itdoors.haccp.ui.fragments.StatisticsOnlineFragment.MODE;
@@ -69,11 +74,11 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		StatisticsOnlineFragment.StatisticsListModeHolder,
 		OnTimeRangeChooseListener,
 		OnRefreshListener,
-		TabListener
+		TabListener,
+		OnNavigationListener 
 {
 	
 	private static final String CHOOSE_TIME_RANGE_TYPE_DIALOG = "com.itdoors.haccp.activities.PointDetailsActivity.CHOOSE_TIME_RANGE_TYPE_DIALOG";
-	private static final String STATISTCICS_FRAGMENT_SAVE_KEY = "com.itdoors.haccp.activities.PointDetailsActivity.STATISTCICS_FRAGMENT_SAVE_KEY"; 
 	private static final String STATISTICS_MODE_SAVE_KEY 	  = "com.itdoors.haccp.activities.PointDetailsActivity.STATISTICS_MODE_SAVE_KEY";
 	private static final String STATISTICS_FROM_TIME_SAVE_KEY = "com.itdoors.haccp.activities.PointDetailsActivity.STATISTICS_FROM_TIME_SAVE_KEY";
 	private static final String STATISTICS_TO_TIME_SAVE_KEY   = "com.itdoors.haccp.activities.PointDetailsActivity.STATISTICS_TO_TIME_SAVE_KEY";
@@ -101,9 +106,8 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	
 	private SpiceManager spiceManager = new SpiceManager(MySpiceService.class);
 	
-    private ViewPager  mViewPager;
-    
-    private Fragment mStatisticsFragment;
+	private ArrayPagerAdapter<Fragment> mViewPagerAdapter;
+	private ViewPager  mViewPager;
     
 	private StatisticsOnlineFragment.MODE mStatisticFragmentMode;
 	private String fromTimeStamp;
@@ -118,16 +122,14 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		@Override
 		public void onRequestFailure(SpiceException exception) {
 			ToastUtil.ToastLong(getApplicationContext(), getString(R.string.failed_to_load_data));
-			refreshFailed();
+			hideSwipeAnimation();
 		}
 		@Override
 		public void onRequestSuccess(MoreStatistics statistics) {
 		
-			PointDetailsActivity.this.networkMode = Mode.ONLINE;
+			updateStatisticsAfterRefreshSuccess(statistics);
 			PointDetailsActivity.this.mStatisticFragmentMode = MODE.GENERAL;
-    		updateStatisticsAfterRefreshSuccess(statistics);
-    		NotificationDialogFragment.newInstance("Responce:", statistics.toString()).show(getSupportFragmentManager(), "responce");
-			//refreshSuccess();
+    	    hideSwipeAnimation();
 		}
 	};
 	
@@ -136,16 +138,14 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		@Override
 		public void onRequestFailure(SpiceException exception) {
 			ToastUtil.ToastLong(getApplicationContext(), getString(R.string.failed_to_load_data));
-			refreshFailed();
+			hideSwipeAnimation();
 		}
 
 		@Override
 		public void onRequestSuccess(MoreStatistics statistics) {
-			PointDetailsActivity.this.networkMode = Mode.ONLINE;
+			updateStatisticsAfterRefreshSuccess(statistics);
 			PointDetailsActivity.this.mStatisticFragmentMode = MODE.GENERAL;
-    		updateStatisticsAfterRefreshSuccess(statistics);
-			NotificationDialogFragment.newInstance("Responce:", statistics.toString()).show(getSupportFragmentManager(), "responce");
-			refreshSuccess();
+    		hideSwipeAnimation();
 		}
 
 		@Override
@@ -157,14 +157,14 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		@Override
 		public void onRequestFailure(SpiceException exception) {
 			ToastUtil.ToastLong(getApplicationContext(), getString(R.string.failed_to_load_data));
-			refreshFailed();
+			hideSwipeAnimation();
 		}
 		@Override
 		public void onRequestSuccess(MoreStatistics statistics) {
 		
 			PointDetailsActivity.this.mStatisticFragmentMode = MODE.FROM_TIME_RANGE;
     		updateStatisticsAfterTimeRangeLoadSuccess(statistics);
-			refreshSuccess();
+			hideSwipeAnimation();
 		}
 	};
 	
@@ -173,14 +173,14 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		@Override
 		public void onRequestFailure(SpiceException exception) {
 			ToastUtil.ToastLong(getApplicationContext(), getString(R.string.failed_to_load_data));
-			refreshFailed();
+			hideSwipeAnimation();
 		}
 
 		@Override
 		public void onRequestSuccess(MoreStatistics statistics) {
 			PointDetailsActivity.this.mStatisticFragmentMode = MODE.FROM_TIME_RANGE;
     		updateStatisticsAfterTimeRangeLoadSuccess(statistics);
-			refreshSuccess();
+			hideSwipeAnimation();
 		}
 
 		@Override
@@ -188,10 +188,13 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		}
 	};
 	
+
+	
 	@Override
 	protected void onStart() {
-		spiceManager.start(this);
 		super.onStart();
+		spiceManager.start(this);
+		Logger.Loge(getClass(), "onStart()");
 	}
 	
 	@Override
@@ -199,15 +202,33 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		super.onResume();
 		if(getIntent().getExtras() != null){
 			int id = getIntent().getExtras().getInt(Intents.Point.UID);
-			spiceManager.addListenerIfPending(MoreStatistics.class, GetStatisticsRequest.getCacheKey(id), mRefreshPendingRequestListener);
-			spiceManager.addListenerIfPending(MoreStatistics.class, GetStatisticsRequest.getCacheKey(id, fromTimeStamp, toTimeStamp), mFromTimeRangePendingRequestListener);
+			if(mStatisticFragmentMode == MODE.GENERAL)
+			  spiceManager.addListenerIfPending(MoreStatistics.class, GetStatisticsRequest.getCacheKey(id), mRefreshPendingRequestListener);
+			if(fromTimeStamp != null && toTimeStamp != null && mStatisticFragmentMode == MODE.FROM_TIME_RANGE)
+			  spiceManager.addListenerIfPending(MoreStatistics.class, GetStatisticsRequest.getCacheKey(id, fromTimeStamp, toTimeStamp), mFromTimeRangePendingRequestListener);
 		}
+
+		Logger.Loge(getClass(), "onResume()");
+	}
+	@Override
+	protected void onPause() {
+		super.onPause();
+		Logger.Loge(getClass(), "onPause()");
+	}
+	@Override
+	protected void onStop() {
+		if(spiceManager.isStarted())
+		   spiceManager.shouldStop();
+		super.onStop();
+		
+		Logger.Loge(getClass(), "onStop()");
 	}
 	
 	@Override
-	protected void onStop() {
-		spiceManager.shouldStop();
-		super.onStop();
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		Logger.Loge(getClass(), "onDestroy()");
 	}
 	
 	public SpiceManager getSpiceManager(){
@@ -234,37 +255,23 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 			fromTimeStamp = savedInstanceState.getString(STATISTICS_FROM_TIME_SAVE_KEY);
 			toTimeStamp = savedInstanceState.getString(STATISTICS_TO_TIME_SAVE_KEY);
 			title = savedInstanceState.getString(TITLE_SAVE_KEY);
-			
-			if (mStatisticsFragment == null) {
-			 	mStatisticsFragment = (ReplaceableFragment) getSupportFragmentManager()
-			 			.getFragment(savedInstanceState, STATISTCICS_FRAGMENT_SAVE_KEY);
-			}
+	
 		}
 		
 		setTitle(title);
 		setContentView(R.layout.activity_control_point);
 		
 		mViewPager = (ViewPager)findViewById(R.id.cp_pager);
-        
-		if(mViewPager != null){
-     		
-		    mViewPager.setAdapter( new PointInfoTabsAdapter(getSupportFragmentManager()));
-		    mViewPager.setOnPageChangeListener(this);
-		    mViewPager.setPageMarginDrawable(R.drawable.grey_border_inset_lr);
-            mViewPager.setPageMargin(getResources()
-                    .getDimensionPixelSize(R.dimen.page_margin_width));
-		    
-		    final ActionBar actionBar = getSupportActionBar();
-            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-            actionBar.addTab(actionBar.newTab()
-                    .setText(R.string.statistics)
-                    .setTabListener(this));
-            actionBar.addTab(actionBar.newTab()
-                    .setText(R.string.attributes)
-                    .setTabListener(this));
-          	
-        }
+		mViewPagerAdapter = buildViewPagerAdapter();
 		
+		mViewPager.setAdapter(mViewPagerAdapter);
+		mViewPager.setOnPageChangeListener(this);
+		mViewPager.setPageMarginDrawable(R.drawable.grey_border_inset_lr);
+        mViewPager.setPageMargin(getResources()
+        		.getDimensionPixelSize(R.dimen.page_margin_width));
+		
+        buildActionBar();
+       
 		ViewGroup bottomPanel = (ViewGroup)findViewById(R.id.cp_bottom_panel);
 		View.OnClickListener mOnBottomPanelClickListener = new View.OnClickListener() {
 			
@@ -278,8 +285,73 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		bottomPanel.findViewById(R.id.cp_bp_params_item).setOnClickListener(mOnBottomPanelClickListener);
 		bottomPanel.findViewById(R.id.cp_bp_calendar_item).setOnClickListener(mOnBottomPanelClickListener);
 	
+		Logger.Loge(getClass(), "onCreate()");
 	}
+	
+	private void buildActionBar(){
+		
+		final ActionBar actionBar = getSupportActionBar();
+		int navigationMode = (getResources().getConfiguration().orientation == 
+	    	Configuration.ORIENTATION_PORTRAIT) ? 
+	    			ActionBar.NAVIGATION_MODE_TABS : 
+	    			ActionBar.NAVIGATION_MODE_LIST;
+	        actionBar.setNavigationMode(navigationMode);
+	        
+	        if(navigationMode == ActionBar.NAVIGATION_MODE_TABS){
+		    	actionBar.addTab(actionBar.newTab()
+		          .setText(R.string.statistics)
+		          .setTabListener(this));
+		        actionBar.addTab(actionBar.newTab()
+		         .setText(R.string.attributes)
+		         .setTabListener(this));
+		    }
+	        else{
+	        	Context context = getSupportActionBar().getThemedContext();
+	            ArrayAdapter<CharSequence> list = ArrayAdapter.createFromResource(context, 
+	            		R.array.point_details_navigation, R.layout.sherlock_spinner_item);
+	            list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+	            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+	            actionBar.setListNavigationCallbacks(list, this);
+	        }
+	}
+	
+	private static String ONLINE = "online";
+	private static String OFFLINE = "offline";
+	private static String ATTRIBUTES = "attributes";
    
+	private ArrayPagerAdapter<Fragment> buildViewPagerAdapter(){
+		
+		ArrayList<PageDescriptor> pages=new ArrayList<PageDescriptor>();
+		String statTag = (networkMode == Mode.ONLINE) ? ONLINE : OFFLINE;
+		pages.add( new SimplePageDescriptor(statTag, null));
+		pages.add( new SimplePageDescriptor(ATTRIBUTES, null));
+		return new SamplePagerAdapter(getSupportFragmentManager(), pages);
+	}
+	
+	private class SamplePagerAdapter extends ArrayPagerAdapter<Fragment> {
+		
+		public SamplePagerAdapter(FragmentManager fragmentManager, ArrayList<PageDescriptor> descriptors) {
+			super(fragmentManager, descriptors);
+		}
+		
+		@Override
+		protected Fragment createFragment(PageDescriptor desc) {
+			if(desc.getFragmentTag().equals(ONLINE))
+				return new StatisticsOnlineFragment();
+			if(desc.getFragmentTag().equals(OFFLINE))
+				return new StatisticsOfflineFragment();
+			else if (desc.getFragmentTag().equals(ATTRIBUTES))
+				return new AttributesFragment();
+			throw new IllegalArgumentException("Unknown fragmnent tag:" + desc.getFragmentTag());
+		}
+	}
+	
+	@Override
+	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+    	mViewPager.setCurrentItem(itemPosition);
+		return true;
+	}
+	   
 	@Override
 	public void onTabSelected(Tab tab, FragmentTransaction ft) {
 		 mViewPager.setCurrentItem(tab.getPosition());
@@ -309,89 +381,6 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		}
 	}
 	
-	private class PointInfoTabsAdapter extends FragmentPagerAdapter{
-		
-		public PointInfoTabsAdapter(FragmentManager fm) {
-	       super(fm);
-		}
-		
-		@Override
-		public Fragment getItem(int position) {
-			
-			switch (position) {
-			
-				case 0: {
-					
-					Logger.Loge(getClass(), "getItem, netwok is online: " + (networkMode == Mode.ONLINE) );
-					return ( mStatisticsFragment = 
-									(networkMode == Mode.ONLINE) 
-										? ReplaceableFragment.newInstance(StatisticsOnlineFragment.class)
-										: ReplaceableFragment.newInstance(StatisticsOfflineFragment.class));
-				}
-				
-				case 1:	return new AttributesFragment();
-			};
-			return new Fragment();
-		}
-		
-		@Override
-		public int getCount() {
-			return 2;
-		}
-	
-	}
-	
-	public static class ReplaceableFragment extends Fragment{
-	
-		public static ReplaceableFragment newInstance(Class<?> _class){
-			
-			ReplaceableFragment f = new ReplaceableFragment();
-			Bundle args = new Bundle();
-			args. putSerializable("class", _class);
-			f.setArguments(args);
-			return f;
-		
-		}
-
-		@Override
-		public void onActivityCreated(Bundle savedInstanceState) {
-			super.onActivityCreated(savedInstanceState);
-			
-			FragmentManager fm = getChildFragmentManager();
-			Fragment insideFragment = fm.findFragmentByTag("insideFragment");
-			if(insideFragment == null && getArguments() != null){
-				
-				Logger.Loge(getClass(), "create inside fragment");
-				Class<?> clazz = (Class<?>)getArguments().getSerializable("class");
-				insideFragment = Fragment.instantiate(getActivity(), clazz.getName());
-				fm.beginTransaction()
-					.add(R.id.root_frame, insideFragment, "insideFragment")
-					.commit();
-			}
-		}
-		
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View view = inflater.inflate(R.layout.fragment_replaceable, container, false);
-			//setRetainInstance(true);
-			Logger.Logi(getClass(), "onCreateView");
-			return view;
-		}
-	
-		public void replaceInside(Fragment fragment){
-			getChildFragmentManager()
-					.beginTransaction()
-					.replace(R.id.root_frame, fragment, "insideFragment")
-					.commit();
-		}
-		
-		public Fragment getFragment(){
-			return getChildFragmentManager().findFragmentByTag("insideFragment");
-		}
-		
-	}
-    
     public boolean onBottomPanelPressed(View item){
 		
 		switch (item.getId()) {
@@ -447,9 +436,6 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		outState.putString(STATISTICS_FROM_TIME_SAVE_KEY, fromTimeStamp);
 		outState.putString(STATISTICS_TO_TIME_SAVE_KEY, toTimeStamp);
 		outState.putString(TITLE_SAVE_KEY, getTitle().toString());
-		if (mStatisticsFragment != null) {
-			 getSupportFragmentManager().putFragment(outState, STATISTCICS_FRAGMENT_SAVE_KEY, mStatisticsFragment);
-	    }
 	}
 
     @SuppressLint("SimpleDateFormat")
@@ -466,7 +452,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	    		String toTimeStampStr = CalendarUtils.inUsualDateFromat(toTimeStamp);
 	    				
 	    		ToastUtil.ToastLong(getApplicationContext(), getString(R.string.from) + " : " + fromTimeStampStr + ", " + getString(R.string.to) + " : " + toTimeStampStr);
-	    		loadStatisticsFromTimeRange(fromTimeStamp, toTimeStamp);
+	    		onStatisticsFromTimeRangeLoad(fromTimeStamp, toTimeStamp);
 	    	
 	    	}
 	    }
@@ -533,18 +519,30 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	// Swipe refresh support.v4 rev.19.1;
 	@Override
 	public void onRefresh() {
-		if(networkMode == Mode.ONLINE){
-			refreshStatistics();
-		}
-		else{
-			if(Enviroment.isNetworkAvaliable(this)){
+		if(Enviroment.isNetworkAvaliable(this)){
+			if(networkMode == Mode.ONLINE){
 				refreshStatistics();
 			}
 			else{
-				ToastUtil.ToastLong(getApplicationContext(), getString(R.string.not_avalieble_without_any_interent_connection));
-				refreshFailed();
+				/*refreshStatistics();*/
+				Handler handler = new Handler();
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						mViewPagerAdapter.remove(0);
+						networkMode = Mode.ONLINE;
+						mViewPagerAdapter.insert( new SimplePageDescriptor(ONLINE, null), 0);
+		    			mViewPager.setCurrentItem(0);
+		    			hideSwipeAnimation();
+					}
+				}, 1000);
 			}
 		}
+		else{
+			ToastUtil.ToastLong(getApplicationContext(), getString(R.string.not_avalieble_without_any_interent_connection));
+			hideSwipeAnimation();
+		}
+		
 		
 	}
 
@@ -619,7 +617,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	    		
 	    		ToastUtil.ToastLong(getApplicationContext(), toastMess);
 	    		
-	    		loadStatisticsFromTimeRange(fromUnixTimeStamp, toUnixTimeStamp);
+	    		onStatisticsFromTimeRangeLoad(fromUnixTimeStamp, toUnixTimeStamp);
 				
 			}
 			else{
@@ -640,10 +638,6 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
     public void onPageSelected(int position) {
 		 getSupportActionBar().setSelectedNavigationItem(position);
     }
-
-	
-
-	
 	
 	protected void showProgress(){
 		setSupportProgressBarIndeterminateVisibility(true);
@@ -660,11 +654,34 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 			spiceManager.execute(request, request.getCacheKey(), DurationInMillis.ONE_MINUTE, mStatisticsRefreshRequestListener);
 		}
 	}
-	
-	private void loadStatisticsFromTimeRange(String fromUnixTimeStamp, String toUnixTimeStamp){
+	private void onStatisticsFromTimeRangeLoad(String from, String to){
+		if(Enviroment.isNetworkAvaliable(getApplicationContext())){
+			
+			this.fromTimeStamp = from;
+			this.toTimeStamp = to;
 		
-		this.fromTimeStamp = fromUnixTimeStamp;
-		this.toTimeStamp = toUnixTimeStamp;
+			if(networkMode == Mode.ONLINE){
+				loadStatisticsFromTimeRange(from, to);
+			}
+			else if(networkMode == Mode.OFFLINE){
+				Handler handler = new Handler();
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						mViewPagerAdapter.remove(0);
+						networkMode = Mode.ONLINE;
+						mViewPagerAdapter.insert( new SimplePageDescriptor(ONLINE, null), 0);
+		    			mViewPager.setCurrentItem(0);
+					}
+				}, 1000);
+    			
+    		}
+		}
+		else{
+			ToastUtil.ToastLong(getApplicationContext(), getString(R.string.not_avalieble_without_any_interent_connection));
+		}
+	}
+	private void loadStatisticsFromTimeRange(String fromUnixTimeStamp, String toUnixTimeStamp){
 		
 		Bundle extras = getIntent().getExtras();
 		if( extras != null){ 
@@ -675,62 +692,31 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	}
 	
 	protected void updateStatisticsAfterTimeRangeLoadSuccess(MoreStatistics content){
-		if(mStatisticsFragment != null){
+		
+		Fragment fragment = mViewPagerAdapter.getExistingFragment(0);
+		if(fragment != null){
 			if(networkMode == Mode.ONLINE){
-				StatisticsOnlineFragment fragment = (StatisticsOnlineFragment) ((ReplaceableFragment)mStatisticsFragment).getFragment();
-				fragment.updateStatisticsAfterTimeRangeLoadSuccess(content.getStatistics(), content.getMore());
-			}
-			else{
-				ReplaceableFragment fragment = (ReplaceableFragment)mStatisticsFragment;
-    			StatisticsOnlineFragment newFragment = StatisticsOnlineFragment.newInstance(
-    					StatisticsOnlineFragment.TIME_RANGE_ACTION, 
-    					(ArrayList<Statistic>)content.getStatistics(), 
-    					content.getMore()
-    			);
-    			
-    			fragment.replaceInside(newFragment);
-    			networkMode = Mode.ONLINE;
+				((StatisticsOnlineFragment)fragment).updateAfterFromTimeRangeLoad(content.getStatistics(), content.getMore());
 			}
 		}
 	}
 	
 	protected void updateStatisticsAfterRefreshSuccess(MoreStatistics content){
-		if(mStatisticsFragment != null){
-			if(networkMode == Mode.ONLINE){
-				
-				StatisticsOnlineFragment fragment = (StatisticsOnlineFragment) ((ReplaceableFragment)mStatisticsFragment).getFragment();
-				(fragment).updateStatisticsAfterRefreshSuccess(content.getStatistics(), content.getMore());
-				refreshSuccess();
-			}
-			else{
-				
-				ReplaceableFragment fragment = (ReplaceableFragment)mStatisticsFragment;
-    			StatisticsOnlineFragment newFragment = StatisticsOnlineFragment.newInstance(
-    					StatisticsOnlineFragment.REFRESH_ACTION, 
-    					(ArrayList<Statistic>)content.getStatistics(), 
-    					content.getMore()
-    			);
-    			
-    			fragment.replaceInside(newFragment);
-    			networkMode = Mode.ONLINE;	
-			}
-		}
 		
-}
-	
-	
-	
-	protected void refreshFailed(){
-		if(mStatisticsFragment != null){
-			Fragment frg = ((ReplaceableFragment)mStatisticsFragment).getFragment();
-			SwipeRefreshListFragment swipeFrg = (SwipeRefreshListFragment)frg;
-			swipeFrg.setRefreshing(false);
+		Fragment fragment = mViewPagerAdapter.getExistingFragment(0);
+		if(fragment != null){
+			if(networkMode == Mode.ONLINE){
+				((StatisticsOnlineFragment)fragment).updateAfterRefresh(content.getStatistics(), content.getMore());
+			}
 		}
 	}
-	protected void refreshSuccess(){
-		if(mStatisticsFragment != null){
-			Fragment frg = ((ReplaceableFragment)mStatisticsFragment).getFragment();
-			SwipeRefreshListFragment swipeFrg = (SwipeRefreshListFragment)frg;
+	
+	
+	
+	protected void hideSwipeAnimation(){
+		Fragment fragment = mViewPagerAdapter.getExistingFragment(0); 
+		if(fragment != null && fragment instanceof SwipeRefreshListFragment){
+			SwipeRefreshListFragment swipeFrg = (SwipeRefreshListFragment)fragment;
 			swipeFrg.setRefreshing(false);
 		}
 	}

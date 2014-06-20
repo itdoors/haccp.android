@@ -134,11 +134,6 @@ public class LoadActivityUtils {
 				View emptyView = fragmentView.findViewById(empty_id);
 				if(emptyView != null )
 					fragmentView.removeView(emptyView);
-				else
-					Logger.Loge(LoadActivityUtils.class, "emptyView == null");
-			}
-			else{
-				Logger.Loge(LoadActivityUtils.class, "fragmentView == null");
 			}
 	}
 }

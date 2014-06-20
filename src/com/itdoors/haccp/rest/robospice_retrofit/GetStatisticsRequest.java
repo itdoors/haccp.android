@@ -25,10 +25,10 @@ public class GetStatisticsRequest extends RetrofitSpiceRequest<MoreStatistics, H
 		
 		HaccpApi service = getService();
 		switch (type) {
-			case DEFAULT: 		 return service.getStaticstics(params.id);
-			case FROM_TIME:		 return service.getStaticstics(params.id, params.startDate, params.endDate);
-			case NEXT_DEFAULT:	 return service.getMoreStatistics(params.id, params.lastId);
-			case NEXT_FROM_TIME: return service.getMoreStatistics(params.id, params.startDate, params.endDate, params.lastId);
+			case DEFAULT: 		  return service.getStaticstics(params.id);
+			case FROM_TIME:   	  return service.getStaticstics(params.id, params.startDate, params.endDate);
+			case NEXT_DEFAULT:    return service.getMoreStatistics(params.id, params.lastId);
+			case NEXT_FROM_TIME:  return service.getMoreStatistics(params.id, params.startDate, params.endDate, params.lastId);
 		}
 		throw new IllegalArgumentException("Wrong Statistics request inicialization!");
 	}

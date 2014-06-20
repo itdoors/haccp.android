@@ -51,4 +51,8 @@
 	    <item>current_weak</item>
 	    <item>current_month</item>
 	</string-array>
+	<string-array name="point_details_navigation">
+	    <item>@string/statistics</item>
+	    <item>@string/attributes</item>
+	</string-array>
 </resources>

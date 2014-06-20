@@ -4,6 +4,9 @@ import retrofit.RestAdapter;
 import retrofit.RestAdapter.Builder;
 import retrofit.RestAdapter.LogLevel;
 import retrofit.converter.Converter;
+import roboguice.util.temp.Ln;
+
+import android.util.Log;
 
 import com.itdoors.haccp.Global;
 import com.octo.android.robospice.retrofit.RetrofitGsonSpiceService;
@@ -14,6 +17,7 @@ public class MySpiceService extends RetrofitGsonSpiceService{
 	public void onCreate() {
 		addRetrofitInterface(HaccpApi.class);
 		super.onCreate();
+		Ln.getConfig().setLoggingLevel(Log.ERROR);
 	}
 	
 	@Override

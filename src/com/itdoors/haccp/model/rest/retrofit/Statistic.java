@@ -56,17 +56,38 @@ public class Statistic implements Serializable{
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+    	return new ToStringBuilder(this).append("id",id)
+    			.append("value", value)
+    			.append("entryDate", entryDate)
+    			.append("characteristic", characteristic)
+    			.toString();
     }
 
     @Override
     public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this);
+    	return new HashCodeBuilder()
+	    	.append(id)
+	    	.append(value)
+	    	.append(entryDate)
+	    	.append(characteristic)
+	    	.hashCode();
     }
 
     @Override
     public boolean equals(Object other) {
-        return EqualsBuilder.reflectionEquals(this, other);
+    
+    	if(other == this)
+    		return true;
+    	if(!(other instanceof Statistic))
+    		return false;
+    	
+    	Statistic myOther = (Statistic)other;
+    	
+    	return new EqualsBuilder()
+    		.append(id, myOther.id)
+    		.append(value, myOther.value)
+    		.append(entryDate, myOther.entryDate)
+    		.append(characteristic, myOther.characteristic)
+    		.isEquals();
     }
-
 }

@@ -163,5 +163,14 @@ public class SwipeRefreshListFragment extends ListFragment {
         }
     }
     // END_INCLUDE (check_list_can_scroll)
+    @Override
+    public void onDestroyView() {
+    	if(mSwipeRefreshLayout !=null)
+    		mSwipeRefreshLayout.setOnRefreshListener(null);
+    	mSwipeRefreshLayout = null;
+    	super.onDestroyView();
+    	
+    
+    }
 
 } 

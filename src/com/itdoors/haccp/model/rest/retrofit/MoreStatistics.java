@@ -34,17 +34,33 @@ public class MoreStatistics {
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+    	return new ToStringBuilder(this).append("more",more)
+    			.append("statistics", statistics)
+    			.toString();
     }
 
     @Override
     public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this);
+    	return new HashCodeBuilder()
+	    	.append(more)
+	    	.append(statistics)
+	    	.hashCode();
     }
 
     @Override
     public boolean equals(Object other) {
-        return EqualsBuilder.reflectionEquals(this, other);
+    
+    	if(other == this)
+    		return true;
+    	if(!(other instanceof MoreStatistics))
+    		return false;
+    	
+    	MoreStatistics myOther = (MoreStatistics)other;
+    	
+    	return new EqualsBuilder()
+    		.append(more, myOther.more)
+    		.append(statistics, myOther.statistics)
+    		.isEquals();
     }
 
 }  

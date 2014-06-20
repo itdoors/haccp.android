@@ -13,6 +13,7 @@ import com.itdoors.haccp.R;
 import com.itdoors.haccp.model.StatististicsItemStatus;
 import com.itdoors.haccp.model.rest.retrofit.Characteristic;
 import com.itdoors.haccp.model.rest.retrofit.MoreStatistics;
+import com.itdoors.haccp.model.rest.retrofit.SpiceRequestInfo;
 import com.itdoors.haccp.model.rest.retrofit.Statistic;
 import com.itdoors.haccp.rest.robospice_retrofit.GetStatisticsRequest;
 import com.itdoors.haccp.rest.robospice_retrofit.GetStatisticsRequest.Builder;
@@ -25,6 +26,7 @@ import com.itdoors.haccp.utils.Logger;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
+import com.octo.android.robospice.request.listener.PendingRequestListener;
 import com.octo.android.robospice.request.listener.RequestListener;
 
 import android.annotation.SuppressLint;
@@ -70,6 +72,8 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
 	private int retryCount = 0;
 	private long retryInterval = MIN_RETRY_INTERVAL;
     
+	
+	
     public interface TimeRangeParametersHolder{
     	public String getFromTimeInTimeStamp();
     	public String getToTimeInTimeStamp();
@@ -92,7 +96,12 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
 	private OnRefreshListener mOnRefreshListener;
 	
 	private StatisticListAdapter mStreamAdapter;
-
+	
+	private List<Object> stream = new ArrayList<Object>();
+	
+	private final long  loadMoreRequestDuration = 10 * DurationInMillis.ONE_MINUTE;
+	private SpiceRequestInfo<MoreStatistics> lastLoadMoreSpiceRequestInfo;
+	
 	public static StatisticsOnlineFragment newInstance(int action, ArrayList<Statistic> preloadedContent, boolean hasMore){
 		
 		StatisticsOnlineFragment f = new StatisticsOnlineFragment();
@@ -143,6 +152,8 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
 		}
 	}
 	
+	
+	
 	private RequestListener<MoreStatistics> mLoadMoreStatisctics = new RequestListener<MoreStatistics>() {
 
 		@Override
@@ -152,13 +163,54 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
 
 		@Override
 		public void onRequestSuccess(MoreStatistics statistics) {
+			Logger.Loge(getClass(), "from callback");
+			onLoadMoreSuccess(statistics);
+		}
+	};
+	
+	private PendingRequestListener<MoreStatistics> mLoadMorePendingStatisctics = new PendingRequestListener<MoreStatistics>() {
+
+		@Override
+		public void onRequestFailure(SpiceException exception) {
+			tryExponetialBackOff();
+		}
+
+		@Override
+		public void onRequestSuccess(MoreStatistics statistics) {
+			Logger.Loge(getClass(), "from pending callback");
+			if(getStreamingState() == StreamingState.LOADING){
+				onLoadMoreSuccess(statistics);
+			}
+		}
+
+		@Override
+		public void onRequestNotFound() {}
+	};
+	private RequestListener<MoreStatistics> mLoadMoreFromCacheRequestListener = new RequestListener<MoreStatistics>() {
+
+		@Override
+		public void onRequestFailure(SpiceException exception) {
+			tryExponetialBackOff();
+		}
+		@Override
+		public void onRequestSuccess(MoreStatistics statistics) {
+			Logger.Loge(getClass(), "from cache callback");
+			if(getStreamingState() == StreamingState.LOADING){
+				onLoadMoreSuccess(statistics);
+			}
+		}
+		
+	};
+	
+	private void onLoadMoreSuccess(MoreStatistics statistics){
+		if(statistics != null){
 			boolean hasMoreResults = statistics.getMore();
 			setState(hasMoreResults ? StreamingState.DONE : StreamingState.COMPLETE);
 			onListPackageReady(statistics.getStatistics());
 			if(getStreamingState() == StreamingState.COMPLETE)
 			  addOrRemoveEmptyView(statistics.getStatistics());
 		}
-	};
+	}
 	
 	private void loadMore(int lastStatisticsId){
 		if(getActivity() != null){
@@ -171,7 +223,8 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
 					if(lastStatisticsId != -1) 
 						builder.setLastId(lastStatisticsId);
 					GetStatisticsRequest request = builder.build();
-					spiceManager.execute(request, request.getCacheKey() , 10 * DurationInMillis.ONE_MINUTE, mLoadMoreStatisctics);
+					spiceManager.execute(request, request.getCacheKey() , loadMoreRequestDuration, mLoadMoreStatisctics);
+					lastLoadMoreSpiceRequestInfo = new SpiceRequestInfo<MoreStatistics>(request, request.getCacheKey(), loadMoreRequestDuration);
 				}
 			}
 		}
@@ -191,7 +244,8 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
 					 if(lastStatisticsId != -1)
 						 builder.setLastId(lastStatisticsId);
 					GetStatisticsRequest request = builder.build();
-					spiceManager.execute(request, request.getCacheKey() , 10 * DurationInMillis.ONE_MINUTE, mLoadMoreStatisctics);
+					spiceManager.execute(request, request.getCacheKey() , loadMoreRequestDuration, mLoadMoreStatisctics);
+					lastLoadMoreSpiceRequestInfo = new SpiceRequestInfo<MoreStatistics>(request, request.getCacheKey(), loadMoreRequestDuration);
 				}
 			}
 		}
@@ -211,6 +265,13 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
 			 throw new ClassCastException(activity.toString() + " must implement OnLongStatisticsItemPressedListener, " +
 			 		"TimeRangeParametersHolder, StatisticsListModeHolder, OnRefreshListener, OnContextMenuItemPressedListener");
 		}
+		Logger.Loge(getClass(), "onAttach()");
+	}
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		Logger.Loge(getClass(), "onCreate()");
 	}
 	
 	private static final int EDIT_ID = Menu.FIRST + 3;
@@ -249,7 +310,9 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
 			Bundle savedInstanceState) {
 		View root = super.onCreateView(inflater, container, savedInstanceState);
 		root.setBackgroundColor(Color.WHITE);
-	    return root;
+		
+		Logger.Loge(getClass(), "onCreateView()");
+		return root;
 	}
 	
 	@Override
@@ -262,14 +325,18 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
 		listView.setDrawSelectorOnTop(true);
 		listView.setTranscriptMode(ListView.TRANSCRIPT_MODE_DISABLED);
 		
-		mStreamAdapter = new StatisticListAdapter(getActivity());
-		setListAdapter(mStreamAdapter);
 		registerForContextMenu(getListView());
 		
-
 		setOnRefreshListener(mOnRefreshListener);
-		setColorScheme(R.color.swipe_first, R.color.swipe_second, R.color.swipe_third, R.color.swipe_fourth);
+		setColorScheme(R.color.swipe_first, 
+				R.color.swipe_second, 
+				R.color.swipe_third, 
+				R.color.swipe_fourth);
 		
+		mStreamAdapter = new StatisticListAdapter(getActivity(), stream);
+		
+		setListAdapter(mStreamAdapter);
+	
         if(hasPreloadedContent()){
         	int action = getArguments().getInt(ARGS_ACTION);
         	boolean hasMore = getArguments().getBoolean(ARGS_HAS_MORE);
@@ -277,30 +344,98 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
 			ArrayList<Statistic> records = (ArrayList<Statistic>)getArguments().getSerializable(ARGS_PRELOADED_CONTENT);
 			switch (action) {
 				case TIME_RANGE_ACTION:
-				  updateStatisticsAfterTimeRangeLoadSuccess(records, hasMore);
+				  updateAfterFromTimeRangeLoad(records, hasMore);
 				  break;
 				case REFRESH_ACTION:
-				  updateStatisticsAfterRefreshSuccess(records, hasMore);
+				  updateAfterRefresh(records, hasMore);
 				  break;
 			}
         	setState(StreamingState.LOADING);
         }
-      	
-        if(mStreamAdapter.isEmpty()){
-			fillStatistics();
-		}
-		
+  
+ 
+        
+        Logger.Loge(getClass(), "onViewCreated()");
 	}
 	
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		setRetainInstance(true);
+		
+		Logger.Loge(getClass(), "onActivityCreated()");
+	}
+	@Override
+	public void onStart() {
+		super.onStart();
+		Logger.Loge(getClass(), "onStart()");
+	}
+	@Override
+	public void onResume() {
+		super.onResume();
+		SpiceManager spiceManager = ((PointDetailsActivity)getActivity()).getSpiceManager();
+		if(spiceManager != null && lastLoadMoreSpiceRequestInfo != null && getStreamingState() == StreamingState.LOADING){
+			spiceManager.addListenerIfPending(MoreStatistics.class, lastLoadMoreSpiceRequestInfo.getCachekey(), mLoadMorePendingStatisctics);
+			spiceManager.getFromCacheAndLoadFromNetworkIfExpired(
+							lastLoadMoreSpiceRequestInfo.getSpiceRequest(), 
+							lastLoadMoreSpiceRequestInfo.getCachekey(), 
+							lastLoadMoreSpiceRequestInfo.getDurration(), 
+							mLoadMoreFromCacheRequestListener);
+		}
+	   
+		if(mStreamAdapter.isEmpty() ){
+			if(getStreamingState() != StreamingState.COMPLETE){
+				Logger.Loge(getClass(), "onResume(), fillStatistics()");
+		    	fill();
+	    	}
+	    	else{
+	    		LoadActivityUtils.addEmptyViewIfNotExist(this, getString(R.string.no_statistic_items));
+	    	}
+		}
+		Logger.Loge(getClass(), "onResume()");
+	}
+	@Override
+	public void onPause() {
+		super.onPause();
+		Logger.Loge(getClass(), "onPause()");
+	}
+	@Override
+	public void onStop() {
+		super.onStop();
+		Logger.Loge(getClass(), "onPause()");
+	}
+	@Override
+	public void onDestroyView() {
+		LoadActivityUtils.removeEmptyViewIfExist(this);
+		super.onDestroyView();
+		setListAdapter(null);
+		mStreamAdapter = null;
+		Logger.Loge(getClass(), "onDestroyView()");
+	}
+	
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		mOnLongStatisticsItemPressedListener = null;
+		mTimeRangeParametersHolder = null;
+		mStatisticsListModeHolder = null;
+		mOnContextMenuItemPressedListener = null;
+		mOnRefreshListener = null;
+		
+		Logger.Loge(getClass(), "onDetach()");
+	}
 	private static class StatisticListAdapter extends BaseAdapter{
 			 
 		private LayoutInflater mLayoutInflater;
 		private Map<StatististicsItemStatus, String> statusesMap;
-		private List<Object> items = new ArrayList<Object>();
+		private List<Object> items;
 		
-		public StatisticListAdapter(Context context) {
+		private final Object mLock = new Object();
+		
+		public StatisticListAdapter(Context context, List<Object> stream) {
 			mLayoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			statusesMap = PointDetailsActivity.getStatusesMap(context);
+			items = stream;
 		}
 		
 		@Override
@@ -316,10 +451,19 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
 			return position;
 		}
 		public void clear(){
-			items.clear();
+			synchronized (mLock) {
+				items.clear();	
+			}
 		}
+		
 		public void addAll(Collection<? extends Object> collection){
-			items.addAll(collection);
+			synchronized (mLock) {
+				for(Object object : collection){
+					if(!items.contains(object))
+						items.add(object);
+				}
+				//items.addAll(collection);
+			}
 		}
 		
 		@SuppressLint("SimpleDateFormat")
@@ -388,59 +532,49 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
 	  }
 	
 	
-	public void restoreStatistics(List<Statistic> records){
+	public void restore(List<Statistic> records){
 	
 		mStreamAdapter.clear();
 		mStreamAdapter.addAll(records);
 		mStreamAdapter.notifyDataSetChanged();
+		
 		addOrRemoveEmptyView(records);
 	}
 	
-	public void fillStatistics(){
+	public void fill(){
 		setState(StreamingState.LOADING );
 		load();
 	}
 	
 	
-	public void fillStatistics(List<Statistic> records, boolean hasMoreItems) {
+	public void fill(List<Statistic> records, boolean hasMoreItems) {
 		
 		mStreamAdapter.clear();
 		mStreamAdapter.addAll(records);
 		mStreamAdapter.notifyDataSetChanged();
-	
-		setState(hasMoreItems ? StreamingState.LOADING : StreamingState.COMPLETE);
-		if(getStreamingState() == StreamingState.LOADING) load();
+		
+		setState(hasMoreItems ? StreamingState.DONE : StreamingState.COMPLETE);
 		addOrRemoveEmptyView(records);
 		
 	}
 	
-	public void updateStatisticsAfterAddRequestSuccess( List<Statistic> records, Boolean hasMoreStatiscticItems) {
+	public void updateAfterFromTimeRangeLoad(List<Statistic> records, Boolean hasMore) {
 		
 		mStreamAdapter.clear();
 		mStreamAdapter.addAll(records);
 		mStreamAdapter.notifyDataSetChanged();
+		
+		setState(hasMore ? StreamingState.DONE : StreamingState.COMPLETE);
 		addOrRemoveEmptyView(records);
 	}
 	
-	public void updateStatisticsAfterTimeRangeLoadSuccess(List<Statistic> records, Boolean hasMoreStatiscticItems) {
+	public void updateAfterRefresh(List<Statistic> records, Boolean hasMore) {
 		
 		mStreamAdapter.clear();
 		mStreamAdapter.addAll(records);
 		mStreamAdapter.notifyDataSetChanged();
 		
-		setState(hasMoreStatiscticItems ? StreamingState.LOADING : StreamingState.COMPLETE);
-		if(getStreamingState() == StreamingState.LOADING) load();
-		addOrRemoveEmptyView(records);
-	}
-	
-	public void updateStatisticsAfterRefreshSuccess(List<Statistic> records, Boolean hasMoreStatiscticItems) {
-		
-		mStreamAdapter.clear();
-		mStreamAdapter.addAll(records);
-		mStreamAdapter.notifyDataSetChanged();
-		
-		setState(hasMoreStatiscticItems ? StreamingState.LOADING : StreamingState.COMPLETE);
-		if(getStreamingState() == StreamingState.LOADING) load();
+		setState(hasMore ? StreamingState.DONE : StreamingState.COMPLETE);
 		addOrRemoveEmptyView(records);
 	}
 	
@@ -454,6 +588,7 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
 		setState(StreamingState.INIT);
 		mStreamAdapter.clear();
 		mStreamAdapter.notifyDataSetChanged();
+		
 		LoadActivityUtils.addEmptyViewIfNotExist(this, getString(R.string.no_statistic_items));
 	}
 	
@@ -481,7 +616,7 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
     	if(collection != null){
     		mStreamAdapter.addAll(collection);
      	   	mStreamAdapter.notifyDataSetChanged();
-    	}
+     	}
 	}
 	private void tryExponetialBackOff(){
 		// simple exponential back-off
