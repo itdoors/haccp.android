@@ -129,7 +129,6 @@ public class Processor {
 				//update point status
 				Logger.Logi(getClass(), "update point status " + requestId);
 				
-				@SuppressWarnings("unused")
 				final UpdatePointStatusResponce updatePointStatusResponce = (UpdatePointStatusResponce) responce;
 				final PointRecord record = updatePointStatusResponce.getPointRecord();
 				if(record != null){

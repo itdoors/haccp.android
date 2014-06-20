@@ -441,6 +441,7 @@ public class StreamParser {
 	}
 	
 	
+	@SuppressWarnings("unused")
 	private static String readStream(GZIPInputStream gzip) throws IOException {
 		 
 		Writer writer = new StringWriter();

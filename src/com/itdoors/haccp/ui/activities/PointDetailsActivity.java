@@ -7,8 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.http.util.LangUtils;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;

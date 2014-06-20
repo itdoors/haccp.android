@@ -644,7 +644,7 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
 		@Override
 		public void run() {
 			StatisticsOnlineFragment fragment = fragmentRef.get();
-			if(fragment != null){
+			if(fragment != null && fragment.isAdded()){
 				Logger.Logi(getClass(), "retry : " + "count: "  + fragment.retryCount + ", interval:" + fragment.retryInterval);
         		fragment.setState(StreamingState.REPEAT);
         		fragment.loadMoreResults();

@@ -54,7 +54,7 @@
     <string name="cp_statistics_type_approved">Approved</string>
     <string name="cp_statistics_type_danger">Danger</string>
     <string name="add">Добавить</string>
-    <string name="settings">Еще</string>
+    <string name="settings">Настройки</string>
     <string name="timeslot">Интервал</string>
     <string name="edit">Изменить</string>
     <string name="delete">Удалить</string>
