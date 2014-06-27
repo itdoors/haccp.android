@@ -18,8 +18,8 @@
     </style>
 
     <style name="MainMenuStyle" parent="Theme.Sherlock.Light.DarkActionBar">
-        <item name="homeAsUpIndicator">@drawable/main_menu_home_as_up_indicator</item>
-        <item name="android:homeAsUpIndicator">@drawable/main_menu_home_as_up_indicator</item>
+        <item name="homeAsUpIndicator">@drawable/ic_drawer</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_drawer</item>
     </style>
 
 </resources>

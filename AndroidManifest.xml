@@ -36,6 +36,7 @@
         android:icon="@drawable/logo_300"
         android:label="@string/app_name_haccp"
         android:theme="@style/Theme.Sherlock.Light.DarkActionBar" >
+        <!--  
         <activity
             android:name="com.itdoors.haccp.ui.activities.MainActivity"
             android:label="@string/app_name_haccp"
@@ -46,6 +47,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+          -->
+        <activity
+            android:name="com.itdoors.haccp.ui.activities.HomeActivity"
+            android:label="@string/app_name_haccp"
+            android:uiOptions="splitActionBarWhenNarrow" 
+            android:theme="@style/MainMenuStyle"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+      
         <activity android:name="com.itdoors.haccp.ui.activities.PointDetailsActivity" />
         <activity android:name="com.itdoors.haccp.ui.activities.CalendarActivity" />
         <activity android:name="com.itdoors.haccp.ui.activities.AddStatisticsActivity" />

@@ -384,11 +384,11 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
 		}
 	   
 		if(mStreamAdapter.isEmpty() ){
-			if(getStreamingState() != StreamingState.COMPLETE){
+			if(getStreamingState() != StreamingState.COMPLETE && getStreamingState() != StreamingState.ERROR){
 				Logger.Loge(getClass(), "onResume(), fillStatistics()");
 		    	fill();
 	    	}
-	    	else{
+			else{
 	    		LoadActivityUtils.addEmptyViewIfNotExist(this, getString(R.string.no_statistic_items));
 	    	}
 		}

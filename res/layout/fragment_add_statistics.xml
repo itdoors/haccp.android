@@ -41,7 +41,7 @@
 
         <Button
             android:id="@+id/add_st_done_btn"
-            android:layout_width="fill_parent"
+            android:layout_width="360dp"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_marginLeft="30dp"

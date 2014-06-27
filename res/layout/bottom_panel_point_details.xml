@@ -5,8 +5,7 @@
     android:baselineAligned="false"
     android:background="@drawable/abs__ab_solid_light_holo"
     android:orientation="horizontal"
-    android:paddingBottom="5dp"
-    android:paddingTop="5dp"
+   
     >
     <LinearLayout
         android:id="@+id/cp_bp_params_item"
@@ -15,6 +14,8 @@
         android:layout_weight="1"
         android:background="@drawable/abs__tab_indicator_ab_holo"
         android:orientation="horizontal"
+        android:paddingBottom="5dp"
+    	android:paddingTop="5dp"
         >
         <ImageView
             android:id="@+id/cp_bottom_panel_params_img"
@@ -39,6 +40,9 @@
         android:layout_weight="1"
         android:background="@drawable/abs__tab_indicator_ab_holo"
         android:orientation="horizontal"
+        android:paddingBottom="5dp"
+    	android:paddingTop="5dp"
+        
         >
         <ImageView
             android:id="@+id/cp_bottom_panel_calendar_img"
@@ -63,6 +67,9 @@
         android:layout_weight="1"
         android:background="@drawable/abs__tab_indicator_ab_holo"
         android:orientation="horizontal"
+        android:paddingBottom="5dp"
+    	android:paddingTop="5dp"
+        
         >
         <ImageView
             android:id="@+id/cp_bottom_panel_add_img"
