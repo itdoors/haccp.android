@@ -3,10 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="20dp" >
+    android:padding="20dp">
 
     <com.squareup.timessquare.CalendarPickerView
-        
         android:layout_gravity="center_horizontal"
         android:id="@+id/calendar_view"
         android:layout_width="match_parent"

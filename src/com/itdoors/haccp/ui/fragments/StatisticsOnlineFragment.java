@@ -46,7 +46,6 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
@@ -516,7 +515,7 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
 				
 				
 				int backgroundResources = (position % 2 == 0) ? R.drawable.abs__ab_solid_light_holo : R.drawable.abs__ab_solid_shadow_holo;
-				((RelativeLayout)convertView).setBackgroundResource(backgroundResources);
+				convertView.setBackgroundResource(backgroundResources);
 			
 			return convertView;
 		}

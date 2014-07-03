@@ -7,7 +7,7 @@
 
     <com.squareup.timessquare.CalendarPickerView
         android:id="@+id/calendar_view"
-        android:layout_width="360dp"
+        android:layout_width="@dimen/landscape_widht"
         android:layout_gravity="center_horizontal"
         android:layout_height="fill_parent"
         android:background="#FFFFFF"

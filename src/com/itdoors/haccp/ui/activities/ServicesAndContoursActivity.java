@@ -1,6 +1,5 @@
 package com.itdoors.haccp.ui.activities;
 
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,16 +19,15 @@ public class ServicesAndContoursActivity extends SherlockFragmentActivity implem
 	
 	private static final String FRAGMENT_TAG = "com.itdoors.haccp.activities.ServicesAndContoursActivity.FRAGMENT_TAG";
 	
-	
 	private Fragment mFragment;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-
-		requestWindowFeature(com.actionbarsherlock.view.Window.FEATURE_INDETERMINATE_PROGRESS);
+		
 		super.onCreate(savedInstanceState);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		setSupportProgressBarIndeterminateVisibility(false);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		
 		setContentView(R.layout.activity_services_and_contours);
 		setTitle(R.string.contours);
 		
@@ -85,7 +83,7 @@ public class ServicesAndContoursActivity extends SherlockFragmentActivity implem
 			CompanyObject companyobject = (CompanyObject)getIntent().getExtras().get(Intents.CompanyObject.COMPANY_OBJECT);
 			Intent intent = PointsListActivity.newIntentInstance(this, companyobject, contour);
 			startActivity(intent);
-			
+		
 		}
 		
 	}

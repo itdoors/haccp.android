@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class ContextUtils {
@@ -34,5 +36,19 @@ public class ContextUtils {
 		textView.setText(context.getString(R.string.loading));
 		textView.setGravity(Gravity.CENTER);
 		return textView;
+	}
+	
+	public static FrameLayout wrapListFragment(FrameLayout frameLayout){
+		Context context = frameLayout.getContext();
+		ListView list = (ListView)frameLayout.findViewById(android.R.id.list);
+		boolean isTablet = Enviroment.isTablet(context);
+		FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(list.getLayoutParams());
+		if(isTablet){
+			lp.width = context.getResources().getDimensionPixelSize(R.dimen.list_widht);
+			lp.gravity = Gravity.CENTER_HORIZONTAL;
+			list.setLayoutParams(lp);
+			list.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
+		}
+		return frameLayout;
 	}
 }

@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/abs__ab_solid_light_holo"
+    android:orientation="vertical"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" 
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        >
+
+        <!-- CP number -->
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:singleLine="true"
+                android:text="@string/point_number"
+                android:textColor="@android:color/black"
+                android:textSize="22sp" />
+
+            <TextView
+                android:id="@+id/cp_attr_point_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="2dp"
+                android:singleLine="false"
+                android:textColor="@android:color/black"
+                android:textSize="22sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:background="@color/black" />
+
+        <LinearLayout 
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp"
+           
+            >
+  
+		        <!-- CP installation date -->
+		
+		        <LinearLayout
+		            android:layout_width="fill_parent"
+		            android:layout_height="wrap_content"
+		            android:layout_marginTop="10dp"
+		            android:orientation="vertical" >
+
+		            <TextView
+		                android:layout_width="fill_parent"
+		                android:layout_height="wrap_content"
+		                android:layout_marginBottom="5dp"
+		                android:singleLine="true"
+		                android:text="@string/installation_date"
+		                android:textColor="@android:color/black"
+		                android:textSize="16sp"
+		                android:textStyle="bold" />
+		
+		            <TextView
+		                android:id="@+id/cp_attr_inst_date"
+		                android:layout_width="fill_parent"
+		                android:layout_height="wrap_content"
+		                android:background="@drawable/cp_attr_values_bg"
+		                android:paddingBottom="2dp"
+		                android:paddingLeft="5dp"
+		                android:paddingRight="5dp"
+		                android:paddingTop="2dp"
+		                android:singleLine="false"
+		                android:textColor="@android:color/black"
+		                android:typeface="serif"
+		                android:textSize="16sp" />
+		        </LinearLayout>
+		
+		        <!-- CP who_set -->
+		
+		        <LinearLayout
+		            android:layout_width="fill_parent"
+		            android:layout_height="wrap_content"
+		            android:layout_marginTop="10dp"
+		            android:orientation="vertical" >
+		
+		            <TextView
+		                android:layout_width="fill_parent"
+		                android:layout_height="wrap_content"
+		                android:layout_marginBottom="5dp"
+		                android:singleLine="true"
+		                android:text="@string/who_set"
+		                android:textColor="@android:color/black"
+		                android:textSize="16sp"
+		                android:textStyle="bold" />
+		
+		            <TextView
+		                android:id="@+id/cp_attr_who_set"
+		                android:layout_width="fill_parent"
+		                android:layout_height="wrap_content"
+		                android:background="@drawable/cp_attr_values_bg"
+		                android:paddingBottom="2dp"
+		                android:paddingLeft="5dp"
+		                android:paddingRight="5dp"
+		                android:paddingTop="2dp"
+		                android:singleLine="false"
+		                android:textColor="@android:color/black"
+		                android:typeface="serif"
+		                android:textSize="16sp" />
+		        </LinearLayout>
+		
+		        <!-- CP type -->
+		
+		        <LinearLayout
+		            android:layout_width="fill_parent"
+		            android:layout_height="wrap_content"
+		            android:layout_marginTop="10dp"
+		            android:orientation="vertical" >
+		
+		            <TextView
+		                android:layout_width="fill_parent"
+		                android:layout_height="wrap_content"
+		                android:layout_marginBottom="5dp"
+		                android:singleLine="true"
+		                android:text="@string/point_type"
+		                android:textColor="@android:color/black"
+		                android:textSize="16sp"
+		                android:textStyle="bold" />
+		
+		            <TextView
+		                android:id="@+id/cp_attr_point_type"
+		                android:layout_width="fill_parent"
+		                android:layout_height="wrap_content"
+		                android:background="@drawable/cp_attr_values_bg"
+		                android:paddingBottom="2dp"
+		                android:paddingLeft="5dp"
+		                android:paddingRight="5dp"
+		                android:paddingTop="2dp"
+		                android:singleLine="false"
+		                android:textColor="@android:color/black"
+		                android:typeface="serif"
+		                android:textSize="16sp" />
+		        </LinearLayout>
+			
+		
+		        <!-- CP mlevel -->
+		
+				        <LinearLayout
+				            android:id="@+id/product_descr_category_holder"
+				            android:layout_width="fill_parent"
+				            android:layout_height="wrap_content"
+				            android:layout_marginTop="10dp"
+				            android:orientation="vertical" >
+				
+				            <TextView
+				                android:layout_width="fill_parent"
+				                android:layout_height="wrap_content"
+				                android:layout_marginBottom="5dp"
+				                android:singleLine="true"
+				                android:text="@string/multi_barrier_level"
+				                android:textColor="@android:color/black"
+				                android:textSize="16sp"
+				                android:textStyle="bold" />
+				
+				            <TextView
+				                android:id="@+id/cp_attr_mlevel"
+				                android:layout_width="fill_parent"
+				                android:layout_height="wrap_content"
+				                android:background="@drawable/cp_attr_values_bg"
+				                android:paddingBottom="2dp"
+				                android:paddingLeft="5dp"
+				                android:paddingRight="5dp"
+				                android:paddingTop="2dp"
+				                android:singleLine="false"
+				                android:textColor="@android:color/black"
+				                android:typeface="serif"
+				                android:textSize="16sp" />
+				        </LinearLayout>
+				
+				        <!-- CP monitoring object -->
+				
+				        <LinearLayout
+				            android:id="@+id/cp_attr_mobject_holder"
+				            android:layout_width="fill_parent"
+				            android:layout_height="wrap_content"
+				            android:layout_marginTop="10dp"
+				            android:orientation="vertical" >
+				
+				            <TextView
+				                android:layout_width="fill_parent"
+				                android:layout_height="wrap_content"
+				                android:layout_marginBottom="5dp"
+				                android:singleLine="true"
+				                android:text="@string/object"
+				                android:textColor="@android:color/black"
+				                android:textSize="16sp"
+				                android:textStyle="bold" />
+				
+				            <TextView
+				                android:id="@+id/cp_attr_object"
+				                android:layout_width="fill_parent"
+				                android:layout_height="wrap_content"
+				                android:background="@drawable/cp_attr_values_bg"
+				                android:paddingBottom="2dp"
+				                android:paddingLeft="5dp"
+				                android:paddingRight="5dp"
+				                android:paddingTop="2dp"
+				                android:singleLine="false"
+				                android:textColor="@android:color/black"
+				                android:typeface="serif"
+				                android:textSize="16sp" />
+				        </LinearLayout>
+				
+				        <!-- CP status -->
+				
+				        <LinearLayout
+				            android:id="@+id/cp_attr_status_holder"
+				            android:layout_width="fill_parent"
+				            android:layout_height="wrap_content"
+				            android:layout_marginTop="10dp"
+				            android:orientation="vertical" >
+				 		
+				            <TextView
+				                android:layout_width="fill_parent"
+				                android:layout_height="wrap_content"
+				                android:layout_marginBottom="5dp"
+				                android:singleLine="true"
+				                android:text="@string/status"
+				                android:textColor="@android:color/black"
+				                android:textSize="16sp"
+				                android:textStyle="bold" />
+							<TextView
+				                android:id="@+id/cp_attr_status"
+				                android:layout_width="fill_parent"
+				                android:layout_height="wrap_content"
+				                android:background="@drawable/cp_attr_values_bg"
+				                android:paddingBottom="2dp"
+				                android:paddingLeft="5dp"
+				                android:paddingRight="5dp"
+				                android:paddingTop="2dp"
+				                android:singleLine="false"
+				                android:textColor="@android:color/black"
+				                android:typeface="serif"
+				                android:textSize="16sp" />
+				           
+				        </LinearLayout>
+		        
+		        </LinearLayout>
+		        
+        </LinearLayout>
+    
+</ScrollView>

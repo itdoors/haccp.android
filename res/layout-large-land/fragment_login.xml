@@ -15,7 +15,7 @@
         >
 
         <ImageView
-           
+            android:contentDescription="@null"
             android:layout_width="360dp"
             android:layout_height="wrap_content"
             android:scaleType="centerInside"
@@ -71,6 +71,7 @@
             android:text="@string/login" />
 
         <ImageView
+            android:contentDescription="@null"
             android:layout_width="360dp"
             android:layout_gravity="center_horizontal"
             android:layout_height="1dp"

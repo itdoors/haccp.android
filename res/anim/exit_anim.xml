@@ -1,0 +1,13 @@
+  <set xmlns:android="http://schemas.android.com/apk/res/android"    
+        android:interpolator="@android:anim/accelerate_decelerate_interpolator">
+   <translate
+    android:fromYDelta="0%p" 
+    android:toYDelta="20%p"  
+    android:duration="700"   
+    />
+   </set>
+   
+   <!--  
+	//this takes val from 0(screenbottom) to 100(screentop).
+	//this takes val from 0(screenbottom) to 100(screentop).
+	//transition timing-->

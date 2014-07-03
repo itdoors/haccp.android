@@ -8,6 +8,7 @@ import com.itdoors.haccp.model.Contour;
 import com.itdoors.haccp.model.Service;
 import com.itdoors.haccp.provider.HaccpContract;
 import com.itdoors.haccp.ui.adapters.SectionedListAdapter;
+import com.itdoors.haccp.utils.ContextUtils;
 import com.itdoors.haccp.utils.Logger;
 
 import android.app.Activity;
@@ -19,7 +20,10 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 
 public class ServicesAndContoursFragment extends ListFragment implements
@@ -86,13 +90,17 @@ public class ServicesAndContoursFragment extends ListFragment implements
  	    
 	}
 	
-	
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		mOnContourPressedListener = (OnContourPressedListener) activity;
 	}
-	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		FrameLayout root = (FrameLayout)super.onCreateView(inflater, container, savedInstanceState); 
+		return ContextUtils.wrapListFragment(root);
+	}
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
@@ -102,6 +110,9 @@ public class ServicesAndContoursFragment extends ListFragment implements
 		mListView.setSelector(R.drawable.abs__tab_indicator_ab_holo);
 		mListView.setCacheColorHint(Color.TRANSPARENT);
 		mListView.setDrawSelectorOnTop(true);
+		
+
+		
 		//mListView.setEmptyView(ContextUtils.getEmptyListView(getActivity()));
 
 		

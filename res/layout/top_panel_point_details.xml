@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="40dp"
     android:baselineAligned="false"
-    android:background="@drawable/abs__ab_solid_light_holo"
     android:orientation="horizontal"
     style="?android:attr/buttonBarStyle"
    
@@ -12,20 +11,18 @@
         android:id="@+id/cp_bp_params_item"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:layout_weight="1"
         android:background="@drawable/abs__tab_indicator_ab_holo"
         android:orientation="horizontal"
-        android:paddingBottom="5dp"
-    	android:paddingTop="5dp"
-    	android:gravity="center"
+     	android:padding="5dp"
         >
         <ImageView
             android:id="@+id/cp_bottom_panel_params_img"
-            android:layout_width="38dp"
+            android:layout_width="30dp"
             android:layout_height="fill_parent"
             android:duplicateParentState="true"
             android:contentDescription="@null"
             android:src="@drawable/settings_purple" 
+            android:padding="2dp"
             />
         <TextView
             android:layout_width="wrap_content"
@@ -33,27 +30,26 @@
             android:gravity="center_vertical|left"
             android:duplicateParentState="true"
             android:singleLine="true"
-            android:text="@string/settings" />
+            android:text="@string/settings" 
+            android:textColor="@android:color/white"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/cp_bp_calendar_item"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:layout_weight="1"
         android:background="@drawable/abs__tab_indicator_ab_holo"
         android:orientation="horizontal"
-        android:paddingBottom="5dp"
-    	android:paddingTop="5dp"
-    	android:gravity="center"
+        android:padding="5dp"
         
         >
         <ImageView
             android:id="@+id/cp_bottom_panel_calendar_img"
-            android:layout_width="38dp"
+            android:layout_width="30dp"
             android:layout_height="fill_parent"
             android:duplicateParentState="true"
             android:contentDescription="@null"
             android:src="@drawable/calendar_red_white"
+            android:padding="2dp"
            />
         <TextView
             android:layout_width="wrap_content"
@@ -61,26 +57,25 @@
             android:gravity="center_vertical|left"
             android:duplicateParentState="true"
             android:singleLine="true"
-            android:text="@string/timeslot" />
+            android:text="@string/timeslot"
+            android:textColor="@android:color/white" />
     </LinearLayout>
 	<LinearLayout
         android:id="@+id/cp_bp_add_item"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:layout_weight="1"
         android:background="@drawable/abs__tab_indicator_ab_holo"
         android:orientation="horizontal"
-        android:paddingBottom="5dp"
-    	android:paddingTop="5dp"
-        android:gravity="center"
+       	android:padding="5dp"        
         >
         <ImageView
             android:id="@+id/cp_bottom_panel_add_img"
-            android:layout_width="38dp"
+            android:layout_width="30dp"
             android:layout_height="fill_parent"
             android:duplicateParentState="true"
             android:contentDescription="@null"
             android:src="@drawable/add_green"
+            android:padding="2dp"
             />
         <TextView
             android:layout_width="wrap_content"
@@ -88,6 +83,7 @@
             android:gravity="center_vertical|left"
             android:duplicateParentState="true"
             android:singleLine="true"
-            android:text="@string/add" />
+            android:text="@string/add" 
+            android:textColor="@android:color/white"/>
     </LinearLayout>
 </LinearLayout>

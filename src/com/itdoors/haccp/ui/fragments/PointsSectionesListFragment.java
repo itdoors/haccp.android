@@ -18,6 +18,7 @@ import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -28,6 +29,7 @@ import com.itdoors.haccp.model.Contour;
 import com.itdoors.haccp.model.Point;
 import com.itdoors.haccp.provider.HaccpContract;
 import com.itdoors.haccp.ui.adapters.SimpleSectionedListAdapter;
+import com.itdoors.haccp.utils.ContextUtils;
 
 public class PointsSectionesListFragment  extends ListFragment implements
 		LoaderManager.LoaderCallbacks<Cursor> {
@@ -100,7 +102,14 @@ public class PointsSectionesListFragment  extends ListFragment implements
 		super.onAttach(activity);
 		mOnPointPressedListener = (OnPointPressedListener) activity;
 	}
-
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		FrameLayout root = (FrameLayout)super.onCreateView(inflater, container, savedInstanceState); 
+		return ContextUtils.wrapListFragment(root);
+	}
+	
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);

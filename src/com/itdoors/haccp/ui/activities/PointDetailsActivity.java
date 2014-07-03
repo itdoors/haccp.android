@@ -19,6 +19,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -81,7 +82,6 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	private static final String STATISTICS_FROM_TIME_SAVE_KEY = "com.itdoors.haccp.activities.PointDetailsActivity.STATISTICS_FROM_TIME_SAVE_KEY";
 	private static final String STATISTICS_TO_TIME_SAVE_KEY   = "com.itdoors.haccp.activities.PointDetailsActivity.STATISTICS_TO_TIME_SAVE_KEY";
 	private static final String TITLE_SAVE_KEY 				  = "com.itdoors.haccp.activities.PointDetailsActivity.TITLE_SAVE_KEY";
-	
 	private static final String NETWORK_MODE_SAVE_KEY 		  = "com.itdoors.haccp.activities.PointDetailsActivity.NETWORK_MODE_SAVE_KEY"; 
 	
 	private static final int TIME_RANGE_REQUEST = 0x0abc;
@@ -107,6 +107,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 	private ArrayPagerAdapter<Fragment> mViewPagerAdapter;
 	private ViewPager  mViewPager;
     
+	//private Fragment mStatisticsFragment;
 	private StatisticsOnlineFragment.MODE mStatisticFragmentMode;
 	private String fromTimeStamp;
 	private String toTimeStamp;
@@ -260,57 +261,85 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		setContentView(R.layout.activity_control_point);
 		
 		mViewPager = (ViewPager)findViewById(R.id.cp_pager);
-		mViewPagerAdapter = buildViewPagerAdapter();
 		
-		mViewPager.setAdapter(mViewPagerAdapter);
-		mViewPager.setOnPageChangeListener(this);
-		mViewPager.setPageMarginDrawable(R.drawable.grey_border_inset_lr);
-        mViewPager.setPageMargin(getResources()
-        		.getDimensionPixelSize(R.dimen.page_margin_width));
-		
-        buildActionBar();
-       
-		ViewGroup bottomPanel = (ViewGroup)findViewById(R.id.cp_bottom_panel);
-		View.OnClickListener mOnBottomPanelClickListener = new View.OnClickListener() {
+		if(mViewPager != null){
 			
-			@Override
-			public void onClick(View v) {
-				onBottomPanelPressed(v);
-			}
-		};
-		
-		bottomPanel.findViewById(R.id.cp_bp_add_item).setOnClickListener(mOnBottomPanelClickListener);
-		bottomPanel.findViewById(R.id.cp_bp_params_item).setOnClickListener(mOnBottomPanelClickListener);
-		bottomPanel.findViewById(R.id.cp_bp_calendar_item).setOnClickListener(mOnBottomPanelClickListener);
+			mViewPagerAdapter = buildViewPagerAdapter();
+			
+			mViewPager.setAdapter(mViewPagerAdapter);
+			mViewPager.setOnPageChangeListener(this);
+			mViewPager.setPageMarginDrawable(R.drawable.grey_border_inset_lr);
+	        mViewPager.setPageMargin(getResources()
+	        		.getDimensionPixelSize(R.dimen.page_margin_width));
+			
+	        buildActionBar();
+	       
+		}
 	
+		
+		
 		Logger.Loge(getClass(), "onCreate()");
 	}
 	
 	private void buildActionBar(){
 		
 		final ActionBar actionBar = getSupportActionBar();
-		int navigationMode = (getResources().getConfiguration().orientation == 
-	    	Configuration.ORIENTATION_PORTRAIT) ? 
-	    			ActionBar.NAVIGATION_MODE_TABS : 
-	    			ActionBar.NAVIGATION_MODE_LIST;
-	        actionBar.setNavigationMode(navigationMode);
-	        
-	        if(navigationMode == ActionBar.NAVIGATION_MODE_TABS){
-		    	actionBar.addTab(actionBar.newTab()
-		          .setText(R.string.statistics)
-		          .setTabListener(this));
-		        actionBar.addTab(actionBar.newTab()
-		         .setText(R.string.attributes)
-		         .setTabListener(this));
-		    }
-	        else{
-	        	Context context = getSupportActionBar().getThemedContext();
-	            ArrayAdapter<CharSequence> list = ArrayAdapter.createFromResource(context, 
-	            		R.array.point_details_navigation, R.layout.sherlock_spinner_item);
-	            list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
-	            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-	            actionBar.setListNavigationCallbacks(list, this);
-	        }
+		int navigationMode = ActionBar.NAVIGATION_MODE_STANDARD;
+		
+		int orientation = getResources().getConfiguration().orientation;
+	    boolean isTablet = Enviroment.isTablet(getApplicationContext());
+		
+	    if(isTablet){
+				navigationMode = ActionBar.NAVIGATION_MODE_TABS;
+		}
+		else{
+			navigationMode = (orientation == Configuration.ORIENTATION_PORTRAIT) 
+					? ActionBar.NAVIGATION_MODE_TABS 
+					: ActionBar.NAVIGATION_MODE_LIST;
+		}
+		
+		actionBar.setNavigationMode(navigationMode);
+	    
+		if(actionBar.getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS){
+		   	actionBar.addTab(actionBar.newTab()
+		     .setText(R.string.statistics)
+		     .setTabListener(this));
+		    actionBar.addTab(actionBar.newTab()
+		     .setText(R.string.attributes)
+		     .setTabListener(this));
+		}
+	    else if(actionBar.getNavigationMode() == ActionBar.NAVIGATION_MODE_LIST){
+	       	Context context = getSupportActionBar().getThemedContext();
+	        ArrayAdapter<CharSequence> list = ArrayAdapter.createFromResource(context, 
+	         		R.array.point_details_navigation, R.layout.sherlock_spinner_item);
+	        list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+	        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+	        actionBar.setListNavigationCallbacks(list, this);
+	    }
+		
+
+	    View actionPanel = null;
+		View.OnClickListener mOnActionPanelClickListener = new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					onBottomPanelPressed(v);
+				}
+			};
+		
+	    if(isTablet && orientation == Configuration.ORIENTATION_LANDSCAPE){
+		    
+	    	actionPanel = LayoutInflater.from(this).inflate(R.layout.top_panel_point_details, null);
+		    actionBar.setCustomView(actionPanel);
+		    actionBar.setDisplayShowCustomEnabled(true);
+		}
+		else{
+			actionPanel = (ViewGroup)findViewById(R.id.cp_bottom_panel);
+		}
+	    if(actionPanel != null){
+	    	actionPanel.findViewById(R.id.cp_bp_add_item).setOnClickListener(mOnActionPanelClickListener);
+			actionPanel.findViewById(R.id.cp_bp_params_item).setOnClickListener(mOnActionPanelClickListener);
+			actionPanel.findViewById(R.id.cp_bp_calendar_item).setOnClickListener(mOnActionPanelClickListener);
+		}
 	}
 	
 	private static String ONLINE = "online";
@@ -326,7 +355,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		return new SamplePagerAdapter(getSupportFragmentManager(), pages);
 	}
 	
-	private class SamplePagerAdapter extends ArrayPagerAdapter<Fragment> {
+	private static class SamplePagerAdapter extends ArrayPagerAdapter<Fragment> {
 		
 		public SamplePagerAdapter(FragmentManager fragmentManager, ArrayList<PageDescriptor> descriptors) {
 			super(fragmentManager, descriptors);
@@ -335,7 +364,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 		@Override
 		protected Fragment createFragment(PageDescriptor desc) {
 			if(desc.getFragmentTag().equals(ONLINE))
-				return new StatisticsOnlineFragment();
+				return  new StatisticsOnlineFragment();
 			if(desc.getFragmentTag().equals(OFFLINE))
 				return new StatisticsOfflineFragment();
 			else if (desc.getFragmentTag().equals(ATTRIBUTES))
