@@ -23,6 +23,7 @@ import com.itdoors.haccp.ui.interfaces.OnLongStatisticsItemPressedListener;
 import com.itdoors.haccp.utils.DateUtils;
 import com.itdoors.haccp.utils.LoadActivityUtils;
 import com.itdoors.haccp.utils.Logger;
+import com.itdoors.haccp.utils.AppUtils;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
@@ -433,7 +434,7 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
 		
 		public StatisticListAdapter(Context context, List<Object> stream) {
 			mLayoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			statusesMap = PointDetailsActivity.getStatusesMap(context);
+			statusesMap = AppUtils.getStatusesMap(context);
 			items = stream;
 		}
 		
@@ -496,9 +497,9 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
 				String valueTop = characteristic == null ? "100" : characteristic.getCriticalValueTop();
 				String valueBottom = characteristic == null ? "0" : characteristic.getCriticalValueBottom();
 				
-				StatististicsItemStatus status = PointDetailsActivity.getStatus(value, valueTop, valueBottom);
+				StatististicsItemStatus status = AppUtils.getStatus(value, valueTop, valueBottom);
 				if(status != null)
-					PointDetailsActivity.setUpStatusView(status, holder.status, statusesMap);
+					AppUtils.setUpStatusView(status, holder.status, statusesMap);
 					
 				String groupNameStr  = characteristic == null ? "-" : characteristic.getName();
 				String unit = characteristic == null ? "%" : characteristic.getUnit();
