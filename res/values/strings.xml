@@ -12,8 +12,9 @@
     <string name="retry">Retry</string>
     <string name="refresh">Refresh</string>
     <string name="login">Login</string>
+    <string name="email">Email</string>
     <string name="authorization">Authorization</string>
-    <string name="email">Email address</string>
+    <string name="name_login">Login</string>
     <string name="password">Password</string>
     <string name="loading">Loading&#8230;</string>
     <string name="butt_reload">Reload</string>
@@ -40,6 +41,7 @@
     <string name="status">Status</string>
     <string name="point_number">Control point #</string>
     <string name="contours">Contours</string>
+    <string name="company_objects">Company\'s objects</string>
 
     <!-- CP TYPES -->
     <string name="cp_type_grounbait_box">Grounbait box</string>

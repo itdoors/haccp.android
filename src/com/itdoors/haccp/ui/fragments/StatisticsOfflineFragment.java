@@ -96,8 +96,8 @@ public class StatisticsOfflineFragment extends SwipeRefreshListFragment implemen
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle data) {
-        int pointID = getActivity().getIntent().getIntExtra(Intents.Point.UID, -1);
-        if (pointID == -1)
+        String pointID = getActivity().getIntent().getStringExtra(Intents.Point.UID);
+        if (pointID == null)
             return null;
 
         Uri uri = HaccpContract.Statistics.buildUriForPoint(pointID);

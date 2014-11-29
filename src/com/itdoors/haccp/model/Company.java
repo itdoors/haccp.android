@@ -1,58 +1,58 @@
+
 package com.itdoors.haccp.model;
 
 import java.io.Serializable;
 
-public class Company implements Serializable{
+public class Company implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private final int id;
-	private final String name;
+    private static final long serialVersionUID = -1911363245210238857L;
 
-	public Company(int id, String name) {
-		this.id = id;
-		this.name = name;
-	}
+    private final int id;
+    private final String name;
 
-	public String getName() {
-		return name;
-	}
+    public Company(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
-	public int getId() {
-		return id;
-	}
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public int hashCode() {
+    public int getId() {
+        return id;
+    }
 
-		int prime = 31;
-		int hash = 1;
+    @Override
+    public int hashCode() {
 
-		hash = prime * hash + Integer.valueOf(id).hashCode();
-		hash = prime * hash + (name == null ? 0 : name.hashCode());
+        int prime = 31;
+        int hash = 1;
 
-		return hash;
-	}
+        hash = prime * hash + Integer.valueOf(id).hashCode();
+        hash = prime * hash + (name == null ? 0 : name.hashCode());
 
-	@Override
-	public boolean equals(Object o) {
+        return hash;
+    }
 
-		if(this == o) return true;
-		if(!(o instanceof Company)) return false;
-		Company c = (Company)o;
-		return c.id == id && 
-			   (name == null ? c.name == null : name.equals(c.name));
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Company))
+            return false;
+        Company c = (Company) o;
+        return c.id == id &&
+                (name == null ? c.name == null : name.equals(c.name));
+    }
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("{");
-		sb.append("id:" + id +",");
-		sb.append("name:" + (name == null ? "null" : name ));
-		sb.append("}");
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        sb.append("id:" + id + ",");
+        sb.append("name:" + (name == null ? "null" : name));
+        sb.append("}");
+        return sb.toString();
+    }
 }

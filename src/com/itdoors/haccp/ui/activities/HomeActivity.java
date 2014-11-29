@@ -5,16 +5,12 @@ import java.util.Arrays;
 
 import org.json.JSONException;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
-import android.database.Cursor;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -35,14 +31,13 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.google.zxing.client.android.CaptureActivity;
 import com.itdoors.haccp.R;
-import com.itdoors.haccp.model.Company;
-import com.itdoors.haccp.model.CompanyObject;
 import com.itdoors.haccp.parser.ScanResultParser;
 import com.itdoors.haccp.provider.HaccpContract;
+import com.itdoors.haccp.provider.RestContentProvider;
 import com.itdoors.haccp.sync.SyncUtils;
 import com.itdoors.haccp.ui.fragments.AboutFragment;
-import com.itdoors.haccp.ui.fragments.CompanyObjectsFragment;
-import com.itdoors.haccp.ui.fragments.LoginFragment;
+import com.itdoors.haccp.ui.fragments.CompaniesFragment;
+import com.itdoors.haccp.ui.fragments.ProfileFragment;
 import com.itdoors.haccp.ui.fragments.QRFragment;
 import com.itdoors.haccp.ui.interfaces.SetQRCallback;
 import com.itdoors.haccp.ui.interfaces.TakeQRCallback;
@@ -50,13 +45,14 @@ import com.itdoors.haccp.ui.interfaces.TakeQRListener;
 import com.itdoors.haccp.utils.AppUtils;
 import com.itdoors.haccp.utils.Enviroment;
 import com.itdoors.haccp.utils.Logger;
-import com.itdoors.haccp.utils.NotifyingAsyncQueryHandler;
 import com.itdoors.haccp.utils.ToastUtil;
 
 public class HomeActivity extends SherlockFragmentActivity implements
         SetQRCallback,
         TakeQRListener,
-        CompanyObjectsFragment.OnCompanyObjectItemPressedListener {
+        CompaniesFragment.OnCompanyPressedListener,
+        ProfileFragment.OnLogoutPressedListener
+{
 
     private static final String SELECTED = "selected";
 
@@ -82,6 +78,13 @@ public class HomeActivity extends SherlockFragmentActivity implements
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        if (!SyncUtils.isLoggedIn(this, getIntent())) {
+            Logger.Logi(getClass(), "Need to login first...");
+            finish();
+            return;
+        }
+
         if (!SyncUtils.cheakSync(this, getIntent())) {
             Logger.Logi(getClass(), "Need sync first...");
             finish();
@@ -256,7 +259,7 @@ public class HomeActivity extends SherlockFragmentActivity implements
 
         switch (position) {
             case 0:
-                frg = new LoginFragment();
+                frg = new ProfileFragment();
                 break;
             case 1:
                 frg = new QRFragment();
@@ -271,10 +274,10 @@ public class HomeActivity extends SherlockFragmentActivity implements
                 frg = new AboutFragment();
                 break;
         }
-        if (frg != null)
+        if (frg != null) {
             replaceFragment(frg);
-
-        setTitle(mTitles[position]);
+            setTitle(mTitles[position]);
+        }
         mDrawerLayout.closeDrawer(mDrawerList);
 
     }
@@ -300,9 +303,11 @@ public class HomeActivity extends SherlockFragmentActivity implements
             if (requestCode == GET_RECOGNIZED_TEXT_REQUEST_CODE) {
                 mTakeCodeFromCameraCallback.codeFromCameraCallback(data);
                 try {
-                    Integer id = (Integer) (new ScanResultParser()).parse(data
+
+                    Logger.Logd(getClass(), "data:" + data);
+                    String id = (String) (new ScanResultParser()).parse(data
                             .getStringExtra("SCAN_RESULT"));
-                    Intent intent = PointDetailsActivity.newIntent(this, id.intValue());
+                    Intent intent = PointDetailsActivity.newIntent(this, id);
                     startActivity(intent);
 
                 } catch (JSONException e) {
@@ -337,7 +342,6 @@ public class HomeActivity extends SherlockFragmentActivity implements
             intent.setAction("com.itdoors.haccp.SCAN");
             intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
             intent.putExtra("SAVE_HISTORY", false);
-
             startActivityForResult(intent, GET_RECOGNIZED_TEXT_REQUEST_CODE);
 
         } else {
@@ -363,8 +367,6 @@ public class HomeActivity extends SherlockFragmentActivity implements
             mResource = resource;
         }
 
-        @SuppressLint("InlinedApi")
-        @TargetApi(Build.VERSION_CODES.HONEYCOMB)
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -402,24 +404,15 @@ public class HomeActivity extends SherlockFragmentActivity implements
     }
 
     public void onPointsPressed() {
-        new NotifyingAsyncQueryHandler(this, new NotifyingAsyncQueryHandler.AsyncQueryListener() {
-            @Override
-            public void onQueryComplete(int token, Object cookie, Cursor cursor) {
-                cursor.moveToFirst();
-                Company company = new Company(cursor.getInt(ComapiesQuery.UID),
-                        cursor.getString(ComapiesQuery.NAME));
-                cursor.close();
-                CompanyObjectsFragment fragment = CompanyObjectsFragment.newInstance(company);
-                replaceFragment(fragment);
-            }
-        }).startQuery(0, null, HaccpContract.Companies.CONTENT_URI, ComapiesQuery.PROJECTION, null,
-                null, HaccpContract.Companies.DEFAULT_SORT);
+
+        CompaniesFragment fragment = new CompaniesFragment();
+        replaceFragment(fragment);
+
     }
 
     public void onSettingsPressed() {
         handler.postDelayed(new Runnable() {
             public void run() {
-
                 mAdapter.notifyDataSetChanged();
                 Intent intent = new Intent(HomeActivity.this, SettingsActivity.class);
                 startActivity(intent);
@@ -428,8 +421,16 @@ public class HomeActivity extends SherlockFragmentActivity implements
     }
 
     @Override
-    public void onCompanyObjectPressedListener(CompanyObject companyObject) {
-        startActivity(ServicesAndContoursActivity.newIntentInstance(this, companyObject));
+    public void onCompanyPressedListener(com.itdoors.haccp.model.Company companyObject) {
+        startActivity(CompanyObjectsActivity.newIntentInstance(this, companyObject));
+    };
+
+    @Override
+    public void onLogoutPressed() {
+        getContentResolver().delete(RestContentProvider.BASE_CONTENT_URI, null, null);
+        // delete db
+        SyncUtils.logOut(getApplicationContext(), getIntent());
+        finish();
     }
 
     public interface ComapiesQuery {

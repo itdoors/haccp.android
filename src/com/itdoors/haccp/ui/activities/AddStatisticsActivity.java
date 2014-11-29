@@ -1,3 +1,4 @@
+
 package com.itdoors.haccp.ui.activities;
 
 import java.util.Calendar;
@@ -18,111 +19,118 @@ import com.itdoors.haccp.model.PointStatus;
 import com.itdoors.haccp.rest.AsyncSQLiteOperations;
 import com.itdoors.haccp.ui.fragments.AddStatisticsFragment;
 import com.itdoors.haccp.ui.fragments.AddStatisticsFragment.Action;
+import com.itdoors.haccp.utils.Logger;
 import com.itdoors.haccp.utils.ToastUtil;
 
-public class AddStatisticsActivity extends SherlockFragmentActivity implements AddStatisticsFragment.OnAddPressedListener{
-	
-	private static final String ADD_STATICTICS_FRAGMENT_TAG = "com.itdoors.haccp.activities.AddStatisticsActivity.ADD_STATICTICS_FRAGMENT_TAG";
-	
-	private Fragment mFragment;
+public class AddStatisticsActivity extends SherlockFragmentActivity implements
+        AddStatisticsFragment.OnAddPressedListener {
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+    private static final String ADD_STATICTICS_FRAGMENT_TAG = "com.itdoors.haccp.activities.AddStatisticsActivity.ADD_STATICTICS_FRAGMENT_TAG";
 
-		requestWindowFeature(com.actionbarsherlock.view.Window.FEATURE_INDETERMINATE_PROGRESS);
-		super.onCreate(savedInstanceState);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		setSupportProgressBarIndeterminateVisibility(false);
-		setContentView(R.layout.activity_add_statictics);
-		setTitle(R.string.add_statistic_record);
-		
-		mFragment = getSupportFragmentManager().findFragmentByTag(ADD_STATICTICS_FRAGMENT_TAG );
-		if(mFragment == null){
-				mFragment = new AddStatisticsFragment();
-				getSupportFragmentManager()
-					.beginTransaction()
-					.add(R.id.add_statictics_frame,mFragment, ADD_STATICTICS_FRAGMENT_TAG)
-					.commit();
-		}
-		
-	}
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-	    menu.add(Menu.NONE, 0 , Menu.NONE, getString(R.string.done))
-	        .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-	    return true;
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				setResult(RESULT_CANCELED);
-				finish();
-				return true;
-			case 0 :
-				onDonePressed();
-				return true;
-			
-		}
-		return super.onOptionsItemSelected(item);
-	
-	}
+    private Fragment mFragment;
 
-	public void onDonePressed(){
-		
-		if(mFragment != null && mFragment.isAdded()){
-			AddStatisticsFragment fragment = (AddStatisticsFragment)mFragment;
-			Action action = fragment.getActionType();
-			if(action != null){
-				switch (action) {
-					case CHANGE_STATUS:
-						changeStatusPressed(fragment.getStatus());
-						break;
-					case ADD_STATISTICS:
-						onAddPressed(fragment.getValues());
-						break;
-				}
-			}
-			
-		}
-	}
-	
-	@Override
-	public void onAddPressed(HashMap<GroupCharacteristic, Double> values) {
-		
-		int pointId = getIntent().getIntExtra(Intents.Point.UID, -1);
-		if(pointId == -1)
-			return;
-		
-		Iterator<Entry<GroupCharacteristic, Double>> iterator = values.entrySet().iterator();
-		Entry<GroupCharacteristic, Double> entry = null;
-		
-		if(iterator.hasNext())
-			entry = iterator.next();
-		if(entry == null) 
-			return;
-		
-		
-		GroupCharacteristic characteristic = entry.getKey();
-		Double value = entry.getValue();
-		String date = Long.toString(Calendar.getInstance().getTime().getTime() / 1000);;
-		
-		AsyncSQLiteOperations.startInsertStatistics(getContentResolver(), pointId, characteristic.getId(), date, date, Integer.toString(value.intValue()));
-		ToastUtil.ToastLong(getApplicationContext(), getString(R.string.data_will_be_entered_on_the_server));
-		finish();
-	}
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
 
-	@Override
-	public void changeStatusPressed(PointStatus status) {
-		
-		int pointId = getIntent().getIntExtra(Intents.Point.UID, -1);
-		if(pointId == -1)
-			return;
-		
-		AsyncSQLiteOperations.startUpdatePointStatus(getContentResolver(), pointId, status.getId());
-		ToastUtil.ToastLong(getApplicationContext(), getString(R.string.data_will_be_entered_on_the_server));
-		finish();
-	}
+        requestWindowFeature(com.actionbarsherlock.view.Window.FEATURE_INDETERMINATE_PROGRESS);
+        super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setSupportProgressBarIndeterminateVisibility(false);
+        setContentView(R.layout.activity_add_statictics);
+        setTitle(R.string.add_statistic_record);
+
+        mFragment = getSupportFragmentManager().findFragmentByTag(ADD_STATICTICS_FRAGMENT_TAG);
+        if (mFragment == null) {
+            mFragment = new AddStatisticsFragment();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.add_statictics_frame, mFragment, ADD_STATICTICS_FRAGMENT_TAG)
+                    .commit();
+        }
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(Menu.NONE, 0, Menu.NONE, getString(R.string.done))
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                setResult(RESULT_CANCELED);
+                finish();
+                return true;
+            case 0:
+                onDonePressed();
+                return true;
+
+        }
+        return super.onOptionsItemSelected(item);
+
+    }
+
+    public void onDonePressed() {
+
+        if (mFragment != null && mFragment.isAdded()) {
+            AddStatisticsFragment fragment = (AddStatisticsFragment) mFragment;
+            Action action = fragment.getActionType();
+            if (action != null) {
+                switch (action) {
+                    case CHANGE_STATUS:
+                        onChangeStatusPressed(fragment.getStatus());
+                        break;
+                    case ADD_STATISTICS:
+                        onAddPressed(fragment.getValues());
+                        break;
+                }
+            }
+
+        }
+    }
+
+    @Override
+    public void onAddPressed(HashMap<GroupCharacteristic, Double> values) {
+
+        String pointId = getIntent().getStringExtra(Intents.Point.UID);
+        if (pointId == null)
+            return;
+
+        Iterator<Entry<GroupCharacteristic, Double>> iterator = values.entrySet().iterator();
+        Entry<GroupCharacteristic, Double> entry = null;
+
+        if (iterator.hasNext())
+            entry = iterator.next();
+        if (entry == null)
+            return;
+
+        GroupCharacteristic characteristic = entry.getKey();
+        Double value = entry.getValue();
+        String date = Long.toString(Calendar.getInstance().getTime().getTime() / 1000);
+        ;
+
+        Logger.Logd(getClass(), "onAddPressed  pointId : " + pointId);
+        AsyncSQLiteOperations.startInsertStatistics(getContentResolver(), pointId,
+                characteristic.getId(), date, date, Integer.toString(value.intValue()));
+        ToastUtil.ToastLong(getApplicationContext(),
+                getString(R.string.data_will_be_entered_on_the_server));
+        finish();
+    }
+
+    @Override
+    public void onChangeStatusPressed(PointStatus status) {
+
+        String pointId = getIntent().getStringExtra(Intents.Point.UID);
+        if (pointId == null)
+            return;
+
+        Logger.Logd(getClass(), "onChangeStatusPressed  pointId : " + pointId);
+        AsyncSQLiteOperations.startUpdatePointStatus(getContentResolver(), pointId, status.getId());
+        ToastUtil.ToastLong(getApplicationContext(),
+                getString(R.string.data_will_be_entered_on_the_server));
+        finish();
+    }
 }

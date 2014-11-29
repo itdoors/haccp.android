@@ -19,5 +19,12 @@
     <string name="no_connection_cant_sync">Не удается синхронизировать данные с сервером. Проверьте подключение к интернету.</string>
     <string name="not_avalieble_without_any_interent_connection">Недоступно в отсутствии интернет подключения.</string>
     <string name="no_records">Нет записей.</string>
+    <string name="fill_the_fields">Заполните поля</string>
+    <string name="failed_to_log_in">Ошибка: Неверные данные!</string>
+
+    <!-- Instruction -->
+    <string name="instruction_data_sending">Данные отправляються не сразу, даже при включенном интернете</string>
+    <string name="instruction_using_flashlight">Фонарик в сканнере можно включить и выключить при помощи кнопок громкости</string>
+    <string name="instruction_do_not_off_sync">Не отключайте синхронизацию на сматрфоне</string>
     
 </resources>

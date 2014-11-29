@@ -47,18 +47,21 @@
             android:orientation="vertical" >
 
             <EditText
-                android:id="@+id/user_email"
+                android:id="@+id/user_login"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/email"
-                android:inputType="textEmailAddress" />
+                android:hint="@string/name_login"
+                android:inputType="textEmailAddress" 
+                android:imeOptions="actionNext"
+                />
 
             <EditText
                 android:id="@+id/user_pass"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/password"
-                android:inputType="textPassword" />
+                android:inputType="textPassword" 
+                android:imeOptions="actionDone"/>
         </LinearLayout>
 
         <Button

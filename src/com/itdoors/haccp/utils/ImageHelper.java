@@ -1,17 +1,21 @@
+
 package com.itdoors.haccp.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Bitmap.Config;
-import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
 
-public class ImageHelper {
+public final class ImageHelper {
+    private ImageHelper() {
+    }
+
     public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, int pixels) {
         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap
                 .getHeight(), Config.ARGB_8888);
@@ -33,7 +37,9 @@ public class ImageHelper {
 
         return output;
     }
-    public static Bitmap getRoundedCornerBitmap(Context context, Bitmap input, int pixels , int w , int h , boolean squareTL, boolean squareTR, boolean squareBL, boolean squareBR  ) {
+
+    public static Bitmap getRoundedCornerBitmap(Context context, Bitmap input, int pixels, int w,
+            int h, boolean squareTL, boolean squareTR, boolean squareBL, boolean squareBR) {
 
         Bitmap output = Bitmap.createBitmap(w, h, Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
@@ -44,43 +50,43 @@ public class ImageHelper {
         final Rect rect = new Rect(0, 0, w, h);
         final RectF rectF = new RectF(rect);
 
-        //make sure that our rounded corner is scaled appropriately
-        final float roundPx = pixels*densityMultiplier;
+        // make sure that our rounded corner is scaled appropriately
+        final float roundPx = pixels * densityMultiplier;
 
         paint.setAntiAlias(true);
         canvas.drawARGB(0, 0, 0, 0);
         paint.setColor(color);
         canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
 
-
-        //draw rectangles over the corners we want to be square
-        if (squareTL ){
-            canvas.drawRect(0, 0, w/2, h/2, paint);
+        // draw rectangles over the corners we want to be square
+        if (squareTL) {
+            canvas.drawRect(0, 0, w / 2, h / 2, paint);
         }
-        if (squareTR ){
-            canvas.drawRect(w/2, 0, w, h/2, paint);
+        if (squareTR) {
+            canvas.drawRect(w / 2, 0, w, h / 2, paint);
         }
-        if (squareBL ){
-            canvas.drawRect(0, h/2, w/2, h, paint);
+        if (squareBL) {
+            canvas.drawRect(0, h / 2, w / 2, h, paint);
         }
-        if (squareBR ){
-            canvas.drawRect(w/2, h/2, w, h, paint);
+        if (squareBR) {
+            canvas.drawRect(w / 2, h / 2, w, h, paint);
         }
 
         paint.setXfermode(new PorterDuffXfermode(android.graphics.PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(input, 0,0, paint);
+        canvas.drawBitmap(input, 0, 0, paint);
 
         return output;
     }
-    static public Drawable scaleDrawable(Drawable drawable, int width, int height){ 
-    	
-		int wi = drawable.getIntrinsicWidth(); 
-		int hi = drawable.getIntrinsicHeight(); 
-		int dimDiff = Math.abs(wi - width) - Math.abs(hi - height); 
-		float scale = (dimDiff > 0) ? width/(float)wi : height/(float)hi; 
-		Rect bounds = new Rect(0, 0, (int)(scale*wi), (int)(scale*hi)); 
-		drawable.setBounds(bounds); 
-		return drawable; 
-		
-	} 
+
+    static public Drawable scaleDrawable(Drawable drawable, int width, int height) {
+
+        int wi = drawable.getIntrinsicWidth();
+        int hi = drawable.getIntrinsicHeight();
+        int dimDiff = Math.abs(wi - width) - Math.abs(hi - height);
+        float scale = (dimDiff > 0) ? width / (float) wi : height / (float) hi;
+        Rect bounds = new Rect(0, 0, (int) (scale * wi), (int) (scale * hi));
+        drawable.setBounds(bounds);
+        return drawable;
+
+    }
 }

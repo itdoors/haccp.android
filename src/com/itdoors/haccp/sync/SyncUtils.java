@@ -24,10 +24,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
+import com.itdoors.haccp.oauth.AccessToken;
 import com.itdoors.haccp.provider.HaccpContract;
 import com.itdoors.haccp.sync.accounts.GenericAccountService;
+import com.itdoors.haccp.ui.activities.HomeActivity;
 import com.itdoors.haccp.ui.activities.InitActivity;
+import com.itdoors.haccp.ui.activities.LoginActivity;
 import com.itdoors.haccp.utils.Logger;
 
 /**
@@ -40,8 +44,9 @@ public class SyncUtils {
     public static String FINISH_INTENT_EXTRA = "com.itdoors.sync.SyncUtils.FINISH_INTENT_EXTRA";
 
     public static final String PREF_SETUP_COMPLETE = "setup_complete";
-
     public static final String PREF_SETUP_DONE = "setup_done";
+
+    public static final String PREF_TOKEN = "oauth_token";
 
     /**
      * Create an entry for this application in the system account list, if it
@@ -50,7 +55,7 @@ public class SyncUtils {
      * @param context Context
      */
 
-    public static void CreateSyncAccount(Context context) {
+    public static synchronized void CreateSyncAccount(Context context) {
         @SuppressWarnings("unused")
         boolean newAccount = false;
         @SuppressWarnings("unused")
@@ -88,7 +93,57 @@ public class SyncUtils {
         }
     }
 
-    public static boolean cheakSync(Context context, Intent finishIntent) {
+    public static synchronized boolean isLoggedIn(Context context, Intent intentToRedirect) {
+        String token = PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(PREF_TOKEN, "");
+
+        boolean loggedIn = !token.equals("");
+        if (loggedIn) {
+
+            return true;
+
+        }
+        else {
+
+            Intent intent = new Intent(context, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra(FINISH_INTENT_EXTRA, intentToRedirect);
+            context.startActivity(intent);
+            return false;
+
+        }
+
+    }
+
+    public static synchronized void logIn(Context context, AccessToken assessToken,
+            Intent redirectIntent) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putString(PREF_TOKEN, assessToken.getToken()).commit();
+
+        Intent intent = new Intent(context, HomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(FINISH_INTENT_EXTRA, redirectIntent);
+        context.startActivity(intent);
+    }
+
+    public static synchronized void logOut(Context context, Intent finishIntent) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().clear().commit();
+
+        Intent intent = new Intent(context, HomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(FINISH_INTENT_EXTRA, finishIntent);
+        context.startActivity(intent);
+
+    }
+
+    public static synchronized String getAccessToken(Context context) {
+        String token = PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(PREF_TOKEN, null);
+        Log.d(SyncUtils.class.getSimpleName(), token);
+        return token;
+    }
+
+    public static synchronized boolean cheakSync(Context context, Intent finishIntent) {
 
         if (syncCompleted(context)) {
             return true;
@@ -105,13 +160,13 @@ public class SyncUtils {
 
     }
 
-    public static boolean syncCompleted(Context context) {
+    public static synchronized boolean syncCompleted(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).
                 getBoolean(SyncUtils.PREF_SETUP_COMPLETE, false);
 
     }
 
-    public static boolean wasSynced(Context context) {
+    public static synchronized boolean wasSynced(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).
                 getBoolean(SyncUtils.PREF_SETUP_DONE, false);
 
@@ -129,7 +184,7 @@ public class SyncUtils {
      * the OS additional freedom in scheduling your sync request.
      */
 
-    public static void requestManualSync(Context context) {
+    public static synchronized void requestManualSync(Context context) {
         Logger.Logi(SyncUtils.class, "request Manual Sync");
         Bundle b = new Bundle();
         // Disable sync backoff and ignore sync preferences. In other

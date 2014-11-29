@@ -1,8 +1,8 @@
+
 package com.itdoors.haccp.ui.adapters;
 
 import java.util.Arrays;
 import java.util.Comparator;
-
 
 import android.content.Context;
 import android.database.DataSetObserver;
@@ -13,34 +13,34 @@ import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.itdoors.haccp.utils.Logger;
+
 public class SectionedListAdapter extends BaseAdapter {
-	
-	private boolean mValid = false;
-	private boolean mSectionValid = false;
-    
-	private ListAdapter mSectionBaseAdapter;
-	private ListAdapter mBaseAdapter;
-    
-	@SuppressWarnings("unused")
-	private Context mContext;
-    
-	private SparseArray<Section> mSections = new SparseArray<Section>();
+
+    private boolean mValid = false;
+    private boolean mSectionValid = false;
+
+    private ListAdapter mSectionBaseAdapter;
+    private ListAdapter mBaseAdapter;
+
+    @SuppressWarnings("unused")
+    private Context mContext;
+
+    private SparseArray<Section> mSections = new SparseArray<Section>();
 
     public static class Section {
         int firstPosition;
         int sectionedPosition;
-        
-    
-        public Section(int postion){
-        	this.firstPosition = postion;
-    	}
-	}
-    
+
+        public Section(int postion) {
+            this.firstPosition = postion;
+        }
+    }
+
     public SectionedListAdapter(Context context, ListAdapter sectionBaseAdapter,
             ListAdapter baseAdapter) {
-        
-    	 
-    	mContext = context;
+
+        mContext = context;
         mBaseAdapter = baseAdapter;
         mBaseAdapter.registerDataSetObserver(new DataSetObserver() {
             @Override
@@ -55,18 +55,18 @@ public class SectionedListAdapter extends BaseAdapter {
                 notifyDataSetInvalidated();
             }
         });
-        
+
         mSectionBaseAdapter = sectionBaseAdapter;
-        mSectionBaseAdapter.registerDataSetObserver( new DataSetObserver() {
-        	@Override
+        mSectionBaseAdapter.registerDataSetObserver(new DataSetObserver() {
+            @Override
             public void onChanged() {
-        		mSectionValid = !mSectionBaseAdapter.isEmpty();
+                mSectionValid = !mSectionBaseAdapter.isEmpty();
                 notifyDataSetChanged();
             }
 
             @Override
             public void onInvalidated() {
-            	mSectionValid = false;
+                mSectionValid = false;
                 notifyDataSetInvalidated();
             }
         });
@@ -93,7 +93,6 @@ public class SectionedListAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-  
     public int sectionedPositionToPosition(int sectionedPosition) {
         if (isSectionHeaderPosition(sectionedPosition)) {
             return ListView.INVALID_POSITION;
@@ -108,26 +107,28 @@ public class SectionedListAdapter extends BaseAdapter {
         }
         return sectionedPosition + offset;
     }
-    
-    public int indexOfSection(int position){
-    	int index = -1;
-    	for (int i = 0; i < mSections.size(); i++) {
-    		if(mSections.valueAt(i).sectionedPosition == position)
-    			index = i;
-    	}
-    	return index;
+
+    public int indexOfSection(int position) {
+        int index = -1;
+        for (int i = 0; i < mSections.size(); i++) {
+            if (mSections.valueAt(i).sectionedPosition == position)
+                index = i;
+        }
+        return index;
     }
-    
-    public boolean isSectionHeaderPosition(int position){
-    	return mSections.get(position) != null;
+
+    public boolean isSectionHeaderPosition(int position) {
+        return mSections.get(position) != null;
     }
+
     @Override
     public int getCount() {
-     //   return (mSectionValid ? mSectionBaseAdapter.getCount() : 0) + 
-     //   	   (mValid ? mBaseAdapter.getCount() : 0) ;
-    	
-    	return mSectionValid && mValid ? mSectionBaseAdapter.getCount() + mBaseAdapter.getCount() : 0;
-    
+        // return (mSectionValid ? mSectionBaseAdapter.getCount() : 0) +
+        // (mValid ? mBaseAdapter.getCount() : 0) ;
+
+        return mSectionValid && mValid ? mSectionBaseAdapter.getCount() + mBaseAdapter.getCount()
+                : 0;
+
     }
 
     @Override
@@ -153,7 +154,7 @@ public class SectionedListAdapter extends BaseAdapter {
 
     @Override
     public boolean isEnabled(int position) {
-        //noinspection SimplifiableConditionalExpression
+        // noinspection SimplifiableConditionalExpression
         return isSectionHeaderPosition(position)
                 ? false
                 : mBaseAdapter.isEnabled(sectionedPositionToPosition(position));
@@ -161,7 +162,9 @@ public class SectionedListAdapter extends BaseAdapter {
 
     @Override
     public int getViewTypeCount() {
-        return mBaseAdapter.getViewTypeCount() + mSectionBaseAdapter.getViewTypeCount(); // the section headings
+        return mBaseAdapter.getViewTypeCount() + mSectionBaseAdapter.getViewTypeCount(); // the
+                                                                                         // section
+                                                                                         // headings
     }
 
     @Override
@@ -182,9 +185,20 @@ public class SectionedListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (isSectionHeaderPosition(position)) {
-        	return mSectionBaseAdapter.getView(indexOfSection(position), convertView, parent);
+            try {
+                return mSectionBaseAdapter.getView(indexOfSection(position), convertView, parent);
+            } catch (Exception e) {
+                Logger.Loge(getClass(), "position:" + position);
+                return convertView = new View(parent.getContext());
+            }
         } else {
-            return mBaseAdapter.getView(sectionedPositionToPosition(position), convertView, parent);
+            try {
+                return mBaseAdapter.getView(sectionedPositionToPosition(position), convertView,
+                        parent);
+            } catch (Exception e) {
+                Logger.Loge(getClass(), "position:" + position);
+                return convertView = new View(parent.getContext());
+            }
         }
     }
 

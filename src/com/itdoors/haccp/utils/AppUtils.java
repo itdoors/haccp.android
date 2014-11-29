@@ -6,12 +6,16 @@ import java.util.Map;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.view.View;
 import android.widget.TextView;
 
 import com.itdoors.haccp.R;
 import com.itdoors.haccp.model.StatististicsItemStatus;
 
-public class AppUtils {
+public final class AppUtils {
+
+    private AppUtils() {
+    }
 
     public static StatististicsItemStatus getStatus(double value, double top, double bottom) {
         return (value <= bottom) ? StatististicsItemStatus.APPROVED :
@@ -26,6 +30,21 @@ public class AppUtils {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static void setUpStatusViewColor(StatististicsItemStatus status, View view) {
+        switch (status) {
+            case WARNING:
+                view.setBackgroundResource(R.color.status_warning);
+                break;
+            case DANGER:
+                view.setBackgroundResource(R.color.status_danger);
+                break;
+            default:
+                view.setBackgroundResource(R.color.status_approved);
+                break;
+        }
+
     }
 
     public static void setUpStatusView(StatististicsItemStatus status, TextView tv,

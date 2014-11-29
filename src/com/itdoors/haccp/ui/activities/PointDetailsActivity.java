@@ -38,10 +38,10 @@ import com.commonsware.cwac.pager.v4.ArrayPagerAdapter;
 import com.itdoors.haccp.Global;
 import com.itdoors.haccp.Intents;
 import com.itdoors.haccp.R;
-import com.itdoors.haccp.model.Point;
 import com.itdoors.haccp.model.rest.retrofit.MoreStatistics;
 import com.itdoors.haccp.rest.robospice_retrofit.GetStatisticsRequest;
 import com.itdoors.haccp.rest.robospice_retrofit.MySpiceService;
+import com.itdoors.haccp.sync.SyncUtils;
 import com.itdoors.haccp.ui.fragments.AttributesFragment;
 import com.itdoors.haccp.ui.fragments.StatisticsOfflineFragment;
 import com.itdoors.haccp.ui.fragments.StatisticsOnlineFragment;
@@ -91,13 +91,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
         ONLINE, OFFLINE;
     }
 
-    public static Intent newIntent(Activity activity, Point point) {
-        Intent intent = new Intent(activity, PointDetailsActivity.class);
-        intent.putExtra(Intents.Point.POINT, point);
-        return intent;
-    }
-
-    public static Intent newIntent(Activity activity, int id) {
+    public static Intent newIntent(Activity activity, String id) {
         Intent intent = new Intent(activity, PointDetailsActivity.class);
         intent.putExtra(Intents.Point.UID, id);
         return intent;
@@ -117,6 +111,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
     private ActionMode mActionMode;
 
     private Mode networkMode;
+    private Handler handler = new Handler();
 
     RequestListener<MoreStatistics> mStatisticsRefreshRequestListener = new RequestListener<MoreStatistics>() {
         @Override
@@ -201,14 +196,19 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
     protected void onResume() {
         super.onResume();
         if (getIntent().getExtras() != null) {
-            int id = getIntent().getExtras().getInt(Intents.Point.UID);
+
+            String id = getIntent().getExtras().getString(Intents.Point.UID);
+            String token = SyncUtils.getAccessToken(getApplicationContext());
+
             if (mStatisticFragmentMode == MODE.GENERAL)
-                spiceManager.addListenerIfPending(MoreStatistics.class,
-                        GetStatisticsRequest.getCacheKey(id), mRefreshPendingRequestListener);
+                spiceManager
+                        .addListenerIfPending(MoreStatistics.class,
+                                GetStatisticsRequest.getCacheKey(token, id),
+                                mRefreshPendingRequestListener);
             if (fromTimeStamp != null && toTimeStamp != null
                     && mStatisticFragmentMode == MODE.FROM_TIME_RANGE)
                 spiceManager.addListenerIfPending(MoreStatistics.class,
-                        GetStatisticsRequest.getCacheKey(id, fromTimeStamp, toTimeStamp),
+                        GetStatisticsRequest.getCacheKey(token, id, fromTimeStamp, toTimeStamp),
                         mFromTimeRangePendingRequestListener);
         }
         Logger.Loge(getClass(), "onResume()");
@@ -217,6 +217,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
     @Override
     protected void onPause() {
         super.onPause();
+        handler.removeCallbacksAndMessages(null);
         Logger.Loge(getClass(), "onPause()");
     }
 
@@ -418,7 +419,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 
             case R.id.cp_bp_add_item:
 
-                int pointId = getIntent().getExtras().getInt(Intents.Point.UID);
+                String pointId = getIntent().getExtras().getString(Intents.Point.UID);
                 Intent intent = new Intent(this, AddStatisticsActivity.class);
                 intent.putExtra(Intents.Point.UID, pointId);
                 startActivity(intent);
@@ -562,7 +563,6 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
             }
             else {
                 /* refreshStatistics(); */
-                Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -693,8 +693,10 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
     private void refreshStatistics() {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            int pointId = extras.getInt(Intents.Point.UID);
-            GetStatisticsRequest request = new GetStatisticsRequest.Builder().setId(pointId)
+            String pointId = extras.getString(Intents.Point.UID);
+            GetStatisticsRequest request = new GetStatisticsRequest.Builder()
+                    .setToken(SyncUtils.getAccessToken(getApplicationContext()))
+                    .setId(pointId)
                     .build();
             spiceManager.execute(request, request.getCacheKey(), DurationInMillis.ONE_MINUTE,
                     mStatisticsRefreshRequestListener);
@@ -711,7 +713,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
                 loadStatisticsFromTimeRange(from, to);
             }
             else if (networkMode == Mode.OFFLINE) {
-                Handler handler = new Handler();
+
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -734,9 +736,12 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            int pointId = extras.getInt(Intents.Point.UID);
-            GetStatisticsRequest request = new GetStatisticsRequest.Builder().setId(pointId)
-                    .setStartDate(fromUnixTimeStamp).setEndDate(toUnixTimeStamp).build();
+            String pointId = extras.getString(Intents.Point.UID);
+            GetStatisticsRequest request = new GetStatisticsRequest.Builder()
+                    .setToken(SyncUtils.getAccessToken(getApplicationContext()))
+                    .setId(pointId)
+                    .setStartDate(fromUnixTimeStamp)
+                    .setEndDate(toUnixTimeStamp).build();
             spiceManager.execute(request, request.getCacheKey(), DurationInMillis.ONE_MINUTE,
                     mStatisticsFromTimeRangeRequestListener);
         }

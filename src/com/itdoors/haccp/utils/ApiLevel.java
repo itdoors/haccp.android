@@ -1,3 +1,4 @@
+
 package com.itdoors.haccp.utils;
 
 /*
@@ -21,12 +22,14 @@ import android.os.Build;
 /**
  * Class containing some static utility methods.
  */
-public class ApiLevel {
-    private ApiLevel() {};
+public final class ApiLevel {
+    private ApiLevel() {
+    };
 
     public static boolean hasFroyo() {
         // Can use static final constants like FROYO, declared in later versions
-        // of the OS since they are inlined at compile time. This is guaranteed behavior.
+        // of the OS since they are inlined at compile time. This is guaranteed
+        // behavior.
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO;
     }
 
@@ -42,9 +45,8 @@ public class ApiLevel {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1;
     }
 
-    public static boolean hasIceCreamSandwich(){
-    	return Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
+    public static boolean hasIceCreamSandwich() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
     }
-   
-}
 
+}
