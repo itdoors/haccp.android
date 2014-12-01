@@ -4,6 +4,8 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -36,6 +38,9 @@
         android:icon="@drawable/logo_300"
         android:label="@string/app_name_haccp"
         android:theme="@style/Theme.Sherlock.Light.DarkActionBar" >
+        
+        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
+                
         <!--  
         <activity
             android:name="com.itdoors.haccp.ui.activities.MainActivity"

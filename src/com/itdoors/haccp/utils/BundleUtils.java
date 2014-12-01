@@ -22,7 +22,7 @@ public final class BundleUtils {
             if (value != null) {
                 sb.append(key).append(':').append(value);
                 if (count < size - 1)
-                    sb.append(',');
+                    sb.append(';');
             }
             count++;
         }
@@ -33,7 +33,7 @@ public final class BundleUtils {
     public static Bundle deserialize(String string) {
         Bundle bundle = new Bundle();
         string = string.substring(1, string.length() - 1);
-        String pairs[] = string.split(",");
+        String pairs[] = string.split(";");
         for (String pair : pairs) {
             String keyValue[] = pair.split(":");
             bundle.putString(keyValue[0], keyValue[1]);

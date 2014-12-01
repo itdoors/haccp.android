@@ -26,5 +26,6 @@
     <string name="instruction_data_sending">Данные отправляються не сразу, даже при включенном интернете</string>
     <string name="instruction_using_flashlight">Фонарик в сканнере можно включить и выключить при помощи кнопок громкости</string>
     <string name="instruction_do_not_off_sync">Не отключайте синхронизацию на сматрфоне</string>
+    <string name="instruction_turn_gps_on">Включите GPS</string>
     
 </resources>

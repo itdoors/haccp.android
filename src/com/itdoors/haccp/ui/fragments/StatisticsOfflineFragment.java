@@ -251,7 +251,7 @@ public class StatisticsOfflineFragment extends SwipeRefreshListFragment implemen
                 groupNameStr = name == null ? "-" : name;
                 unitStr = unit == null ? "%" : unit;
                 valueStr = Integer.toString(value) + unitStr;
-                whoSetStr = "Михайличенко";
+                whoSetStr = ""; // "Михайличенко";
                 dateStr = date == null ? "-" : new SimpleDateFormat(Global.usualDateFromat).format(
                         date).toString();
 

@@ -706,7 +706,7 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
                     final int bottom = characteristics.getCriticalBottomValue();
                     final int top = characteristics.getCriticalTopValue();
 
-                    int defValue = (bottom + top) / 2;
+                    int defValue = 0; // (bottom + top) / 2;
                     valueTV.setText(Integer.toString(defValue));
 
                     StatististicsItemStatus status = AppUtils.getStatus(defValue, top, bottom);
@@ -762,8 +762,9 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
 
         int progress = seekBar.getProgress();
         double value = (double) (max - min) * ((double) progress / 100);
-        int intVlue = Double.valueOf(value).intValue();
-        return intVlue;
+        int intValue = Double.valueOf(value).intValue();
+        return (max < 25) ? intValue : intValue - (intValue % 25); // step
+                                                                   // - 25
     }
 
     public HashMap<GroupCharacteristic, Double> getValues() {

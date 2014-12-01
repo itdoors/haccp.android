@@ -533,7 +533,7 @@ public class StatisticsOnlineFragment extends EndlessListFragment {
             String groupNameStr = characteristic == null ? "-" : characteristic.getName();
             String unit = characteristic == null ? "%" : characteristic.getUnit();
             String valueStr = statistics.getValue() + unit;
-            String whoSetStr = "Михайличенко";
+            String whoSetStr = ""; // "Михайличенко";
 
             Date recordEntrydate = DateUtils.getDate(statistics.getEntryDate());
             String dateFormat = DateUtils.inUsualFormat(recordEntrydate);

@@ -20,6 +20,7 @@ import com.itdoors.haccp.oauth.HaccpOAuthServiceApi.User;
 import com.itdoors.haccp.provider.HaccpContract;
 import com.itdoors.haccp.sync.SyncUtils;
 import com.itdoors.haccp.ui.fragments.LoginFragment;
+import com.itdoors.haccp.utils.Enviroment;
 import com.itdoors.haccp.utils.Logger;
 import com.itdoors.haccp.utils.ToastUtil;
 
@@ -58,14 +59,20 @@ public class LoginActivity extends BaseSherlockFragmentActivity implements
     @Override
     public void onLoginClick(String login, String password) {
 
-        if (login != null && !login.equals("") && password != null && !password.equals("")) {
-            HaccpOAuthService.getService().getAccessToken(Global.CLIENT_ID, Global.CLIENT_SECRET,
-                    Global.GRAND_TYPE_PASSWORD, login, password, mLoginCallback);
+        if (Enviroment.isNetworkAvaliable(getApplicationContext())) {
+            if (login != null && !login.equals("") && password != null && !password.equals("")) {
+                HaccpOAuthService.getService().getAccessToken(Global.CLIENT_ID,
+                        Global.CLIENT_SECRET,
+                        Global.GRAND_TYPE_PASSWORD, login, password, mLoginCallback);
+            }
+            else {
+                ToastUtil.ToastShort(getApplicationContext(), getString(R.string.fill_the_fields));
+            }
         }
         else {
-            ToastUtil.ToastShort(getApplicationContext(), getString(R.string.fill_the_fields));
+            ToastUtil.ToastShort(getApplicationContext(),
+                    getString(R.string.not_avalieble_without_any_interent_connection));
         }
-
     }
 
     private static Callback<AccessToken> mLoginCallback = new Callback<AccessToken>() {

@@ -4,18 +4,21 @@ package com.itdoors.haccp.rest;
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 
 import com.itdoors.haccp.Global;
 import com.itdoors.haccp.provider.HaccpContract;
 import com.itdoors.haccp.utils.BundleUtils;
+import com.itdoors.haccp.utils.LocationUtils;
 import com.itdoors.haccp.utils.Logger;
 
 public class AsyncSQLiteOperations {
 
     public static void startInsertStatistics(ContentResolver cr, String pointId,
-            int characterisrticId, String createdAt, String entryDate, String value) {
+            int characterisrticId, String createdAt, String entryDate, String value,
+            Location location) {
 
         AsyncQueryHandler handler = new AsyncQueryHandler(cr) {
             @Override
@@ -36,6 +39,7 @@ public class AsyncSQLiteOperations {
         params.putString("pointStatisticsApiForm[createdAt]", createdAt);
         params.putString("pointStatisticsApiForm[entryDate]", entryDate);
         params.putString("pointStatisticsApiForm[value]", value);
+        params.putString("pointStatisticsApiForm[location]", LocationUtils.getLatLng(location));
 
         values.put(HaccpContract.Transactions.ACTION_TYPE, action_type);
         values.put(HaccpContract.Transactions.URI, url);

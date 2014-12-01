@@ -403,13 +403,6 @@ public class HomeActivity extends SherlockFragmentActivity implements
         int imgRes, strRes;
     }
 
-    public void onPointsPressed() {
-
-        CompaniesFragment fragment = new CompaniesFragment();
-        replaceFragment(fragment);
-
-    }
-
     public void onSettingsPressed() {
         handler.postDelayed(new Runnable() {
             public void run() {
@@ -418,6 +411,12 @@ public class HomeActivity extends SherlockFragmentActivity implements
                 startActivity(intent);
             }
         }, MAX_DURATION_FOR_DRAWER_OPEN_CLOSE);
+    }
+
+    public void onPointsPressed() {
+        CompaniesFragment fragment = new CompaniesFragment();
+        replaceFragment(fragment);
+        setTitle(R.string.companies);
     }
 
     @Override
