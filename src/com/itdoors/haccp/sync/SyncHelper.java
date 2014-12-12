@@ -11,14 +11,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SyncResult;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.itdoors.haccp.Constants;
 import com.itdoors.haccp.Global;
 import com.itdoors.haccp.Intents;
@@ -89,6 +91,11 @@ public class SyncHelper {
 
         Logger.Logi(TAG, "Performing sync");
 
+        if (!SyncUtils.isLoggedIn(mContext, null)) {
+            Logger.Logi(getClass(), "Try to sync when logout or not loggin yet...");
+            return;
+        }
+
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         final int localVersion = prefs.getInt("local_data_version", 0);
 
@@ -101,12 +108,19 @@ public class SyncHelper {
 
                 final long startLocal = System.currentTimeMillis();
                 HaccpDatabase dbHelper = new HaccpDatabase(mContext);
-                SQLiteDatabase db = dbHelper.getWritableDatabase();
 
                 boolean sucess = false;
-                File tempFile = Enviroment.getDiskDir(mContext, TEMP_DB_NAME);
-                Logger.Logi(getClass(), "Create temp file:" + tempFile.getAbsolutePath());
+                // File tempFile = Enviroment.getDiskDir(mContext,
+                // TEMP_DB_NAME);
 
+                File tempFile;
+                try {
+                    tempFile = Enviroment.getPackageTempFileDir(mContext, TEMP_DB_NAME);
+                } catch (NameNotFoundException ignore) {
+                    // Should never happened
+                    return;
+                }
+                Logger.Logi(getClass(), "Create temp file:" + tempFile.getAbsolutePath());
                 try {
 
                     final long startloadingLocal = System.currentTimeMillis();
@@ -120,6 +134,9 @@ public class SyncHelper {
                             + (System.currentTimeMillis() - startloadingLocal) + "ms");
 
                     final long startParsingLocal = System.currentTimeMillis();
+
+                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+
                     try {
 
                         Logger.Logi(getClass(),
@@ -135,20 +152,21 @@ public class SyncHelper {
                             ++syncResult.stats.numEntries;
                         }
                         sucess = true;
-                    } catch (SQLiteException e) {
 
-                        Logger.Loge(getClass().getSimpleName(), "Eroor write to db");
-                        e.printStackTrace();
-
-                        // hard error
+                    } catch (SQLException sqlRunTimeException) {
+                        Logger.Loge(getClass(), "Error in db");
                         syncResult.databaseError = true;
+                        throw sqlRunTimeException;
 
-                        Intent intent = new Intent(Intents.SyncComplete.ACTION_FINISHED_SYNC);
-                        intent.putExtra(Intents.SyncComplete.LOCAL_SYNC_COMPELTED_SUCCESFULLY,
-                                false);
-                        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+                    } catch (JsonParseException parseException) {
 
-                    } finally {
+                        Logger.Loge(getClass(), "Error when try to parse db");
+                        parseException.printStackTrace();
+                        syncResult.databaseError = true;
+                        throw parseException;
+                    }
+
+                    finally {
                         db.endTransaction();
                         if (db.isOpen()) {
                             db.close();
@@ -157,6 +175,14 @@ public class SyncHelper {
 
                     Logger.Logi(TAG, "Parsing file took "
                             + (System.currentTimeMillis() - startParsingLocal) + "ms");
+
+                } catch (IOException generalInitException) {
+
+                    Intent intent = new Intent(Intents.SyncComplete.ACTION_FINISHED_SYNC);
+                    intent.putExtra(Intents.SyncComplete.LOCAL_SYNC_SUCCESFULLY, false);
+                    LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+                    throw generalInitException;
+
                 } finally {
                     String path = tempFile.getAbsolutePath();
                     boolean exeption = !tempFile.delete();
@@ -169,13 +195,14 @@ public class SyncHelper {
                 if (sucess) {
 
                     Intent intent = new Intent(Intents.SyncComplete.ACTION_FINISHED_SYNC);
-                    intent.putExtra(Intents.SyncComplete.LOCAL_SYNC_COMPELTED_SUCCESFULLY, true);
+                    intent.putExtra(Intents.SyncComplete.LOCAL_SYNC_SUCCESFULLY, true);
                     LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
 
                     prefs.edit().putBoolean(SyncUtils.PREF_SETUP_COMPLETE, true).commit();
                     prefs.edit().putInt("local_data_version", LOCAL_VERSION_CURRENT).commit();
                 }
             }
+
         }
 
         if ((flags & FLAG_SYNC_REMOTE) != 0) {

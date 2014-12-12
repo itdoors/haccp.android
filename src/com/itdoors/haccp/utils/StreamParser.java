@@ -12,14 +12,14 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.zip.GZIPInputStream;
 
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonToken;
-
 import android.content.ContentValues;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 public final class StreamParser {
 
@@ -27,7 +27,7 @@ public final class StreamParser {
     }
 
     private static void readCompany(JsonParser parser, SQLiteDatabase db)
-            throws JsonParseException, SQLiteException, IOException {
+            throws JsonParseException, SQLException, IOException {
 
         String id = null;
         String name = null;
@@ -53,7 +53,7 @@ public final class StreamParser {
     }
 
     private static void readCompanyObject(JsonParser parser, SQLiteDatabase db)
-            throws JsonParseException, SQLiteException, IOException {
+            throws JsonParseException, SQLException, IOException {
 
         String id = null;
         String companyId = null;
@@ -84,7 +84,7 @@ public final class StreamParser {
     }
 
     private static void readService(JsonParser parser, SQLiteDatabase db)
-            throws JsonParseException, SQLiteException, IOException {
+            throws JsonParseException, SQLException, IOException {
 
         String id = null;
         String name = null;
@@ -109,7 +109,7 @@ public final class StreamParser {
     }
 
     private static void readContour(JsonParser parser, SQLiteDatabase db)
-            throws JsonParseException, SQLiteException, IOException {
+            throws JsonParseException, SQLException, IOException {
 
         String id = null;
         String name = null;
@@ -150,7 +150,7 @@ public final class StreamParser {
     }
 
     private static void readPlan(JsonParser parser, SQLiteDatabase db) throws JsonParseException,
-            SQLiteException, IOException {
+            SQLException, IOException {
 
         String id = null;
         String name = null;
@@ -209,7 +209,7 @@ public final class StreamParser {
     }
 
     private static void readGroup(JsonParser parser, SQLiteDatabase db) throws JsonParseException,
-            SQLiteException, IOException {
+            SQLException, IOException {
 
         String id = null;
         String name = null;
@@ -235,7 +235,7 @@ public final class StreamParser {
     }
 
     private static void readGroupCharacteristic(JsonParser parser, SQLiteDatabase db)
-            throws JsonParseException, SQLiteException, IOException {
+            throws JsonParseException, SQLException, IOException {
 
         String id = null;
         String name = null;
@@ -302,7 +302,7 @@ public final class StreamParser {
     }
 
     private static void readStatus(JsonParser parser, SQLiteDatabase db) throws JsonParseException,
-            SQLiteException, IOException {
+            SQLException, IOException {
 
         String id = null;
         String name = null;
@@ -331,7 +331,7 @@ public final class StreamParser {
     }
 
     private static void readPoint(JsonParser parser, SQLiteDatabase db) throws JsonParseException,
-            SQLiteException, IOException {
+            SQLException, IOException {
 
         String id = null;
         String name = null;
@@ -393,7 +393,7 @@ public final class StreamParser {
     }
 
     private static void readStatistics(JsonParser parser, SQLiteDatabase db)
-            throws JsonParseException, SQLiteException, IOException {
+            throws JsonParseException, SQLException, IOException {
 
         String id = null;
         String charId = null;
@@ -425,7 +425,6 @@ public final class StreamParser {
         ContentValues values = new ContentValues();
 
         values.put("uid", id);
-
         values.put("characteristic_id", charId);
         values.put("point_id", pointId);
         values.put("created_at", createdAt);
@@ -433,6 +432,70 @@ public final class StreamParser {
         values.put("value", value);
 
         db.insertOrThrow("point_statistics", null, values);
+
+    }
+
+    private static void readPoison(JsonParser parser, SQLiteDatabase db)
+            throws JsonParseException, SQLException, IOException {
+
+        String id = null;
+        String name = null;
+        String active_substance = null;
+        String quantity = null;
+        String standard_amount = null;
+
+        parser.nextToken();
+
+        while (parser.nextToken() != JsonToken.END_OBJECT) {
+
+            String fieldName = parser.getCurrentName();
+            if ("id".equals(fieldName)) {
+                id = parser.getText();
+            } else if ("name".equals(fieldName)) {
+                name = parser.getText();
+            } else if ("active_substance".equals(fieldName)) {
+                active_substance = parser.getText();
+            } else if ("quantity".equals(fieldName)) {
+                quantity = parser.getText();
+            } else if ("standard_amount".equals(fieldName)) {
+                standard_amount = parser.getText();
+            }
+        }
+
+        ContentValues values = new ContentValues();
+
+        values.put("uid", id);
+        values.put("name", name);
+        values.put("active_substance", active_substance);
+        values.put("quantity", quantity);
+        values.put("standard_amount", standard_amount);
+
+        db.insertOrThrow("poisons", null, values);
+
+    }
+
+    private static void readPointPoison(JsonParser parser, SQLiteDatabase db)
+            throws JsonParseException, SQLException, IOException {
+
+        String poison_id = null;
+        String point_id = null;
+
+        parser.nextToken();
+
+        while (parser.nextToken() != JsonToken.END_OBJECT) {
+
+            String fieldName = parser.getCurrentName();
+            if ("poison_id".equals(fieldName)) {
+                poison_id = parser.getText();
+            } else if ("point_id".equals(fieldName)) {
+                point_id = parser.getText();
+            }
+        }
+
+        ContentValues values = new ContentValues();
+        values.put("poison_id", poison_id);
+        values.put("point_id", point_id);
+        db.insertOrThrow("point_poison", null, values);
 
     }
 
@@ -455,7 +518,7 @@ public final class StreamParser {
     }
 
     public static void parseZippedDatabase(File file, SQLiteDatabase db) throws JsonParseException,
-            SQLiteException, IOException {
+            SQLException, IOException {
 
         JsonFactory jFactory = new JsonFactory();
 
@@ -464,7 +527,7 @@ public final class StreamParser {
         try {
 
             gzip = new GZIPInputStream(new BufferedInputStream(new FileInputStream(file)));
-            jParser = jFactory.createJsonParser(gzip);
+            jParser = jFactory.createParser(gzip);
 
             int points = 0;
             int statistics = 0;
@@ -472,13 +535,11 @@ public final class StreamParser {
             while (jParser.nextToken() != JsonToken.END_OBJECT) {
 
                 String fieldName = jParser.getCurrentName();
-
                 if ("company".equals(fieldName)) {
                     jParser.nextToken();
                     while (jParser.nextToken() != JsonToken.END_ARRAY) {
                         StreamParser.readCompany(jParser, db);
                     }
-
                 } else if ("company_object".equals(fieldName)) {
                     jParser.nextToken();
                     while (jParser.nextToken() != JsonToken.END_ARRAY) {
@@ -526,15 +587,21 @@ public final class StreamParser {
                         StreamParser.readStatistics(jParser, db);
                         statistics++;
                     }
+                } else if ("poison".equals(fieldName)) {
+                    jParser.nextToken();
+                    while (jParser.nextToken() != JsonToken.END_ARRAY) {
+                        StreamParser.readPoison(jParser, db);
+                    }
+                } else if ("point_poison".equals(fieldName)) {
+                    jParser.nextToken();
+                    while (jParser.nextToken() != JsonToken.END_ARRAY) {
+                        StreamParser.readPointPoison(jParser, db);
+                    }
                 }
             }
             Logger.Logi(StreamParser.class, " Total parsing: points - " + points
                     + ", statistics - " + statistics);
-
-        }
-
-        finally {
-
+        } finally {
             if (gzip != null)
                 try {
                     gzip.close();
@@ -544,7 +611,5 @@ public final class StreamParser {
             if (jParser != null)
                 jParser.close();
         }
-
     }
-
 }

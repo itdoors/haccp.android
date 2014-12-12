@@ -92,7 +92,7 @@ public class HaccpDatabase extends SQLiteOpenHelper {
                 " critical_value_top     varchar(20) DEFAULT NULL," +
                 " critical_value_bottom  varchar(20) DEFAULT NULL," +
                 " critical_color_middle  varchar(20) DEFAULT NULL," +
-                " input_type             varchar(20) DEFAULT NULL," +
+                " input_type             varchar(200) DEFAULT NULL," +
                 " uid                    integer UNIQUE," +
                 /* Foreign keys */
                 " FOREIGN KEY (point_group_id) " +
@@ -170,6 +170,30 @@ public class HaccpDatabase extends SQLiteOpenHelper {
                 " uid   integer NOT NULL UNIQUE" +
                 " );";
 
+        String POISONS = "CREATE TABLE poisons (" +
+                " _id               integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE," +
+                " name              varchar(100)," +
+                " active_substance  varchar(100)," +
+                " quantity          float(50)," +
+                " standard_amount   float(50)," +
+                " uid               integer NOT NULL UNIQUE" +
+                " );";
+
+        String POINT_POISON = "CREATE TABLE point_poison (" +
+                " _id        integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE," +
+                " poison_id  integer NOT NULL," +
+                " point_id   varchar(50) NOT NULL," +
+                /* Foreign keys */
+                " FOREIGN KEY (point_id)" +
+                " REFERENCES points(uid)" +
+                " ON DELETE CASCADE" +
+                " ON UPDATE NO ACTION," +
+                " FOREIGN KEY (poison_id)" +
+                " REFERENCES poisons(uid)" +
+                " ON DELETE CASCADE" +
+                " ON UPDATE NO ACTION" +
+                " );";
+
         String TRANSACTIONS = "CREATE TABLE transactions (" +
                 " _id               integer PRIMARY KEY AUTOINCREMENT NOT NULL," +
                 " action_type       integer NOT NULL," +
@@ -197,6 +221,10 @@ public class HaccpDatabase extends SQLiteOpenHelper {
         String POINT_STATUSES = "point_statuses";
         String POINTS = "points";
         String POINT_STATISTICS = "point_statistics";
+
+        String POISONS = "poisons";
+        String POINT_POISON = "point_poison";
+
         String TRANSACTIONS = "transactions";
 
     }
@@ -215,6 +243,10 @@ public class HaccpDatabase extends SQLiteOpenHelper {
         String POINT_STATUSES = "DROP TABLE IF EXISTS " + Tables.POINT_STATUSES;
         String POINTS = "DROP TABLE IF EXISTS " + Tables.POINTS;
         String SERVICES = "DROP TABLE IF EXISTS " + Tables.SERVICES;
+
+        String POISONS = "DROP TABLE IF EXISTS " + Tables.POISONS;
+        String POINT_POISON = "DROP TABLE IF EXISTS " + Tables.POINT_POISON;
+
         String TRANSACTIONS = "DROP TABLE IF EXISTS " + Tables.TRANSACTIONS;
     }
 
@@ -237,6 +269,10 @@ public class HaccpDatabase extends SQLiteOpenHelper {
         db.execSQL(CreateTableSqls.POINT_STATUSES);
         db.execSQL(CreateTableSqls.POINTS);
         db.execSQL(CreateTableSqls.POINT_STATISTICS);
+
+        db.execSQL(CreateTableSqls.POISONS);
+        db.execSQL(CreateTableSqls.POINT_POISON);
+
         db.execSQL(CreateTableSqls.TRANSACTIONS);
 
     }
@@ -256,6 +292,10 @@ public class HaccpDatabase extends SQLiteOpenHelper {
         db.execSQL(DeleteTableSqls.COMPANY_OBJECTS);
         db.execSQL(DeleteTableSqls.COMPANIES);
         db.execSQL(DeleteTableSqls.USER);
+
+        db.execSQL(DeleteTableSqls.POISONS);
+        db.execSQL(DeleteTableSqls.POINT_POISON);
+
         onCreate(db);
 
     }

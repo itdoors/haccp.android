@@ -70,6 +70,26 @@ public final class HaccpContract {
 
     }
 
+    public static interface PoisonColumns {
+
+        public static final String NAME = "name";
+        public static final String ACTIVE_SUBSTANCE = "active_substance";
+        public static final String QUANTITY = "quantity";
+        public static final String STANDART_AMOUNT = "standard_amount";
+
+        public static final String NAME_FULL = HaccpDatabase.Tables.POISONS + "." + NAME;
+        public static final String UID_FULL = HaccpDatabase.Tables.POISONS + "." + BaseColumns.UID;
+        public static final String _ID_FULL = HaccpDatabase.Tables.POISONS + "." + BaseColumns._ID;
+
+    }
+
+    public static interface PointPoisonColumns {
+
+        public static final String POISON_ID = "poison_id";
+        public static final String POINT_ID = "point_id";
+
+    }
+
     public static interface StatusesColumns {
 
         public static final String NAME = "name";
@@ -305,6 +325,22 @@ public final class HaccpContract {
         public static final String DEFAULT_SORT = BaseColumns.UID + " ASC";
     }
 
+    public static class Poisons implements PoisonColumns, BaseColumns {
+
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/vnd.com.itdoors.haccp.poisons";
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/vnd.com.itdoors.haccp.poisons";
+
+        /** Default "ORDER BY" clause. */
+        public static final String DEFAULT_SORT = BaseColumns.UID + " ASC";
+
+    }
+
+    public static class PointPoison implements PointPoisonColumns {
+
+    }
+
     public static class Points implements PointsColumns, BaseColumns {
 
         public static final String CONTENT_TYPE =
@@ -333,6 +369,10 @@ public final class HaccpContract {
         public static final String GROUP_ID_PROJECTION = "group_id";
         public static final String GROUP_NAME_PROJECTION = "group_name";
         public static final String GROUP_UID_PROJECTION = "group_uid";
+
+        public static final String POISON_UID_PROJECTION = "poison_uid";
+        public static final String POISON_NAME_PROJECTION = "poison_name";
+        public static final String POISON_ACTIVE_SUBSTANCE_PROJECTION = "poison_active_substance";
 
         public static Uri builduriForCompanyObjectInContour(int companyObjectId, int contourId) {
             return BASE_CONTENT_URI

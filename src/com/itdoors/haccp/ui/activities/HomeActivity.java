@@ -31,6 +31,10 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.google.zxing.client.android.CaptureActivity;
 import com.itdoors.haccp.R;
+import com.itdoors.haccp.analytics.Analytics;
+import com.itdoors.haccp.analytics.Analytics.Action;
+import com.itdoors.haccp.analytics.Analytics.Category;
+import com.itdoors.haccp.analytics.TrackerName;
 import com.itdoors.haccp.parser.ScanResultParser;
 import com.itdoors.haccp.provider.HaccpContract;
 import com.itdoors.haccp.provider.RestContentProvider;
@@ -429,6 +433,10 @@ public class HomeActivity extends SherlockFragmentActivity implements
         getContentResolver().delete(RestContentProvider.BASE_CONTENT_URI, null, null);
         // delete db
         SyncUtils.logOut(getApplicationContext(), getIntent());
+
+        Analytics.getInstance(this).sendEvent(TrackerName.APP_TRACKER, Category.Login,
+                Action.Logout);
+
         finish();
     }
 

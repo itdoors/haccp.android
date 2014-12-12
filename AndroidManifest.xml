@@ -30,12 +30,12 @@
     <uses-feature android:name="android.hardware.touchscreen" />
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="9"
         android:targetSdkVersion="18" />
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/logo_300"
+        android:icon="@drawable/logo_64"
         android:label="@string/app_name_haccp"
         android:theme="@style/Theme.Sherlock.Light.DarkActionBar" >
         
@@ -91,7 +91,7 @@
             <meta-data android:name="android.app.searchable" android:resource="@xml/searchable" />
         </activity>
         
-        <activity android:name="com.itdoors.haccp.ui.activities.InitActivity"/>
+        <activity android:name="com.itdoors.haccp.ui.activities.InitActivity" />
         <activity android:name="com.itdoors.haccp.ui.activities.LoginActivity"/>
         
         <activity

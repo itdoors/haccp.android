@@ -6,7 +6,9 @@ import java.util.Map;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.itdoors.haccp.R;
@@ -15,6 +17,29 @@ import com.itdoors.haccp.model.StatististicsItemStatus;
 public final class AppUtils {
 
     private AppUtils() {
+    }
+
+    public static void setupStepView(LinearLayout layout, int step, int min, int max) {
+
+        int count = (max - min) / step;
+        if (count > 0) {
+            Context context = layout.getContext();
+
+            View empty = new View(context);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0,
+                    LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+            empty.setLayoutParams(lp);
+            layout.addView(empty);
+
+            for (int i = 1; i < count; i++) {
+                TextView tv = new TextView(context);
+                tv.setLayoutParams(lp);
+                tv.setGravity(Gravity.LEFT);
+                tv.setTextSize(context.getResources().getDimension(R.dimen.step_text_size));
+                tv.setText(Integer.toString(i * step));
+                layout.addView(tv);
+            }
+        }
     }
 
     public static StatististicsItemStatus getStatus(double value, double top, double bottom) {

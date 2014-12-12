@@ -19,7 +19,6 @@ import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -101,21 +100,14 @@ public class PointsSectionesListFragment extends ListFragment implements
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        FrameLayout root = (FrameLayout) super
-                .onCreateView(inflater, container, savedInstanceState);
-        return ContextUtils.wrapListFragment(root);
-    }
-
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         final ListView mListView = getListView();
-        mListView.setBackgroundResource(R.drawable.abs__ab_solid_light_holo);
         mListView.setDrawSelectorOnTop(true);
         mListView.setSelector(R.drawable.abs__tab_indicator_ab_holo);
         mListView.setCacheColorHint(Color.TRANSPARENT);
+
+        ContextUtils.wrapListView(mListView);
 
         mPointsAdapter = new MyPointsAdapter(getActivity());
         mSectionedListAdapter = new SimpleSectionedListAdapter(getActivity(),

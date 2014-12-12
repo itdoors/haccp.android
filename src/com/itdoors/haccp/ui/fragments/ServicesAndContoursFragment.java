@@ -41,17 +41,17 @@ public class ServicesAndContoursFragment extends ListFragment implements
     private OnContourPressedListener mOnContourPressedListener;
 
     private static final String[] SERVICE_FROM_COLUMNS = new String[] {
-        HaccpContract.Services.NAME
+            HaccpContract.Services.NAME
     };
     private static final int[] SERVICE_TO_FIELDS = new int[] {
-        R.id.serv_item_name
+            R.id.serv_item_name
     };
 
     private static final String[] CONTOUR_FROM_COLUMNS = new String[] {
-        HaccpContract.Contours.NAME
+            HaccpContract.Contours.NAME
     };
     private static final int[] CONTOUR_TO_FIELDS = new int[] {
-        R.id.cont_item_name
+            R.id.cont_item_name
     };
 
     @SuppressWarnings("unused")
@@ -108,7 +108,8 @@ public class ServicesAndContoursFragment extends ListFragment implements
             Bundle savedInstanceState) {
         FrameLayout root = (FrameLayout) super
                 .onCreateView(inflater, container, savedInstanceState);
-        return ContextUtils.wrapListFragment(root);
+        root.setBackgroundResource(R.drawable.abs__ab_solid_light_holo);
+        return root;
     }
 
     @Override
@@ -116,10 +117,11 @@ public class ServicesAndContoursFragment extends ListFragment implements
         super.onViewCreated(view, savedInstanceState);
 
         final ListView mListView = getListView();
-        mListView.setBackgroundResource(R.drawable.abs__ab_solid_light_holo);
         mListView.setSelector(R.drawable.abs__tab_indicator_ab_holo);
         mListView.setCacheColorHint(Color.TRANSPARENT);
         mListView.setDrawSelectorOnTop(true);
+
+        ContextUtils.wrapListView(mListView);
 
         // mListView.setEmptyView(ContextUtils.getEmptyListView(getActivity()));
 

@@ -6,6 +6,7 @@ import java.io.File;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -88,12 +89,40 @@ public final class Enviroment {
         // Check if media is mounted or storage is built-in, if so, try and use
         // external cache dir
         // otherwise use internal cache dir
+
         final String path =
                 Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) ||
                         !isExternalStorageRemovable() ? getExternalCacheDir(context).getPath() :
                         context.getFilesDir().getPath();
 
         return new File(path + File.separator + uniqueName);
+    }
+
+    public static File getPackageTempFileDir(Context context, String uniqueName)
+            throws NameNotFoundException {
+
+        File tempDir = new File(getDataDir(context) + File.separator + "temp");
+
+        if (!tempDir.exists()) {
+            tempDir.mkdirs();
+        }
+
+        File file = new File(tempDir, uniqueName);
+        if (file.exists()) {
+            file.delete();
+        }
+
+        return file;
+
+    }
+
+    private static String getDataDir(Context context) throws NameNotFoundException {
+        return getPackageDataDir(context, context.getPackageName());
+    }
+
+    private static String getPackageDataDir(Context context, String packageName)
+            throws NameNotFoundException {
+        return context.getPackageManager().getPackageInfo(packageName, 0).applicationInfo.dataDir;
     }
 
     @TargetApi(8)

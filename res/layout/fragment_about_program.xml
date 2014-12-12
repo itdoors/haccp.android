@@ -51,17 +51,21 @@
 	        android:background="@android:color/black" />
 		
 	    <TextView
+	        android:id="@+id/about_link"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_gravity="center_horizontal"
 	        android:layout_marginLeft="20dp"
 	        android:layout_marginRight="20dp"
-	        android:autoLink="web"
 	        android:background="@drawable/register_button"
 	        android:padding="5dp"
-	        android:text="@string/app_link"
+	        android:text="@string/app_link_html"
 	        android:textSize="20sp" 
 	        />
+	    	<!-- 
+	        android:autoLink="web"
+	        android:linksClickable="true"
+	        -->
 	
 	</LinearLayout>
 </ScrollView>

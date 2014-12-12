@@ -140,8 +140,6 @@ public class AddStatisticsActivity extends SherlockFragmentActivity implements
         GroupCharacteristic characteristic = entry.getKey();
         Double value = entry.getValue();
         String date = Long.toString(Calendar.getInstance().getTime().getTime() / 1000);
-
-        Logger.Logd(getClass(), "onAddPressed  pointId : " + pointId);
         // Get the current location
         Location currentLocation = mLocationClient.getLastLocation();
 
@@ -159,8 +157,6 @@ public class AddStatisticsActivity extends SherlockFragmentActivity implements
         String pointId = getIntent().getStringExtra(Intents.Point.UID);
         if (pointId == null)
             return;
-
-        Logger.Logd(getClass(), "onChangeStatusPressed  pointId : " + pointId);
         AsyncSQLiteOperations.startUpdatePointStatus(getContentResolver(), pointId, status.getId());
         ToastUtil.ToastLong(getApplicationContext(),
                 getString(R.string.data_will_be_entered_on_the_server));
@@ -203,8 +199,8 @@ public class AddStatisticsActivity extends SherlockFragmentActivity implements
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        Logger.Logd(getClass(), "Connected to Google Location Client...");
 
+        Logger.Logd(getClass(), "Connected to Google Location Client...");
         mFragment = getSupportFragmentManager().findFragmentByTag(ADD_STATICTICS_FRAGMENT_TAG);
         if (mFragment == null) {
             mFragment = new AddStatisticsFragment();

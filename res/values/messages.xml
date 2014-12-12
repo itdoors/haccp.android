@@ -20,7 +20,10 @@
     <string name="not_avalieble_without_any_interent_connection">Not available without any internet connection.</string>
     <string name="no_records">No records avaliable.</string>
     <string name="fill_the_fields">Fill the fields</string>
-    <string name="failed_to_log_in">Error: Wrond data!</string>
+    <string name="initial_setup_db_failed_error">Error has happened when tring to sync. Retry later."</string>
+    
+    <string name="failed_to_log_unknown_error">Unknown Error: Try more!</string>
+    <string name="failed_to_log_in_wrong_data">Error: Wrond data!</string>
     
         <!-- Instruction -->
     <string name="instruction_data_sending">Data will be sent not immediately when the internet available</string>

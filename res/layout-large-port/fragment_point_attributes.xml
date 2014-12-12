@@ -61,72 +61,42 @@
            
             >
   
-		        <!-- CP installation date -->
 		
-		        <LinearLayout
-		            android:layout_width="fill_parent"
-		            android:layout_height="wrap_content"
-		            android:layout_marginTop="10dp"
-		            android:orientation="vertical" >
-
-		            <TextView
-		                android:layout_width="fill_parent"
-		                android:layout_height="wrap_content"
-		                android:layout_marginBottom="5dp"
-		                android:singleLine="true"
-		                android:text="@string/installation_date"
-		                android:textColor="@android:color/black"
-		                android:textSize="16sp"
-		                android:textStyle="bold" />
 		
-		            <TextView
-		                android:id="@+id/cp_attr_inst_date"
-		                android:layout_width="fill_parent"
-		                android:layout_height="wrap_content"
-		                android:background="@drawable/cp_attr_values_bg"
-		                android:paddingBottom="2dp"
-		                android:paddingLeft="5dp"
-		                android:paddingRight="5dp"
-		                android:paddingTop="2dp"
-		                android:singleLine="false"
-		                android:textColor="@android:color/black"
-		                android:typeface="serif"
-		                android:textSize="16sp" />
-		        </LinearLayout>
-		
-		        <!-- CP who_set -->
-		
-		        <LinearLayout
-		            android:layout_width="fill_parent"
-		            android:layout_height="wrap_content"
-		            android:layout_marginTop="10dp"
-		            android:orientation="vertical" >
-		
-		            <TextView
-		                android:layout_width="fill_parent"
-		                android:layout_height="wrap_content"
-		                android:layout_marginBottom="5dp"
-		                android:singleLine="true"
-		                android:text="@string/who_set"
-		                android:textColor="@android:color/black"
-		                android:textSize="16sp"
-		                android:textStyle="bold" />
-		
-		            <TextView
-		                android:id="@+id/cp_attr_who_set"
-		                android:layout_width="fill_parent"
-		                android:layout_height="wrap_content"
-		                android:background="@drawable/cp_attr_values_bg"
-		                android:paddingBottom="2dp"
-		                android:paddingLeft="5dp"
-		                android:paddingRight="5dp"
-		                android:paddingTop="2dp"
-		                android:singleLine="false"
-		                android:textColor="@android:color/black"
-		                android:typeface="serif"
-		                android:textSize="16sp" />
-		        </LinearLayout>
-		
+              <!-- CP monitoring object -->
+				
+				        <LinearLayout
+				            android:id="@+id/cp_attr_mobject_holder"
+				            android:layout_width="fill_parent"
+				            android:layout_height="wrap_content"
+				            android:layout_marginTop="10dp"
+				            android:orientation="vertical" >
+				
+				            <TextView
+				                android:layout_width="fill_parent"
+				                android:layout_height="wrap_content"
+				                android:layout_marginBottom="5dp"
+				                android:singleLine="true"
+				                android:text="@string/object"
+				                android:textColor="@android:color/black"
+				                android:textSize="16sp"
+				                android:textStyle="bold" />
+				
+				            <TextView
+				                android:id="@+id/cp_attr_object"
+				                android:layout_width="fill_parent"
+				                android:layout_height="wrap_content"
+				                android:background="@drawable/cp_attr_values_bg"
+				                android:paddingBottom="2dp"
+				                android:paddingLeft="5dp"
+				                android:paddingRight="5dp"
+				                android:paddingTop="2dp"
+				                android:singleLine="false"
+				                android:textColor="@android:color/black"
+				                android:typeface="serif"
+				                android:textSize="16sp" />
+				        </LinearLayout>
+				        
 		        <!-- CP type -->
 		
 		        <LinearLayout
@@ -194,41 +164,7 @@
 				                android:typeface="serif"
 				                android:textSize="16sp" />
 				        </LinearLayout>
-				
-				        <!-- CP monitoring object -->
-				
-				        <LinearLayout
-				            android:id="@+id/cp_attr_mobject_holder"
-				            android:layout_width="fill_parent"
-				            android:layout_height="wrap_content"
-				            android:layout_marginTop="10dp"
-				            android:orientation="vertical" >
-				
-				            <TextView
-				                android:layout_width="fill_parent"
-				                android:layout_height="wrap_content"
-				                android:layout_marginBottom="5dp"
-				                android:singleLine="true"
-				                android:text="@string/object"
-				                android:textColor="@android:color/black"
-				                android:textSize="16sp"
-				                android:textStyle="bold" />
-				
-				            <TextView
-				                android:id="@+id/cp_attr_object"
-				                android:layout_width="fill_parent"
-				                android:layout_height="wrap_content"
-				                android:background="@drawable/cp_attr_values_bg"
-				                android:paddingBottom="2dp"
-				                android:paddingLeft="5dp"
-				                android:paddingRight="5dp"
-				                android:paddingTop="2dp"
-				                android:singleLine="false"
-				                android:textColor="@android:color/black"
-				                android:typeface="serif"
-				                android:textSize="16sp" />
-				        </LinearLayout>
-				
+				     
 				        <!-- CP status -->
 				
 				        <LinearLayout
@@ -262,6 +198,148 @@
 				                android:textSize="16sp" />
 				           
 				        </LinearLayout>
+				       
+				        <!-- CP poison -->
+		
+				        <LinearLayout
+				            android:id="@+id/product_descr_poison_holder"
+				            android:layout_width="fill_parent"
+				            android:layout_height="wrap_content"
+				            android:layout_marginTop="10dp"
+				            android:orientation="vertical" 
+				            android:visibility="gone"
+				            >
+				
+				            <TextView
+				                android:layout_width="fill_parent"
+				                android:layout_height="wrap_content"
+				                android:layout_marginBottom="5dp"
+				                android:singleLine="true"
+				                android:text="@string/poison"
+				                android:textColor="@android:color/black"
+				                android:textSize="16sp"
+				                android:textStyle="bold" />
+				
+				            <TextView
+				                android:id="@+id/cp_poison"
+				                android:layout_width="fill_parent"
+				                android:layout_height="wrap_content"
+				                android:background="@drawable/cp_attr_values_bg"
+				                android:paddingBottom="2dp"
+				                android:paddingLeft="5dp"
+				                android:paddingRight="5dp"
+				                android:paddingTop="2dp"
+				                android:singleLine="false"
+				                android:textColor="@android:color/black"
+				                android:typeface="serif"
+				                android:textSize="16sp" />
+				        </LinearLayout>
+				
+				        <!-- CP poison active substance -->
+		
+				        <LinearLayout
+				            android:id="@+id/product_descr_poison_active_substance_holder"
+				            android:layout_width="fill_parent"
+				            android:layout_height="wrap_content"
+				            android:layout_marginTop="10dp"
+				            android:orientation="vertical" 
+				            android:visibility="gone"
+				            >
+				
+				            <TextView
+				                android:layout_width="fill_parent"
+				                android:layout_height="wrap_content"
+				                android:layout_marginBottom="5dp"
+				                android:singleLine="true"
+				                android:text="@string/active_substance"
+				                android:textColor="@android:color/black"
+				                android:textSize="16sp"
+				                android:textStyle="bold" />
+				
+				            <TextView
+				                android:id="@+id/cp_poison_active_substance"
+				                android:layout_width="fill_parent"
+				                android:layout_height="wrap_content"
+				                android:background="@drawable/cp_attr_values_bg"
+				                android:paddingBottom="2dp"
+				                android:paddingLeft="5dp"
+				                android:paddingRight="5dp"
+				                android:paddingTop="2dp"
+				                android:singleLine="false"
+				                android:textColor="@android:color/black"
+				                android:typeface="serif"
+				                android:textSize="16sp" />
+				        </LinearLayout>
+				
+				      
+				
+				  
+				        
+				                <!-- CP installation date -->
+		
+		        <LinearLayout
+		            android:layout_width="fill_parent"
+		            android:layout_height="wrap_content"
+		            android:layout_marginTop="10dp"
+		            android:orientation="vertical" >
+
+		            <TextView
+		                android:layout_width="fill_parent"
+		                android:layout_height="wrap_content"
+		                android:layout_marginBottom="5dp"
+		                android:singleLine="true"
+		                android:text="@string/installation_date"
+		                android:textColor="@android:color/black"
+		                android:textSize="16sp"
+		                android:textStyle="bold" />
+		
+		            <TextView
+		                android:id="@+id/cp_attr_inst_date"
+		                android:layout_width="fill_parent"
+		                android:layout_height="wrap_content"
+		                android:background="@drawable/cp_attr_values_bg"
+		                android:paddingBottom="2dp"
+		                android:paddingLeft="5dp"
+		                android:paddingRight="5dp"
+		                android:paddingTop="2dp"
+		                android:singleLine="false"
+		                android:textColor="@android:color/black"
+		                android:typeface="serif"
+		                android:textSize="16sp" />
+		        </LinearLayout>
+		
+		        <!-- CP who_set -->
+		
+		        <LinearLayout
+		            android:layout_width="fill_parent"
+		            android:layout_height="wrap_content"
+		            android:layout_marginTop="10dp"
+		            android:orientation="vertical" >
+		
+		            <TextView
+		                android:layout_width="fill_parent"
+		                android:layout_height="wrap_content"
+		                android:layout_marginBottom="5dp"
+		                android:singleLine="true"
+		                android:text="@string/who_set"
+		                android:textColor="@android:color/black"
+		                android:textSize="16sp"
+		                android:textStyle="bold" />
+		
+		            <TextView
+		                android:id="@+id/cp_attr_who_set"
+		                android:layout_width="fill_parent"
+		                android:layout_height="wrap_content"
+		                android:background="@drawable/cp_attr_values_bg"
+		                android:paddingBottom="2dp"
+		                android:paddingLeft="5dp"
+		                android:paddingRight="5dp"
+		                android:paddingTop="2dp"
+		                android:singleLine="false"
+		                android:textColor="@android:color/black"
+		                android:typeface="serif"
+		                android:textSize="16sp" />
+		        </LinearLayout>
 		        
 		        </LinearLayout>
 		        

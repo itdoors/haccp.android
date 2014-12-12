@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="app_name_haccp">HACCP</string>
+    <string name="app_name_haccp">haccp.center</string>
     <string name="version_name">1.0</string>
     <string name="profile">Profile</string>
     <string name="user_profile">Profile</string>
@@ -29,7 +29,9 @@
     <string name="scan">Scan</string>
     <string name="scanner">Scanner</string>
     <string name="about_program">About program</string>
-    <string name="app_link">http://haccp.itdoors.com.ua/</string>
+    
+    <string name="app_link_html"><a href="http://haccp.center">http://haccp.center</a></string>
+    <string name="app_link">http://haccp.center</string>
     <string name="statistics">Statistics</string>
     <string name="attributes">Attributes</string>
     <string name="control_point">Control point</string>
@@ -43,7 +45,9 @@
     <string name="point_number">Control point #</string>
     <string name="contours">Contours</string>
     <string name="company_objects">Company\'s objects</string>
-
+    <string name="poison">Poison</string>
+    <string name="active_substance">Active substance</string>
+    
     <!-- CP TYPES -->
     <string name="cp_type_grounbait_box">Grounbait box</string>
     <string name="cp_type_trap">Trap</string>

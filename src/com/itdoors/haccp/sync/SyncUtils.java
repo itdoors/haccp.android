@@ -24,7 +24,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.itdoors.haccp.oauth.AccessToken;
 import com.itdoors.haccp.provider.HaccpContract;
@@ -38,6 +37,7 @@ import com.itdoors.haccp.utils.Logger;
  * Static helper methods for working with the sync framework.
  */
 public class SyncUtils {
+
     private static final long SYNC_FREQUENCY = 60 * 60; // 1 hour (in seconds)
     private static final String CONTENT_AUTHORITY = HaccpContract.CONTENT_AUTHORITY;
 
@@ -88,27 +88,36 @@ public class SyncUtils {
         // data has been deleted. (Note that it's possible to clear app data
         // WITHOUT affecting
         // the account list, so wee need to check both.)
-        if (!setupDone) {
+
+        boolean isSyncActive = ContentResolver.isSyncActive(account,
+                HaccpContract.CONTENT_AUTHORITY);
+
+        // if not syncing yet or if error occurs in previuos sync
+        if (!setupDone || (!setupComplete && !isSyncActive)) {
             requestManualSync(context);
         }
+
     }
 
     public static synchronized boolean isLoggedIn(Context context, Intent intentToRedirect) {
+
         String token = PreferenceManager.getDefaultSharedPreferences(context)
-                .getString(PREF_TOKEN, "");
+                .getString(PREF_TOKEN, null);
 
-        boolean loggedIn = !token.equals("");
-        if (loggedIn) {
-
+        if (token != null) {
             return true;
-
         }
         else {
 
-            Intent intent = new Intent(context, LoginActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra(FINISH_INTENT_EXTRA, intentToRedirect);
-            context.startActivity(intent);
+            if (intentToRedirect != null) {
+
+                Intent intent = new Intent(context, LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra(FINISH_INTENT_EXTRA, intentToRedirect);
+                context.startActivity(intent);
+
+            }
+
             return false;
 
         }
@@ -117,29 +126,40 @@ public class SyncUtils {
 
     public static synchronized void logIn(Context context, AccessToken assessToken,
             Intent redirectIntent) {
+
         PreferenceManager.getDefaultSharedPreferences(context).edit()
                 .putString(PREF_TOKEN, assessToken.getToken()).commit();
 
-        Intent intent = new Intent(context, HomeActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(FINISH_INTENT_EXTRA, redirectIntent);
-        context.startActivity(intent);
+        if (redirectIntent != null) {
+            Intent intent = new Intent(context, HomeActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra(FINISH_INTENT_EXTRA, redirectIntent);
+            context.startActivity(intent);
+        }
     }
 
     public static synchronized void logOut(Context context, Intent finishIntent) {
+
+        // Remove preferences
         PreferenceManager.getDefaultSharedPreferences(context).edit().clear().commit();
 
-        Intent intent = new Intent(context, HomeActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(FINISH_INTENT_EXTRA, finishIntent);
-        context.startActivity(intent);
+        /*
+         * Here it will be needed to remove the account from account manager in
+         * future
+         */
+
+        if (finishIntent != null) {
+            Intent intent = new Intent(context, HomeActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra(FINISH_INTENT_EXTRA, finishIntent);
+            context.startActivity(intent);
+        }
 
     }
 
     public static synchronized String getAccessToken(Context context) {
         String token = PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(PREF_TOKEN, null);
-        Log.d(SyncUtils.class.getSimpleName(), token);
         return token;
     }
 
@@ -149,11 +169,12 @@ public class SyncUtils {
             return true;
         }
         else {
-
-            Intent intent = new Intent(context, InitActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra(FINISH_INTENT_EXTRA, finishIntent);
-            context.startActivity(intent);
+            if (finishIntent != null) {
+                Intent intent = new Intent(context, InitActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra(FINISH_INTENT_EXTRA, finishIntent);
+                context.startActivity(intent);
+            }
             return false;
 
         }

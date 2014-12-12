@@ -242,9 +242,11 @@ public class RestContentProvider extends ContentProvider {
             sPointInfoMap.put(HaccpContract.Points.PLANS_ID_PROJECTION,
                     HaccpContract.Plans._ID_FULL + " AS "
                             + HaccpContract.Points.PLANS_ID_PROJECTION);
+
             sPointInfoMap.put(HaccpContract.Points.PLANS_UID_PROJECTION,
                     HaccpContract.Plans.UID_FULL + " AS "
                             + HaccpContract.Points.PLANS_UID_PROJECTION);
+
             sPointInfoMap.put(HaccpContract.Points.PLANS_NAME_PROJECTION,
                     HaccpContract.Plans.NAME_FULL + " AS "
                             + HaccpContract.Points.PLANS_NAME_PROJECTION);
@@ -285,6 +287,17 @@ public class RestContentProvider extends ContentProvider {
                     HaccpContract.Groups.NAME_FULL + " AS "
                             + HaccpContract.Points.GROUP_NAME_PROJECTION);
 
+            sPointInfoMap.put(HaccpContract.Points.POISON_UID_PROJECTION,
+                    HaccpContract.Poisons.UID_FULL + " AS "
+                            + HaccpContract.Points.POISON_UID_PROJECTION);
+
+            sPointInfoMap.put(HaccpContract.Points.POISON_NAME_PROJECTION,
+                    HaccpContract.Poisons.NAME_FULL + " AS "
+                            + HaccpContract.Points.POISON_NAME_PROJECTION);
+
+            sPointInfoMap.put(HaccpContract.Points.POISON_ACTIVE_SUBSTANCE_PROJECTION,
+                    HaccpContract.Poisons.ACTIVE_SUBSTANCE + " AS "
+                            + HaccpContract.Points.POISON_ACTIVE_SUBSTANCE_PROJECTION);
         }
 
         {
@@ -477,6 +490,25 @@ public class RestContentProvider extends ContentProvider {
                                 + HaccpContract.Points.PLAN_ID + " = " +
                                 HaccpDatabase.Tables.PLANS + "." + HaccpContract.Plans.UID +
                                 ")"
+
+                                +
+
+                                " LEFT JOIN " + HaccpDatabase.Tables.POINT_POISON +
+                                " ON " + "(" + HaccpDatabase.Tables.POINTS + "."
+                                + HaccpContract.Points.UID + " = " +
+                                HaccpDatabase.Tables.POINT_POISON + "."
+                                + HaccpContract.PointPoison.POINT_ID +
+                                ")"
+
+                                +
+
+                                " LEFT JOIN " + HaccpDatabase.Tables.POISONS +
+                                " ON " + "(" + HaccpDatabase.Tables.POISONS + "."
+                                + HaccpContract.Poisons.UID + " = " +
+                                HaccpDatabase.Tables.POINT_POISON + "."
+                                + HaccpContract.PointPoison.POISON_ID +
+                                ")"
+
                         );
 
                 qBuilder.appendWhere(HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.UID

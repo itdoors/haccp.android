@@ -33,13 +33,11 @@ public class AsyncSQLiteOperations {
         String url = Global.API_URL + "/point/" + pointId + "/statistics";
 
         Bundle params = new Bundle();
-        params.putString("pointStatisticsApiForm[characteristic]",
-                Integer.toString(characterisrticId));
-
-        params.putString("pointStatisticsApiForm[createdAt]", createdAt);
-        params.putString("pointStatisticsApiForm[entryDate]", entryDate);
-        params.putString("pointStatisticsApiForm[value]", value);
-        params.putString("pointStatisticsApiForm[location]", LocationUtils.getLatLng(location));
+        params.putString("characteristic", Integer.toString(characterisrticId));
+        params.putString("createdAt", createdAt);
+        params.putString("entryDate", entryDate);
+        params.putString("value", value);
+        params.putString("location", LocationUtils.getLatLng(location));
 
         values.put(HaccpContract.Transactions.ACTION_TYPE, action_type);
         values.put(HaccpContract.Transactions.URI, url);
@@ -55,7 +53,7 @@ public class AsyncSQLiteOperations {
         String url = Global.API_URL + "/point/" + pointId + "/status";
 
         Bundle params = new Bundle();
-        params.putString("pointStatusApiForm[statusId]", Integer.toString(statusId));
+        params.putString("statusId", Integer.toString(statusId));
 
         ContentValues values = new ContentValues();
         values.put(HaccpContract.Transactions.ACTION_TYPE, action_type);

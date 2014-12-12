@@ -1,6 +1,7 @@
 
 package com.itdoors.haccp.ui.fragments;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
+import yanzm.products.customview.itempicker.ItemPicker;
 import android.app.Activity;
 import android.database.Cursor;
 import android.graphics.Paint;
@@ -31,25 +33,32 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.edmodo.rangebar.RangeBar;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.itdoors.haccp.Intents;
 import com.itdoors.haccp.R;
 import com.itdoors.haccp.model.DataType;
 import com.itdoors.haccp.model.GroupCharacteristic;
 import com.itdoors.haccp.model.GroupCharacteristicField;
 import com.itdoors.haccp.model.InputType;
+import com.itdoors.haccp.model.InputType.StepProperty;
 import com.itdoors.haccp.model.PointStatus;
 import com.itdoors.haccp.model.PointStatus.CODE;
 import com.itdoors.haccp.model.StatististicsItemStatus;
 import com.itdoors.haccp.provider.HaccpContract;
 import com.itdoors.haccp.utils.AppUtils;
+import com.itdoors.haccp.utils.ContextUtils;
+import com.itdoors.haccp.utils.InputTypeParser;
 import com.itdoors.haccp.utils.Logger;
 
 public class AddStatisticsFragment extends SherlockFragment implements LoaderCallbacks<Cursor> {
 
     public interface OnAddPressedListener {
+
         public void onAddPressed(HashMap<GroupCharacteristic, Double> values);
 
         public void onChangeStatusPressed(PointStatus status);
+
     }
 
     private static final String CHEAKED_RADIO_BTN_SAVE = "com.itdoors.haccp.fragments.AddStatisticsFragment";
@@ -62,8 +71,6 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
 
     private ArrayList<GroupCharacteristicField> mGroupCharacteristicsFields;
     private ArrayList<PointStatus> mStatuses;
-
-    // three queries to db
 
     private Handler handler = new MyLoadingHandler(this);
     private CountDownLatch allLoadsCompleted;
@@ -142,17 +149,8 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        Logger.Logi(getClass(), "onAttach");
         mOnAddPressedListener = (OnAddPressedListener) activity;
     }
-
-    /**
-     * 
-     class OuterClass { static class InnerClass { private final
-     * WeakReference<OuterClass> mTarget; InnerClass(OuterClass target) {
-     * mTarget = new WeakReference<OuterClass>(target); } void doSomething() {
-     * OuterClass target = mTarget.get(); if (target != null) target.do(); } } }
-     */
 
     private static class MyLoadingHandler extends Handler {
 
@@ -191,16 +189,11 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
                     AddStatisticsFragment fragment = mWeakRef.get();
                     if (fragment != null && fragment.isAdded()) {
                         try {
-                            Logger.Logi(getClass(), "waiting thread locked");
-
                             fragment.allLoadsCompleted.await();
                             fragment.handler.sendEmptyMessage(READY_MSG);
                             fragment.waitingThread = null;
 
-                            Logger.Logi(getClass(), "waiting thread finished");
                         } catch (InterruptedException e) {
-                            Logger.Logi(getClass(), "Interrupted exception");
-                            // mWeakRef.clear();
                         }
                     }
                 } finally {
@@ -212,17 +205,12 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
     };
 
     private void fillViews() {
-
-        if (!isAdded())
-            return;
-
-        if (mGroupCharacteristicsFields != null && mStatuses != null) {
+        if (isAdded() && mGroupCharacteristicsFields != null && mStatuses != null) {
             setCharacteristicsViews(getLayoutInflater(null), (ViewGroup) getView(),
                     mGroupCharacteristicsFields);
             setStatusesRadioGroup(getLayoutInflater(null), (ViewGroup) getView(), mStatuses);
             addBtn.setEnabled(true);
         }
-
     }
 
     @Override
@@ -230,6 +218,9 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
             Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_add_statistics, container,
                 false);
+        View view = root.findViewById(R.id.add_statistics_characteristic_holder);
+        ContextUtils.wrapContentView(view);
+
         addBtn = (Button) root.findViewById(R.id.add_st_done_btn);
         addBtn.setEnabled(false);
         addBtn.setOnClickListener(new View.OnClickListener() {
@@ -250,6 +241,7 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
                 }
             }
         });
+
         return root;
     }
 
@@ -268,9 +260,7 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
             else
                 return Action.ADD_STATISTICS;
         }
-
         return null;
-
     }
 
     public PointStatus getStatus() {
@@ -282,21 +272,18 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
 
     @Override
     public void onResume() {
+
         super.onResume();
-        Logger.Logi(getClass(), "onResume");
 
         allLoadsCompleted = new CountDownLatch(3);
-
         getLoaderManager().initLoader(PointQuery._TOKEN, null, this);
         getLoaderManager().initLoader(StatusesQuery._TOKEN, null, this);
 
         if (isFragmentLostHisState) {
-
             Logger.Logi(getClass(), "waiting thread created !");
             waitingThread = new Thread(new MyLoadingRunnable(this));
             waitingThread.setName("WaitForDBResponces Tread" + "#" + waitingThread.getId());
             waitingThread.start();
-
         } else {
             addBtn.setEnabled(true);
         }
@@ -305,11 +292,9 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
     @Override
     public void onPause() {
         super.onPause();
-        Logger.Logi(getClass(), "onPause");
         if (waitingThread != null) {
             if (waitingThread.isAlive()) {
                 waitingThread.interrupt();
-                Logger.Logi(getClass(), "waiting thread interrupted !");
             }
             waitingThread = null;
         }
@@ -319,14 +304,12 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
     @Override
     public void onStop() {
         super.onStop();
-        Logger.Logi(getClass(), "onStop");
         isFragmentLostHisState = false;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        Logger.Logi(getClass(), "onStart");
     }
 
     @Override
@@ -341,7 +324,6 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
     @Override
     public void onDetach() {
         super.onDetach();
-        Logger.Logi(getClass(), "onDetach");
         handler.removeCallbacksAndMessages(null);
     }
 
@@ -357,8 +339,6 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
     public Loader<Cursor> onCreateLoader(int id, Bundle data) {
 
         if (id == PointQuery._TOKEN) {
-
-            Logger.Logi(getClass(), "onCreateLoader : " + "point query");
             return new CursorLoader(
                     getActivity(),
                     getPointInfoUri(),
@@ -367,8 +347,6 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
                     null,
                     null);
         } else if (id == StatusesQuery._TOKEN) {
-
-            Logger.Logi(getClass(), "onCreateLoader : " + "statuses query");
             return new CursorLoader(getActivity(),
                     HaccpContract.Statuses.CONTENT_URI,
                     StatusesQuery.PROJECTION,
@@ -377,8 +355,6 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
                     null);
         }
         else if (id == GroupCharacteristicsQuery._TOKEN) {
-
-            Logger.Logi(getClass(), "onCreateLoader : " + "characteristics query");
             return new CursorLoader(getActivity(),
                     HaccpContract.GroupCharacterisitcs.buildUriForGroup(data.getInt("group_id")),
                     GroupCharacteristicsQuery.PROJECTION,
@@ -386,7 +362,6 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
                     null,
                     null);
         }
-
         throw new IllegalArgumentException("unknown loader id: " + id);
     }
 
@@ -410,18 +385,13 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
-        // clear UI if needed
-
         switch (loader.getId()) {
             case PointQuery._TOKEN:
-                Logger.Logi(getClass(), "onLoaderReset: point");
                 break;
             case StatusesQuery._TOKEN:
-                Logger.Logi(getClass(), "onLoaderReset: statuses");
                 clearStatuses();
                 break;
             case GroupCharacteristicsQuery._TOKEN:
-                Logger.Logi(getClass(), "onLoaderReset: characteristics");
                 clearCharacteristics();
                 break;
             default:
@@ -431,7 +401,6 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
 
     private void clearStatuses() {
         if (getView() != null) {
-            Logger.Logi(getClass(), "remove all views from statuses");
             RadioGroup mRadioGroup = (RadioGroup) getView().findViewById(
                     R.id.add_st_statuses_radio_group);
             removeAllViews(mRadioGroup);
@@ -440,7 +409,6 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
 
     private void clearCharacteristics() {
         if (getView() != null) {
-            Logger.Logi(getClass(), "remove all views from characteristics");
             LinearLayout mLinearLayout = (LinearLayout) getView().findViewById(
                     R.id.add_st_char_fields_holder);
             removeAllViews(mLinearLayout);
@@ -454,26 +422,17 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
 
     private void onPointLoadFinished(Cursor cursor) {
 
-        Logger.Logi(getClass(), "onLoadFinished : " + "point query");
-
         cursor.moveToFirst();
         if (cursor.getCount() == 0)
             return;
 
         String pointName = cursor.getString(PointQuery.NAME); // (number)
-
         int groupId = cursor.getInt(PointQuery.GROUP_UID);
-
-        // int statusId = cursor.getInt(PointQuery.STATUS_UID);
-
         if (isAdded()) {
             TextView number = (TextView) getView().findViewById(R.id.add_st_char_point_number);
             if (number != null) // vertical orientation case
                 number.setText(pointName);
         }
-
-        // this.mPointStatusId = statusId;
-        // this.mPointGroupId = groupId;
 
         Bundle args = new Bundle();
         args.putInt("group_id", groupId);
@@ -481,15 +440,11 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
         LoaderManager loaderManager = getLoaderManager();
         loaderManager
                 .initLoader(GroupCharacteristicsQuery._TOKEN, args, AddStatisticsFragment.this);
-        Logger.Logi(getClass(), "point countDown");
-
         allLoadsCompleted.countDown();
 
     }
 
     private void onStatusesLoadFinished(Cursor cursor) {
-
-        Logger.Logi(getClass(), "onLoadFinished : " + "statuses");
 
         ArrayList<PointStatus> statuses = new ArrayList<PointStatus>();
         cursor.moveToFirst();
@@ -512,16 +467,11 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
         }
 
         this.mStatuses = statuses;
-
-        Logger.Logi(getClass(), "statuses countDown");
-
         allLoadsCompleted.countDown();
-
     }
 
     private void onGroupCharacteristicsLoadFinished(Cursor cursor) {
 
-        Logger.Logi(getClass(), "onLoadFinished : " + "characteristics");
         ArrayList<GroupCharacteristicField> records = new ArrayList<GroupCharacteristicField>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -543,10 +493,15 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
             DataType dataType = null;
             InputType inputType = null;
             try {
+
                 dataType = DataType.fromString(dataTypeStr);
-                inputType = InputType.fromString(inputTypeStr);
+                inputType = InputTypeParser.parse(inputTypeStr);
+
             } catch (IllegalArgumentException wrongArgumentException) {
                 wrongArgumentException.printStackTrace();
+            } catch (JsonProcessingException failedJsonException) {
+                failedJsonException.printStackTrace();
+            } catch (IOException ignore) {
             }
 
             GroupCharacteristic groupCharacteristics = new GroupCharacteristic(uid, name, unit,
@@ -558,8 +513,6 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
         }
 
         this.mGroupCharacteristicsFields = records;
-
-        Logger.Logi(getClass(), "characteristics countDown");
         allLoadsCompleted.countDown();
 
     }
@@ -601,16 +554,33 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
             View view = entry.getValue();
             InputType inputType = field.getInputType();
 
-            switch (inputType) {
-                case RANGE:
+            switch (inputType.getRange()) {
+                case INT: {
+                    final ItemPicker picker = (ItemPicker) view.findViewById(R.id.number_picker);
+                    picker.setEnabled(false);
+                }
+                    break;
+                case ARRAY:
+                    break;
+                case STEP: {
+                    /*
+                     * final TextView nameTV = (TextView)
+                     * view.findViewById(R.id.add_st_char_name); final SeekBar
+                     * seekBar = (SeekBar)
+                     * view.findViewById(R.id.add_st_char_seak_bar); if
+                     * (seekBar.isEnabled())
+                     * nameTV.setPaintFlags(nameTV.getPaintFlags() |
+                     * Paint.STRIKE_THRU_TEXT_FLAG); seekBar.setEnabled(false);
+                     */
 
                     final TextView nameTV = (TextView) view.findViewById(R.id.add_st_char_name);
-                    final SeekBar seekBar = (SeekBar) view.findViewById(R.id.add_st_char_seak_bar);
+                    final RangeBar rangeBar = (RangeBar) view.findViewById(R.id.add_st_range_bar);
+                    if (rangeBar.isEnabled())
+                        nameTV.setPaintFlags(nameTV.getPaintFlags() |
+                                Paint.STRIKE_THRU_TEXT_FLAG);
+                    rangeBar.setEnabled(false);
 
-                    if (seekBar.isEnabled())
-                        nameTV.setPaintFlags(nameTV.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                    seekBar.setEnabled(false);
-
+                }
                     break;
             }
         }
@@ -625,16 +595,34 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
             View view = entry.getValue();
             InputType inputType = field.getInputType();
 
-            switch (inputType) {
-                case RANGE:
+            switch (inputType.getRange()) {
+                case INT: {
+                    final ItemPicker picker = (ItemPicker) view.findViewById(R.id.number_picker);
+                    picker.setEnabled(true);
+                }
+                    break;
+                case ARRAY:
+                    break;
+                case STEP: {
+                    /*
+                     * final TextView nameTV = (TextView)
+                     * view.findViewById(R.id.add_st_char_name); final SeekBar
+                     * seekBar = (SeekBar)
+                     * view.findViewById(R.id.add_st_char_seak_bar); if
+                     * (!seekBar.isEnabled())
+                     * nameTV.setPaintFlags(nameTV.getPaintFlags() ^
+                     * Paint.STRIKE_THRU_TEXT_FLAG); seekBar.setEnabled(true);
+                     */
 
                     final TextView nameTV = (TextView) view.findViewById(R.id.add_st_char_name);
-                    final SeekBar seekBar = (SeekBar) view.findViewById(R.id.add_st_char_seak_bar);
+                    final RangeBar rangeBar = (RangeBar) view.findViewById(R.id.add_st_range_bar);
 
-                    if (!seekBar.isEnabled())
-                        nameTV.setPaintFlags(nameTV.getPaintFlags() ^ Paint.STRIKE_THRU_TEXT_FLAG);
-                    seekBar.setEnabled(true);
+                    if (!rangeBar.isEnabled())
+                        nameTV.setPaintFlags(nameTV.getPaintFlags() ^
+                                Paint.STRIKE_THRU_TEXT_FLAG);
+                    rangeBar.setEnabled(true);
 
+                }
                     break;
             }
         }
@@ -676,70 +664,164 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
 
         InputType inputType = field.getInputType();
         View view = null;
-        switch (inputType) {
-            case RANGE: {
 
-                view = inflater.inflate(R.layout.list_item_range_add_statisctics, container, false);
+        Logger.Logi(getClass(), "inputType: " + inputType.toString());
 
-                final TextView unitTV = (TextView) view.findViewById(R.id.add_st_char_unit);
-                final TextView valueTV = (TextView) view.findViewById(R.id.add_st_char_value);
-                final TextView nameTV = (TextView) view.findViewById(R.id.add_st_char_name);
-                final SeekBar seekBar = (SeekBar) view.findViewById(R.id.add_st_char_seak_bar);
+        switch (inputType.getRange()) {
 
-                final TextView minTV = (TextView) view.findViewById(R.id.add_st_char_min_value);
-                final TextView maxTV = (TextView) view.findViewById(R.id.add_st_char_max_value);
+            case INT: {
 
+                view = inflater.inflate(R.layout.list_item_range_int_add_statistics, container,
+                        false);
+                final TextView nameView = (TextView) view.findViewById(R.id.add_st_char_name);
+                final ItemPicker picker = (ItemPicker) view.findViewById(R.id.number_picker);
                 final View statusView = view.findViewById(R.id.add_st_char_status);
 
-                if (field.getCharacteristic() != null) {
+                GroupCharacteristic characteristics = field.getCharacteristic();
+                if (characteristics != null) {
 
-                    GroupCharacteristic characteristics = field.getCharacteristic();
-                    unitTV.setText(characteristics.getUnit());
-                    nameTV.setText(characteristics.getName() + ":");
+                    nameView.setText(characteristics.getName() + ":");
 
                     final int minimum = characteristics.getMinValue();
                     final int maximum = characteristics.getMaxValue();
 
-                    minTV.setText(Integer.toString(minimum));
-                    maxTV.setText(Integer.toString(maximum));
+                    final int bottom = characteristics.getCriticalBottomValue();
+                    final int top = characteristics.getCriticalTopValue();
+
+                    picker.setOnChangeListener(new ItemPicker.OnChangedListener() {
+
+                        @Override
+                        public void onChanged(ItemPicker picker, int oldVal, int newVal) {
+                            AppUtils.setUpStatusViewColor(AppUtils.getStatus(newVal, top, bottom),
+                                    statusView);
+                        }
+                    });
+
+                    picker.setRange(minimum, maximum);
+                    picker.setSpeed(1000);
+
+                }
+
+                viewValueContainersMap.put(field, picker);
+            }
+
+                break;
+
+            case ARRAY:
+                break;
+            case STEP: {
+
+                /*
+                 * view =
+                 * inflater.inflate(R.layout.list_item_range_step_add_statisctics
+                 * , container, false); final TextView unitTV = (TextView)
+                 * view.findViewById(R.id.add_st_char_unit); final TextView
+                 * valueTV = (TextView)
+                 * view.findViewById(R.id.add_st_char_value); final TextView
+                 * nameTV = (TextView) view.findViewById(R.id.add_st_char_name);
+                 * final SeekBar seekBar = (SeekBar)
+                 * view.findViewById(R.id.add_st_char_seak_bar); final TextView
+                 * minTV = (TextView)
+                 * view.findViewById(R.id.add_st_char_min_value); final TextView
+                 * maxTV = (TextView)
+                 * view.findViewById(R.id.add_st_char_max_value); final View
+                 * statusView = view.findViewById(R.id.add_st_char_status); if
+                 * (field.getCharacteristic() != null) { GroupCharacteristic
+                 * characteristics = field.getCharacteristic();
+                 * unitTV.setText(characteristics.getUnit());
+                 * nameTV.setText(characteristics.getName() + ":"); final int
+                 * minimum = characteristics.getMinValue(); final int maximum =
+                 * characteristics.getMaxValue();
+                 * minTV.setText(Integer.toString(minimum)); final int step =
+                 * ((StepProperty) inputType.getProperty()).getStep(); if (step
+                 * > 0) { LinearLayout layout = (LinearLayout) view
+                 * .findViewById(R.id.step_holder);
+                 * AppUtils.setupStepView(layout, step, minimum, maximum);
+                 * layout.setVisibility(View.VISIBLE); }
+                 * maxTV.setText(Integer.toString(maximum)); final int bottom =
+                 * characteristics.getCriticalBottomValue(); final int top =
+                 * characteristics.getCriticalTopValue(); int defValue = 0;
+                 * valueTV.setText(Integer.toString(defValue));
+                 * StatististicsItemStatus status = AppUtils.getStatus(defValue,
+                 * top, bottom); AppUtils.setUpStatusViewColor(status,
+                 * statusView); seekBar.setProgress(defValue);
+                 * seekBar.setOnSeekBarChangeListener(new
+                 * SeekBar.OnSeekBarChangeListener() {
+                 * @Override public void onStopTrackingTouch(SeekBar seekBar) {
+                 * }
+                 * @Override public void onStartTrackingTouch(SeekBar seekBar) {
+                 * }
+                 * @Override public void onProgressChanged(SeekBar seekBar, int
+                 * progress, boolean fromUser) { int value = getValue(seekBar,
+                 * minimum, maximum, step);
+                 * valueTV.setText(Integer.toString(value));
+                 * AppUtils.setUpStatusViewColor(AppUtils.getStatus(value, top,
+                 * bottom), statusView); } }); }
+                 * viewValueContainersMap.put(field, seekBar);
+                 */
+
+                view = inflater.inflate(R.layout.list_item_range_step_add_statisctics_range_bar,
+                        container, false);
+
+                final TextView unitView = (TextView) view.findViewById(R.id.add_st_char_unit);
+                final TextView valueView = (TextView) view.findViewById(R.id.add_st_char_value);
+                final TextView nameView = (TextView) view.findViewById(R.id.add_st_char_name);
+
+                final RangeBar rangebar = (RangeBar) view.findViewById(R.id.add_st_range_bar);
+                rangebar.setLeftThumbEnabled(false);
+
+                final TextView minView = (TextView) view.findViewById(R.id.add_st_char_min_value);
+                final TextView maxView = (TextView) view.findViewById(R.id.add_st_char_max_value);
+
+                final View statusView = view.findViewById(R.id.add_st_char_status);
+                if (field.getCharacteristic() != null) {
+
+                    GroupCharacteristic characteristics = field.getCharacteristic();
+                    unitView.setText(characteristics.getUnit());
+                    nameView.setText(characteristics.getName() + ":");
+
+                    final int minimum = characteristics.getMinValue();
+                    final int maximum = characteristics.getMaxValue();
+
+                    minView.setText(Integer.toString(minimum));
+
+                    final int step = ((StepProperty) inputType.getProperty()).getStep();
+                    if (step > 0) {
+                        LinearLayout layout = (LinearLayout) view
+                                .findViewById(R.id.step_holder);
+                        AppUtils.setupStepView(layout, step, minimum, maximum);
+                        layout.setVisibility(View.VISIBLE);
+                    }
+                    maxView.setText(Integer.toString(maximum));
 
                     final int bottom = characteristics.getCriticalBottomValue();
                     final int top = characteristics.getCriticalTopValue();
 
-                    int defValue = 0; // (bottom + top) / 2;
-                    valueTV.setText(Integer.toString(defValue));
+                    int defValue = 0;
+                    valueView.setText(Integer.toString(defValue));
+
+                    int tickCount = 1 + (maximum - minimum) / step;
+
+                    rangebar.setThumbIndices(0, 0);
+                    rangebar.setTickCount(tickCount);
 
                     StatististicsItemStatus status = AppUtils.getStatus(defValue, top, bottom);
-
                     AppUtils.setUpStatusViewColor(status, statusView);
 
-                    // seekBar.setMax(maximum);
-                    seekBar.setProgress(defValue);
-
-                    seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
+                    rangebar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
                         @Override
-                        public void onStopTrackingTouch(SeekBar seekBar) {
-                        }
+                        public void onIndexChangeListener(RangeBar rangeBar, int leftThumbIndex,
+                                int rightThumbIndex) {
 
-                        @Override
-                        public void onStartTrackingTouch(SeekBar seekBar) {
-                        }
-
-                        @Override
-                        public void onProgressChanged(SeekBar seekBar, int progress,
-                                boolean fromUser) {
-
-                            int value = getValue(seekBar, minimum, maximum);
-                            valueTV.setText(Integer.toString(value));
+                            int value = rightThumbIndex * step;
+                            valueView.setText(Integer.toString(value));
                             AppUtils.setUpStatusViewColor(AppUtils.getStatus(value, top, bottom),
                                     statusView);
-
                         }
                     });
 
                 }
-                viewValueContainersMap.put(field, seekBar);
+                viewValueContainersMap.put(field, rangebar);
 
             }
                 break;
@@ -753,18 +835,13 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
                 }
             });
         }
-
         return view;
-
     }
 
-    private int getValue(SeekBar seekBar, int min, int max) {
-
-        int progress = seekBar.getProgress();
-        double value = (double) (max - min) * ((double) progress / 100);
-        int intValue = Double.valueOf(value).intValue();
-        return (max < 25) ? intValue : intValue - (intValue % 25); // step
-                                                                   // - 25
+    @SuppressWarnings("unused")
+    private int getValue(SeekBar seekBar, int min, int max, int step) {
+        int intValue = (int) ((double) (max - min) * ((double) seekBar.getProgress() / 100));
+        return (intValue - (intValue % step));
     }
 
     public HashMap<GroupCharacteristic, Double> getValues() {
@@ -776,17 +853,36 @@ public class AddStatisticsFragment extends SherlockFragment implements LoaderCal
             View view = entry.getValue();
             InputType inputType = characteristicField.getInputType();
 
+            @SuppressWarnings("unused")
+            int minimum = characteristicField.getCharacteristic().getMinValue();
+            @SuppressWarnings("unused")
+            int maximum = characteristicField.getCharacteristic().getMaxValue();
+
             Double value = 0.0;
-            switch (inputType) {
-                case RANGE:
+            switch (inputType.getRange()) {
+                case INT: {
+                    value = Double.valueOf(((ItemPicker) view).getCurrent());
+                }
+                    break;
+                case ARRAY:
+                    break;
+                case STEP: {
+                    /*
+                     * int step = ((StepProperty)
+                     * inputType.getProperty()).getStep(); value =
+                     * Double.valueOf(getValue((SeekBar) view, minimum, maximum,
+                     * step));
+                     */
 
-                    int minimum = characteristicField.getCharacteristic().getMinValue();
-                    int maximum = characteristicField.getCharacteristic().getMaxValue();
-                    value = Double.valueOf(getValue((SeekBar) view, minimum, maximum));
+                    int step = ((StepProperty) inputType.getProperty()).getStep();
+                    RangeBar rangeBar = (RangeBar) view;
+                    int index = rangeBar.getRightIndex();
 
+                    value = (double) (index * step);
+
+                }
                     break;
             }
-
             GroupCharacteristic characteristic = characteristicField.getCharacteristic();
             values.put(characteristic, value);
         }

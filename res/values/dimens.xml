@@ -36,4 +36,6 @@
     
     <dimen name="list_widht">600dp</dimen>
     <dimen name="landscape_widht">600dp</dimen>
+    
+   	<dimen name="step_text_size">15sp</dimen>
 </resources>

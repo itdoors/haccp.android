@@ -64,4 +64,11 @@ public abstract class BaseSherlockFragmentActivity extends SherlockFragmentActiv
         getSupportFragmentManager().putFragment(outState, "mContent", mContentFragment);
     }
 
+    protected void showProgress() {
+        setSupportProgressBarIndeterminateVisibility(true);
+    }
+
+    protected void hideProgress() {
+        setSupportProgressBarIndeterminateVisibility(false);
+    }
 }

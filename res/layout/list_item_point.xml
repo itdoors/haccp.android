@@ -6,6 +6,7 @@
     android:paddingBottom="10dp"
     android:paddingTop="10dp"
     android:gravity="center"
+    android:background="@drawable/abs__ab_solid_light_holo"
     >
 
     <TextView 

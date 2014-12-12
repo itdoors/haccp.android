@@ -2,6 +2,7 @@
 package com.itdoors.haccp.ui.fragments;
 
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +28,8 @@ public class AboutFragment extends SherlockFragment {
             textView.setText(instruction);
             linearLayout.addView(textLayoutView);
         }
-
+        TextView linkView = (TextView) rootView.findViewById(R.id.about_link);
+        linkView.setMovementMethod(LinkMovementMethod.getInstance());
         return rootView;
     }
 

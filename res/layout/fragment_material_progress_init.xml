@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout 
+    	xmlns:android="http://schemas.android.com/apk/res/android"
+    	xmlns:wheel="http://schemas.android.com/apk/res-auto"
+    	android:background="@drawable/abs__ab_solid_light_holo"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    >
+	
+	    <com.itdoors.haccp.utils.ProgressWheel
+	        android:id="@+id/progress_wheel"
+	        android:layout_centerInParent="true"
+	        android:layout_width="80dp"
+	        android:layout_height="80dp"
+	        wheel:progressBarColor="#5588FF"
+	        wheel:progressIndeterminate="true" 
+	        android:visibility="visible"
+	        />
+	    
+	    <Button 
+	        android:id="@+id/retry_btn"
+	        android:layout_centerInParent="true"
+	        android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content" 
+	    	android:textSize="20sp"
+	    	android:text="@string/retry"
+	    	android:visibility="gone"
+	        />
+		
+</RelativeLayout>

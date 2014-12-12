@@ -50,4 +50,14 @@ public final class AccessToken {
         return refreshToken;
     }
 
+    @Override
+    public String toString() {
+        return "AccessToken{" +
+                "accessToken='" + token + '\'' +
+                ", tokenType='" + tokenType + '\'' +
+                ", expiresIn=" + expiresIn +
+                ", refreshToken='" + refreshToken + '\'' +
+                '}';
+    }
+
 }

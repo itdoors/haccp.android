@@ -27,7 +27,7 @@
     <string name="scan">Scan</string>
     <string name="scanner">Сканнер</string>
     <string name="about_program">О программе</string>
-    <string name="app_link">http://haccp.itdoors.com.ua/</string>
+    <string name="app_link">http://haccp.center</string>
     <string name="statistics">Статистика</string>
     <string name="attributes">Атрибуты</string>
     <string name="control_point">Контрольная точка</string>
@@ -39,8 +39,10 @@
     <string name="coordinates">Координаты</string>
     <string name="status">Статус</string>
     <string name="point_number">Контрольная точка №</string>
-     <string name="contours">Контуры</string>
-     <string name="company_objects">Объекты компании</string>
+    <string name="contours">Контуры</string>
+    <string name="company_objects">Объекты компании</string>
+    <string name="poison">Яд</string>
+    <string name="active_substance">Активная субстанция</string>
 
     <!-- CP TYPES -->
     <string name="cp_type_grounbait_box">Grounbait box</string>

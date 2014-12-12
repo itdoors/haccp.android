@@ -25,7 +25,7 @@ public final class Intents {
     public static final class SyncComplete {
 
         public static final String ACTION_FINISHED_SYNC = "com.itdoors.haccp.action.ACTION_FINISHED_SYNC";
-        public static final String LOCAL_SYNC_COMPELTED_SUCCESFULLY = "com.itdoors.haccp.Intents.LOCAL_SYNC_COMPELTED_SUCCESFULLY";
+        public static final String LOCAL_SYNC_SUCCESFULLY = "com.itdoors.haccp.Intents.LOCAL_SYNC_COMPELTED_SUCCESFULLY";
 
     }
 

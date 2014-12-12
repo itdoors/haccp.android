@@ -7,7 +7,7 @@
     <string name="no_more_items_to_load">Все елементы загружены</string>
     <string name="your_device_has_no_camera">На вашем девайсе отсутсвует камера!</string>
     <string name="no_time_range_has_been_selected">Временной интервал не был выбран &#8230;</string>
-    <string name="no_statistic_items">Записей в заданном диапазоне нету&#8230;</string>
+    <string name="no_statistic_items">Записей в заданном диапазоне нет&#8230;</string>
     <string name="failed_to_load_data">Не удалось сделать запрос. Проверьте установки интернета.</string>
     <string name="failed_to_load_more">Не удалось загрузить еще</string>
     <string name="failed_to_load">Не удалось загрузить контент</string>
@@ -20,7 +20,11 @@
     <string name="not_avalieble_without_any_interent_connection">Недоступно в отсутствии интернет подключения.</string>
     <string name="no_records">Нет записей.</string>
     <string name="fill_the_fields">Заполните поля</string>
-    <string name="failed_to_log_in">Ошибка: Неверные данные!</string>
+    <string name="initial_setup_db_failed_error">Произошла ошибка при синхронизации. Попробуйте позже.</string>
+    
+    <string name="failed_to_log_in_unknown_error">Неизвестная ошибка: Попытайтесь еще раз </string>
+    <string name="failed_to_log_in_wrong_data">Ошибка: Неверный логин или пароль</string>
+    
 
     <!-- Instruction -->
     <string name="instruction_data_sending">Данные отправляються не сразу, даже при включенном интернете</string>
