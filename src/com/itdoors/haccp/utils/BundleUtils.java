@@ -5,6 +5,8 @@ import android.os.Bundle;
 
 public final class BundleUtils {
 
+    private static final String empty = "#";
+
     private BundleUtils() {
     }
 
@@ -20,7 +22,7 @@ public final class BundleUtils {
 
             String value = bundle.getString(key);
             if (value != null) {
-                sb.append(key).append(':').append(value);
+                sb.append(key).append(':').append(value.isEmpty() ? empty : value);
                 if (count < size - 1)
                     sb.append(';');
             }
@@ -35,8 +37,16 @@ public final class BundleUtils {
         string = string.substring(1, string.length() - 1);
         String pairs[] = string.split(";");
         for (String pair : pairs) {
+
             String keyValue[] = pair.split(":");
-            bundle.putString(keyValue[0], keyValue[1]);
+
+            String key = keyValue[0];
+            String value = keyValue[1];
+
+            if (value.equals(empty))
+                value = "";
+
+            bundle.putString(key, value);
         }
         return bundle;
     }

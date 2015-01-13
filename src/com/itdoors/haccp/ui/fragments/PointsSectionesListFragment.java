@@ -19,33 +19,33 @@ import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.itdoors.haccp.R;
 import com.itdoors.haccp.model.CompanyObject;
 import com.itdoors.haccp.model.Contour;
-import com.itdoors.haccp.model.Point;
+import com.itdoors.haccp.model.Plan;
 import com.itdoors.haccp.provider.HaccpContract;
 import com.itdoors.haccp.ui.adapters.SimpleSectionedListAdapter;
+import com.itdoors.haccp.ui.adapters.SimpleSectionedListAdapter.Section;
+import com.itdoors.haccp.ui.interfaces.OnPlanPressedListener;
+import com.itdoors.haccp.ui.interfaces.OnPointPressedListener;
 import com.itdoors.haccp.utils.ContextUtils;
 
 public class PointsSectionesListFragment extends ListFragment implements
         LoaderManager.LoaderCallbacks<Cursor> {
-
-    public interface OnPointPressedListener {
-        public void onPointPressed(Point point);
-
-        public void onPointPressed(String pointId);
-    }
 
     private static final String COMPANY_OBJECT_TAG = "com.itdoors.haccp.fragments.PointsSectionesListFragment.COMPANY_OBJECT_TAG";
     private static final String CONTOUR_TAG = "com.itdoors.haccp.fragments.PointsSectionesListFragment.CONTOUR_TAG";
     private static final String QUERY_TAG = "com.itdoors.haccp.fragments.PointsSectionesListFragment.QUERY_TAG";
 
     private MyPointsAdapter mPointsAdapter;
-    private SimpleSectionedListAdapter mSectionedListAdapter;
+    private MySectionedAdapter mSectionedListAdapter;
+
     private OnPointPressedListener mOnPointPressedListener;
+    private OnPlanPressedListener mOnPlanPressedListener;
 
     public static PointsSectionesListFragment newInstance(CompanyObject companyObject,
             Contour contour) {
@@ -72,8 +72,7 @@ public class PointsSectionesListFragment extends ListFragment implements
         return fragment;
     }
 
-    @SuppressWarnings("unused")
-    private interface PointsQuery {
+    public interface PointsQuery {
 
         int _TOKEN = 0;
         String[] PROJECTION = new String[] {
@@ -82,7 +81,11 @@ public class PointsSectionesListFragment extends ListFragment implements
                 HaccpContract.Points.NAME,
 
                 HaccpContract.Points.PLANS_UID_PROJECTION,
-                HaccpContract.Points.PLANS_NAME_PROJECTION
+                HaccpContract.Points.PLANS_NAME_PROJECTION,
+
+                HaccpContract.Points.GROUP_UID_PROJECTION,
+                HaccpContract.Points.GROUP_NAME_PROJECTION,
+
         };
 
         int _ID = 0;
@@ -90,6 +93,8 @@ public class PointsSectionesListFragment extends ListFragment implements
         int NAME = 2;
         int PLANS_UID = 3;
         int PLANS_NAME = 4;
+        int GROUP_UID = 5;
+        int GROUP_NAME = 6;
 
     }
 
@@ -97,6 +102,9 @@ public class PointsSectionesListFragment extends ListFragment implements
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mOnPointPressedListener = (OnPointPressedListener) activity;
+        if (activity instanceof OnPlanPressedListener) {
+            mOnPlanPressedListener = (OnPlanPressedListener) activity;
+        }
     }
 
     @Override
@@ -110,8 +118,8 @@ public class PointsSectionesListFragment extends ListFragment implements
         ContextUtils.wrapListView(mListView);
 
         mPointsAdapter = new MyPointsAdapter(getActivity());
-        mSectionedListAdapter = new SimpleSectionedListAdapter(getActivity(),
-                R.layout.list_item_point_plans_header, mPointsAdapter);
+        mSectionedListAdapter = new MySectionedAdapter(getActivity(),
+                R.layout.list_item_point_plans_header, mPointsAdapter, !isInSeachMode());
 
         if (isInSeachMode()) {
             int emptyResourceId = R.string.no_matches;
@@ -137,15 +145,16 @@ public class PointsSectionesListFragment extends ListFragment implements
             List<SimpleSectionedListAdapter.Section> sections = new ArrayList<SimpleSectionedListAdapter.Section>();
             cursor.moveToFirst();
 
-            long previousHeaderId = -1;
-            long headerId;
+            int previousHeaderId = -1;
+            int headerId;
 
             while (!cursor.isAfterLast()) {
                 headerId = cursor.getInt(PointsQuery.PLANS_UID);
                 if (headerId != previousHeaderId) {
                     int position = cursor.getPosition();
                     String title = cursor.getString(PointsQuery.PLANS_NAME);
-                    sections.add(new SimpleSectionedListAdapter.Section(position, title));
+                    Plan plan = new Plan(headerId, title);
+                    sections.add(new SimpleSectionedListAdapter.Section(position, title, plan));
                 }
                 previousHeaderId = headerId;
                 cursor.moveToNext();
@@ -154,7 +163,6 @@ public class PointsSectionesListFragment extends ListFragment implements
             SimpleSectionedListAdapter.Section[] dummy =
                     new SimpleSectionedListAdapter.Section[sections.size()];
             mSectionedListAdapter.setSections(sections.toArray(dummy));
-
         }
     }
 
@@ -171,7 +179,7 @@ public class PointsSectionesListFragment extends ListFragment implements
 
                 Uri uri;
                 if (query == null)
-                    uri = HaccpContract.Points.builduriForCompanyObjectInContour(companyObjectId,
+                    uri = HaccpContract.Points.buildUriForCompanyObjectInContour(companyObjectId,
                             contourId);
                 else
                     uri = HaccpContract.Points.buildSearchUri(companyObjectId, contourId, query);
@@ -214,16 +222,23 @@ public class PointsSectionesListFragment extends ListFragment implements
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
+        // super.onListItemClick(l, v, position, id);
+
         if (!mSectionedListAdapter.isSectionHeaderPosition(position)
                 && mOnPointPressedListener != null) {
             Cursor cursor = (Cursor) mSectionedListAdapter.getItem(position);
             String pointId = cursor.getString(PointsQuery.UID);
             mOnPointPressedListener.onPointPressed(pointId);
         }
+
+        if (!isInSeachMode() && mSectionedListAdapter.isSectionHeaderPosition(position)
+                && mOnPlanPressedListener != null) {
+            Plan plan = (Plan) ((Section) mSectionedListAdapter.getItem(position)).getTag();
+            mOnPlanPressedListener.onPlanPressed(plan);
+        }
     }
 
-    private class MyPointsAdapter extends CursorAdapter {
+    public static class MyPointsAdapter extends CursorAdapter {
         public MyPointsAdapter(Context context) {
             super(context, null, 0);
         }
@@ -240,6 +255,24 @@ public class PointsSectionesListFragment extends ListFragment implements
             String name = cursor.getString(PointsQuery.NAME);
             nameView.setText(name);
         }
+    }
+
+    public static class MySectionedAdapter extends SimpleSectionedListAdapter {
+
+        private boolean isHeaderViewEnabled;
+
+        public MySectionedAdapter(Context context, int sectionResourceId, ListAdapter baseAdapter,
+                boolean isHeaderViewEnabled) {
+            super(context, sectionResourceId, baseAdapter);
+            this.isHeaderViewEnabled = isHeaderViewEnabled;
+        }
+
+        @Override
+        public boolean isEnabled(int position) {
+            return isSectionHeaderPosition(position) ? isHeaderViewEnabled
+                    : getBaseAdapter().isEnabled(sectionedPositionToPosition(position));
+        }
+
     }
 
 }

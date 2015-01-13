@@ -28,6 +28,7 @@ import com.itdoors.haccp.R;
  */
 
 public class ProgressWheel extends View {
+    @SuppressWarnings("unused")
     private static final String TAG = ProgressWheel.class.getSimpleName();
 
     // Sizes (with defaults)

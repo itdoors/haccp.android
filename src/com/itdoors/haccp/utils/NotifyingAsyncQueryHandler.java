@@ -1,3 +1,4 @@
+
 package com.itdoors.haccp.utils;
 
 import java.lang.ref.WeakReference;
@@ -36,6 +37,7 @@ public class NotifyingAsyncQueryHandler extends AsyncQueryHandler {
         if (listener != null) {
             listener.onQueryComplete(token, cookie, cursor);
         } else if (cursor != null) {
+            Logger.Logd(getClass(), "weakRef. get == null");
             cursor.close();
         }
     }

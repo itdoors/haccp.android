@@ -44,8 +44,9 @@ public class RestContentProvider extends ContentProvider {
 
     private static final int POINTS_ID = 600;
     private static final int POINTS_IN_COMPANY_OBJECT_BY_CONTOUR = 601;
-    private static final int POINTS_IN_COMPANY_OBJECT_BY_CONTOUR_SEARCH = 602;
-    private static final int POINT_ID_STATISTICS = 603;
+    private static final int POINTS_IN_COMPANY_OBJECT_BY_CONTOUR_BY_PLAN = 602;
+    private static final int POINTS_IN_COMPANY_OBJECT_BY_CONTOUR_SEARCH = 603;
+    private static final int POINT_ID_STATISTICS = 604;
 
     private static final int STATUSES = 700;
 
@@ -82,6 +83,10 @@ public class RestContentProvider extends ContentProvider {
         matcher.addURI(authority, "contours", CONTOURS);
         matcher.addURI(authority, "company_objects/#/contours/#/points",
                 POINTS_IN_COMPANY_OBJECT_BY_CONTOUR);
+
+        matcher.addURI(authority, "company_objects/#/contours/#/plans/#/points",
+                POINTS_IN_COMPANY_OBJECT_BY_CONTOUR_BY_PLAN);
+
         matcher.addURI(authority, "company_objects/#/contours/#/points/search/*",
                 POINTS_IN_COMPANY_OBJECT_BY_CONTOUR_SEARCH);
 
@@ -131,6 +136,7 @@ public class RestContentProvider extends ContentProvider {
                 return HaccpContract.Contours.CONTENT_TYPE;
 
             case POINTS_IN_COMPANY_OBJECT_BY_CONTOUR:
+            case POINTS_IN_COMPANY_OBJECT_BY_CONTOUR_BY_PLAN:
             case POINTS_IN_COMPANY_OBJECT_BY_CONTOUR_SEARCH:
                 return HaccpContract.Points.CONTENT_TYPE;
             case POINTS_ID:
@@ -231,9 +237,15 @@ public class RestContentProvider extends ContentProvider {
             sPointsInCObjByContProjMap.put(HaccpContract.Points.PLANS_UID_PROJECTION,
                     HaccpContract.Plans.UID_FULL + " AS "
                             + HaccpContract.Points.PLANS_UID_PROJECTION);
+            sPointsInCObjByContProjMap.put(HaccpContract.Points.GROUP_UID_PROJECTION,
+                    HaccpContract.Groups.UID_FULL + " AS "
+                            + HaccpContract.Points.GROUP_UID_PROJECTION);
             sPointsInCObjByContProjMap.put(HaccpContract.Points.PLANS_NAME_PROJECTION,
                     HaccpContract.Plans.NAME_FULL + " AS "
                             + HaccpContract.Points.PLANS_NAME_PROJECTION);
+            sPointsInCObjByContProjMap.put(HaccpContract.Points.GROUP_NAME_PROJECTION,
+                    HaccpContract.Groups.NAME_FULL + " AS "
+                            + HaccpContract.Points.GROUP_NAME_PROJECTION);
         }
 
         {
@@ -415,10 +427,19 @@ public class RestContentProvider extends ContentProvider {
                             + HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.NAME;
 
                 qBuilder.setTables(
-                        HaccpDatabase.Tables.PLANS + " INNER JOIN " + HaccpDatabase.Tables.POINTS +
+                        HaccpDatabase.Tables.PLANS +
+                                " INNER JOIN " + HaccpDatabase.Tables.POINTS +
                                 " ON " + "(" + HaccpDatabase.Tables.PLANS + "."
-                                + HaccpContract.Plans.UID + " = " +
-                                HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.PLAN_ID +
+                                + HaccpContract.Plans.UID + " = "
+                                + HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.PLAN_ID +
+                                ")"
+                                +
+                                " INNER JOIN " + HaccpDatabase.Tables.POINT_GROUPS +
+                                " ON " + "("
+                                + HaccpDatabase.Tables.POINTS + "."
+                                + HaccpContract.Points.POINT_GROUP_ID + " = "
+                                + HaccpDatabase.Tables.POINT_GROUPS + "."
+                                + HaccpContract.Plans.UID +
                                 ")"
                         );
 
@@ -435,6 +456,44 @@ public class RestContentProvider extends ContentProvider {
                 break;
             }
 
+            case POINTS_IN_COMPANY_OBJECT_BY_CONTOUR_BY_PLAN: {
+
+                if (TextUtils.isEmpty(sortOrder))
+                    sortOrder = HaccpDatabase.Tables.PLANS + "." + HaccpContract.Plans.UID + ","
+                            + HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.NAME;
+
+                qBuilder.setTables(
+                        HaccpDatabase.Tables.PLANS + " INNER JOIN " + HaccpDatabase.Tables.POINTS +
+                                " ON " + "(" + HaccpDatabase.Tables.PLANS + "."
+                                + HaccpContract.Plans.UID + " = " +
+                                HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.PLAN_ID +
+                                ")"
+                                +
+                                " INNER JOIN " + HaccpDatabase.Tables.POINT_GROUPS +
+                                " ON " + "("
+                                + HaccpDatabase.Tables.POINTS + "."
+                                + HaccpContract.Points.POINT_GROUP_ID + " = "
+                                + HaccpDatabase.Tables.POINT_GROUPS + "."
+                                + HaccpContract.Plans.UID +
+                                ")"
+                        );
+
+                qBuilder.appendWhere(HaccpDatabase.Tables.POINTS + "."
+                        + HaccpContract.Points.CONTOUR_ID + "="
+                        + HaccpContract.Points.getContourId(uri));
+                qBuilder.appendWhere(" AND ");
+                qBuilder.appendWhere(HaccpDatabase.Tables.PLANS + "."
+                        + HaccpContract.Plans.CONPANY_OBJECT_ID + "="
+                        + HaccpContract.Points.getCompanyObjectId(uri));
+                qBuilder.appendWhere(" AND ");
+                qBuilder.appendWhere(HaccpDatabase.Tables.PLANS + "."
+                        + HaccpContract.Plans.UID + "="
+                        + HaccpContract.Points.getPlanId(uri));
+
+                qBuilder.setProjectionMap(sPointsInCObjByContProjMap);
+
+                break;
+            }
             case POINTS_IN_COMPANY_OBJECT_BY_CONTOUR_SEARCH: {
 
                 if (TextUtils.isEmpty(sortOrder))
@@ -446,6 +505,13 @@ public class RestContentProvider extends ContentProvider {
                                 " ON " + "(" + HaccpDatabase.Tables.PLANS + "."
                                 + HaccpContract.Plans.UID + " = " +
                                 HaccpDatabase.Tables.POINTS + "." + HaccpContract.Points.PLAN_ID +
+                                ")" +
+                                " INNER JOIN " + HaccpDatabase.Tables.POINT_GROUPS +
+                                " ON " + "("
+                                + HaccpDatabase.Tables.POINTS + "."
+                                + HaccpContract.Points.POINT_GROUP_ID + " = "
+                                + HaccpDatabase.Tables.POINT_GROUPS + "."
+                                + HaccpContract.Plans.UID +
                                 ")"
                         );
 

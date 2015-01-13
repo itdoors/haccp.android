@@ -22,7 +22,7 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.itdoors.haccp.Constants;
-import com.itdoors.haccp.Global;
+import com.itdoors.haccp.Config;
 import com.itdoors.haccp.Intents;
 import com.itdoors.haccp.exceptions.rest.AuthenticationFailureException;
 import com.itdoors.haccp.exceptions.rest.DeviceConnectionException;
@@ -55,7 +55,7 @@ public class SyncHelper {
 
     private static final String TAG = SyncHelper.class.getSimpleName();
     private static final String TEMP_DB_NAME = "dump.gzip";
-    private static final String DB_URI = Global.BASE_URL + "api/v1/backup/";
+    private static final String DB_URI = Config.BASE_URL + "api/v1/backup/";
 
     public static final int FLAG_SYNC_INITIAL = 0x1;
     public static final int FLAG_SYNC_REMOTE = 0x2;
@@ -226,8 +226,11 @@ public class SyncHelper {
                     String methodType = cursor.getString(PendingTransactionsQuery.METHOD);
 
                     String uri = cursor.getString(PendingTransactionsQuery.URI);
-                    Bundle params = BundleUtils.deserialize(cursor
-                            .getString(PendingTransactionsQuery.PARAMS));
+
+                    String paramsStr = cursor.getString(PendingTransactionsQuery.PARAMS);
+
+                    Logger.Logd(getClass(), "deserialize:" + paramsStr);
+                    Bundle params = BundleUtils.deserialize(paramsStr);
 
                     RestAction action;
                     HttpMethod method;

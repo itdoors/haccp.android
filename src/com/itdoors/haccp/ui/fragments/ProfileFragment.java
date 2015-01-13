@@ -11,11 +11,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.itdoors.haccp.R;
 import com.itdoors.haccp.provider.HaccpContract;
+import com.squareup.picasso.Picasso;
 
 public class ProfileFragment extends SherlockFragment implements
         LoaderManager.LoaderCallbacks<Cursor> {
@@ -24,8 +26,10 @@ public class ProfileFragment extends SherlockFragment implements
         public void onLogoutPressed();
     }
 
+    private ImageView avatarView;
     private TextView nameView;
     private TextView emailView;
+
     private Button logOutBtn;
 
     private OnLogoutPressedListener mOnLogoutPressedListener;
@@ -39,7 +43,9 @@ public class ProfileFragment extends SherlockFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_profile_new, container, false);
+
+        avatarView = (ImageView) rootView.findViewById(R.id.user_big_avatar);
         nameView = (TextView) rootView.findViewById(R.id.user_name);
         emailView = (TextView) rootView.findViewById(R.id.user_email);
         logOutBtn = (Button) rootView.findViewById(R.id.logout_btn);
@@ -75,11 +81,17 @@ public class ProfileFragment extends SherlockFragment implements
         cursor.moveToFirst();
         if (cursor.getColumnCount() == 0)
             return;
+
         String name = cursor.getString(UserQuery.NAME);
         String email = cursor.getString(UserQuery.EMAIL);
+        String avatar = cursor.getString(UserQuery.BIG_AVATAR);
+
         nameView.setText(getString(R.string.login) + ":" + name);
         emailView.setText(getString(R.string.email) + ":" + email);
 
+        if (avatar != null) {
+            Picasso.with(getActivity()).load(avatar).into(avatarView);
+        }
     }
 
     @Override
@@ -98,17 +110,18 @@ public class ProfileFragment extends SherlockFragment implements
         mOnLogoutPressedListener = null;
     }
 
-    @SuppressWarnings("unused")
     private interface UserQuery {
 
         String[] PROJECTION = new String[] {
 
                 HaccpContract.User.NAME,
-                HaccpContract.User.EMAIL
+                HaccpContract.User.EMAIL,
+                HaccpContract.User.BIG_AVATAR
         };
 
         int NAME = 0;
         int EMAIL = 1;
+        int BIG_AVATAR = 2;
 
     }
 }

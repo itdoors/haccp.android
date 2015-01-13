@@ -1,15 +1,15 @@
 
 package com.itdoors.haccp.ui.activities;
 
-import java.util.Arrays;
-
 import org.json.JSONException;
 
 import android.app.Activity;
+import android.content.AsyncQueryHandler;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -35,6 +36,7 @@ import com.itdoors.haccp.analytics.Analytics;
 import com.itdoors.haccp.analytics.Analytics.Action;
 import com.itdoors.haccp.analytics.Analytics.Category;
 import com.itdoors.haccp.analytics.TrackerName;
+import com.itdoors.haccp.oauth.HaccpOAuthServiceApi.User;
 import com.itdoors.haccp.parser.ScanResultParser;
 import com.itdoors.haccp.provider.HaccpContract;
 import com.itdoors.haccp.provider.RestContentProvider;
@@ -50,6 +52,9 @@ import com.itdoors.haccp.utils.AppUtils;
 import com.itdoors.haccp.utils.Enviroment;
 import com.itdoors.haccp.utils.Logger;
 import com.itdoors.haccp.utils.ToastUtil;
+import com.squareup.picasso.Picasso;
+
+import de.greenrobot.event.EventBus;
 
 public class HomeActivity extends SherlockFragmentActivity implements
         SetQRCallback,
@@ -72,11 +77,19 @@ public class HomeActivity extends SherlockFragmentActivity implements
     private String[] mTitles;
 
     private BaseAdapter mAdapter;
+    private View mHeaderListView;
+
     private int mSelectedItem;
 
     private TakeQRCallback mTakeCodeFromCameraCallback;
 
-    Handler handler = new Handler();
+    private Handler handler = new Handler();
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +115,9 @@ public class HomeActivity extends SherlockFragmentActivity implements
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
+
+        // mDrawerList.addHeaderView(mHeaderListView = getMainMenuHeader(this,
+        // mDrawerList));
 
         mDrawerList.setCacheColorHint(Color.TRANSPARENT);
         // set a custom shadow that overlays the main content when the drawer
@@ -166,7 +182,6 @@ public class HomeActivity extends SherlockFragmentActivity implements
             menu.strRes = titles.getResourceId(index, 0);
             menus[index] = menu;
         }
-        Logger.Logi(getClass(), Arrays.toString(menus));
 
         imgs.recycle();
         titles.recycle();
@@ -178,6 +193,79 @@ public class HomeActivity extends SherlockFragmentActivity implements
     public void setTitle(CharSequence title) {
         mTitle = title;
         getSupportActionBar().setTitle(mTitle);
+    }
+
+    @SuppressWarnings("unused")
+    private static View getMainMenuHeader(Context context, ListView list) {
+
+        View header = LayoutInflater.from(context).inflate(
+                R.layout.list_item_main_menu_header, list, false);
+
+        AsyncQueryHandler handler = new AsyncQueryHandler(context.getContentResolver()) {
+            @Override
+            public void onQueryComplete(int token, Object cookie, Cursor cursor) {
+
+                try {
+
+                    cursor.moveToFirst();
+
+                    String login = cursor.getString(UserQuery.NAME);
+                    String email = cursor.getString(UserQuery.EMAIL);
+                    String bigAvatar = cursor.getString(UserQuery.BIG_AVATAR);
+                    String smallAvatar = cursor.getString(UserQuery.SMALL_AVATAR);
+
+                    User user = new User(-1, login, email, bigAvatar, smallAvatar);
+
+                    EventBus.getDefault().postSticky(new UserObtainedEvent(user));
+
+                }
+                finally {
+                    if (cursor != null)
+                        cursor.close();
+                }
+            }
+        };
+
+        handler.startQuery(0, null, HaccpContract.User.CONTENT_URI, UserQuery.PROJECTION, null,
+                null, null);
+        return header;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    public static class UserObtainedEvent {
+
+        private final User user;
+
+        public UserObtainedEvent(User user) {
+            this.user = user;
+        }
+
+        public User getUser() {
+            return user;
+        }
+
+    }
+
+    public void onEventMainThread(UserObtainedEvent event) {
+
+        if (mHeaderListView != null) {
+
+            View header = mHeaderListView;
+            User user = event.getUser();
+
+            ImageView logoView = (ImageView) header.findViewById(R.id.menu_user_logo);
+            TextView loginView = (TextView) header.findViewById(R.id.menu_user_login);
+            TextView emailView = (TextView) header.findViewById(R.id.menu_user_email);
+
+            Picasso.with(header.getContext()).load(user.getBigAvatar()).into(logoView);
+            loginView.setText(user.getName());
+            emailView.setText(user.getEmail());
+        }
     }
 
     /**
@@ -221,6 +309,10 @@ public class HomeActivity extends SherlockFragmentActivity implements
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+            /*
+             * if (position == 0) { mDrawerLayout.closeDrawer(mDrawerList);
+             * return; } position--;
+             */
             if (position == 3) {// Settings
 
                 final int previouslySelectedItem = mSelectedItem;
@@ -440,7 +532,9 @@ public class HomeActivity extends SherlockFragmentActivity implements
         finish();
     }
 
-    public interface ComapiesQuery {
+    @SuppressWarnings("unused")
+    private interface ComapiesQuery {
+        int token = 0;
         String[] PROJECTION = {
                 HaccpContract.Companies._ID,
                 HaccpContract.Companies.NAME,
@@ -449,6 +543,26 @@ public class HomeActivity extends SherlockFragmentActivity implements
         int _ID = 0;
         int NAME = 1;
         int UID = 2;
+    }
+
+    private interface UserQuery {
+
+        @SuppressWarnings("unused")
+        int token = 1;
+        String[] PROJECTION = new String[] {
+
+                HaccpContract.User.NAME,
+                HaccpContract.User.EMAIL,
+                HaccpContract.User.BIG_AVATAR,
+                HaccpContract.User.SMALL_AVATAR
+
+        };
+
+        int NAME = 0;
+        int EMAIL = 1;
+        int BIG_AVATAR = 2;
+        int SMALL_AVATAR = 3;
+
     }
 
 }

@@ -1,20 +1,19 @@
+
 package com.itdoors.haccp.ui.adapters;
 
-
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import java.util.Arrays;
-import java.util.Comparator;
 
 import com.itdoors.haccp.R;
 
@@ -29,20 +28,27 @@ public class SimpleSectionedListAdapter extends BaseAdapter {
         int firstPosition;
         int sectionedPosition;
         CharSequence title;
+        Object tag;
 
-        public Section(int firstPosition, CharSequence title) {
+        public Section(int firstPosition, CharSequence title, Object tag) {
             this.firstPosition = firstPosition;
             this.title = title;
+            this.tag = tag;
         }
 
         public CharSequence getTitle() {
             return title;
         }
+
+        public Object getTag() {
+            return tag;
+        }
     }
 
     public SimpleSectionedListAdapter(Context context, int sectionResourceId,
             ListAdapter baseAdapter) {
-        mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mLayoutInflater = (LayoutInflater) context
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mSectionResourceId = sectionResourceId;
         mBaseAdapter = baseAdapter;
         mBaseAdapter.registerDataSetObserver(new DataSetObserver() {
@@ -140,7 +146,7 @@ public class SimpleSectionedListAdapter extends BaseAdapter {
 
     @Override
     public boolean isEnabled(int position) {
-        //noinspection SimplifiableConditionalExpression
+        // noinspection SimplifiableConditionalExpression
         return isSectionHeaderPosition(position)
                 ? false
                 : mBaseAdapter.isEnabled(sectionedPositionToPosition(position));
@@ -166,14 +172,18 @@ public class SimpleSectionedListAdapter extends BaseAdapter {
         return mBaseAdapter.isEmpty();
     }
 
+    protected ListAdapter getBaseAdapter() {
+        return mBaseAdapter;
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (isSectionHeaderPosition(position)) {
-        	TextView view;
-        	if (convertView == null) {
-            	convertView = mLayoutInflater.inflate(mSectionResourceId, parent, false);
+            TextView view;
+            if (convertView == null) {
+                convertView = mLayoutInflater.inflate(mSectionResourceId, parent, false);
             }
-        	view = (TextView)convertView.findViewById(R.id.list_item_schedule_header_textview);
+            view = (TextView) convertView.findViewById(R.id.list_item_schedule_header_textview);
             view.setText(mSections.get(position).title);
             return convertView;
 
@@ -181,5 +191,5 @@ public class SimpleSectionedListAdapter extends BaseAdapter {
             return mBaseAdapter.getView(sectionedPositionToPosition(position), convertView, parent);
         }
     }
-    
+
 }

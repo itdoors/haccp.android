@@ -12,7 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
-import com.itdoors.haccp.Global;
+import com.itdoors.haccp.Config;
 import com.itdoors.haccp.R;
 import com.itdoors.haccp.analytics.Analytics;
 import com.itdoors.haccp.analytics.Analytics.Action;
@@ -69,9 +69,9 @@ public class LoginActivity extends BaseSherlockFragmentActivity implements
         if (Enviroment.isNetworkAvaliable(getApplicationContext())) {
             if (login != null && !login.equals("") && password != null && !password.equals("")) {
 
-                HaccpOAuthService.getService().getAccessToken(Global.CLIENT_ID,
-                        Global.CLIENT_SECRET,
-                        Global.GRAND_TYPE_PASSWORD, login, password, mLoginCallback);
+                HaccpOAuthService.getService().getAccessToken(Config.CLIENT_ID,
+                        Config.CLIENT_SECRET,
+                        Config.GRAND_TYPE_PASSWORD, login, password, mLoginCallback);
                 showProgress();
                 EventBus.getDefault().postSticky(new LoginInitEvent());
 
@@ -191,6 +191,9 @@ public class LoginActivity extends BaseSherlockFragmentActivity implements
         ContentValues values = new ContentValues();
         values.put(HaccpContract.User.NAME, user.getName());
         values.put(HaccpContract.User.EMAIL, user.getEmail());
+        values.put(HaccpContract.User.BIG_AVATAR, user.getBigAvatar());
+        values.put(HaccpContract.User.SMALL_AVATAR, user.getSmallAvatar());
+
         AsyncQueryHandler handler = new AsyncQueryHandler(context.getContentResolver()) {
             @Override
             protected void onInsertComplete(int token, Object cookie, Uri uri) {

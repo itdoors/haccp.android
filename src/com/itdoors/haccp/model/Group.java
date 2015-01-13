@@ -1,84 +1,111 @@
+
 package com.itdoors.haccp.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Group implements Serializable{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	int id;
-	String name;
-	
-	List<GroupCharacteristic> characteristics;
-	
-	
-	public Group(int id, String name) {
-		
-		this.id = id;
-		this.name = name;
-	}
+import com.itdoors.haccp.utils.Logger;
 
-	public Group(int id, String name, GroupCharacteristic characteristic) {
-		
-		this.id = id;
-		this.name = name;
-		this.characteristics = new ArrayList<GroupCharacteristic>();
-		this.characteristics.add(characteristic);
-		
-	}
-	
-	public Group(int id, String name, List<GroupCharacteristic> characteristics) {
-		
-		this.id = id;
-		this.name = name;
-		this.characteristics = characteristics;
-		
-	}
-	
-	public int getId() {
-		return id;
-	}
-	public String getName() {
-		return name;
-	}
-	public boolean hasCharacteristics(){
-		return characteristics == null || characteristics.isEmpty();
-	}
-	
-	public List<GroupCharacteristic> getCharacteristics() {
-		return new ArrayList<GroupCharacteristic>(characteristics);
-	}
-	
-	public GroupCharacteristic getFirstCharacteristic(){
-		return (characteristics == null || characteristics.isEmpty() ? null : characteristics.get(0));
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		
-		if(this == o) return true;
-		if(!(o instanceof Group)) return false;
-		Group g = (Group)o;
-		return  g.id == id && 
-				g.name.equals(name) && 
-				(characteristics == null ? g.characteristics == null : characteristics.equals(g.characteristics));
-	}
-	@Override
-	public int hashCode() {
-		
-		int prime = 31;
-		int hash = 1;
-		
-		hash = prime * hash + Integer.valueOf(id).hashCode();
-		hash = prime * hash + name.hashCode();
-		hash = prime * hash + (characteristics == null ? 0 : characteristics.hashCode());
-		
-		return hash;
-	
-	}
+public class Group implements Serializable {
+
+    private static final long serialVersionUID = -4431776932806031271L;
+
+    private final int id;
+    private final String name;
+    private final List<GroupCharacteristic> characteristics = new ArrayList<GroupCharacteristic>();
+
+    public static class Builder {
+
+        private final int id;
+        private String name;
+        private List<GroupCharacteristic> characteristics;
+
+        public Builder(int id) {
+            this.id = id;
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder characteristics(List<GroupCharacteristic> characteristics) {
+            this.characteristics = characteristics;
+            return this;
+        }
+
+        public Group build() {
+            return new Group(this);
+        }
+    }
+
+    private Group(Builder builder) {
+        this.id = builder.id;
+        this.name = builder.name;
+        if (builder.characteristics != null)
+            this.characteristics.addAll(builder.characteristics);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean hasCharacteristics() {
+        return characteristics == null || characteristics.isEmpty();
+    }
+
+    public List<GroupCharacteristic> getCharacteristics() {
+        return new ArrayList<GroupCharacteristic>(characteristics);
+    }
+
+    public GroupCharacteristic getFirstCharacteristic() {
+        return (characteristics == null || characteristics.isEmpty() ? null : characteristics
+                .get(0));
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((characteristics == null) ? 0 : characteristics.hashCode());
+        result = prime * result + id;
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Group other = (Group) obj;
+        if (characteristics == null) {
+            if (other.characteristics != null)
+                return false;
+        } else if (!characteristics.equals(other.characteristics))
+            return false;
+        if (id != other.id)
+            return false;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Group [id=" + id + ", name=" + name + ", characteristics="
+                + characteristics.toString() + "]";
+    }
+
 }

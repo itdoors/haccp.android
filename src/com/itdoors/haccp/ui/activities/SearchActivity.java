@@ -14,10 +14,11 @@ import com.itdoors.haccp.model.CompanyObject;
 import com.itdoors.haccp.model.Contour;
 import com.itdoors.haccp.model.Point;
 import com.itdoors.haccp.ui.fragments.PointsSectionesListFragment;
+import com.itdoors.haccp.ui.interfaces.OnPointPressedListener;
 import com.itdoors.haccp.utils.Logger;
 
 public class SearchActivity extends SherlockFragmentActivity implements
-        PointsSectionesListFragment.OnPointPressedListener {
+        OnPointPressedListener {
 
     private static final String FRAGMENT_TAG = "com.itdoors.haccp.activities.SearchActivity.FRAGMENT_TAG";
 
@@ -87,7 +88,7 @@ public class SearchActivity extends SherlockFragmentActivity implements
 
     @Override
     public void onPointPressed(Point point) {
-        onPointPressed(point.getId());
+        onPointPressed(point.getUID());
     }
 
     @Override

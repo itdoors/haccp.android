@@ -46,9 +46,14 @@ public final class Intents {
     }
 
     public static final class Point {
-        public static final String UID = "com.itdoors.haccp.Intents.Contour.UID";
-        public static final String POINT = "com.itdoors.haccp.Intents.Contour.POINT";
+        public static final String UID = "com.itdoors.haccp.Intents.Point.UID";
+        public static final String POINT = "com.itdoors.haccp.Intents.Point.POINT";
 
+    }
+
+    public static final class Plan {
+        public static final String UID = "com.itdoors.haccp.Intents.Plan.UID";
+        public static final String PLAN = "com.itdoors.haccp.Intents.Plan.PLAN";
     }
 
     /**

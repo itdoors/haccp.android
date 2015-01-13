@@ -58,7 +58,6 @@ public class SyncUtils {
     public static synchronized void CreateSyncAccount(Context context) {
         @SuppressWarnings("unused")
         boolean newAccount = false;
-        @SuppressWarnings("unused")
         boolean setupComplete = PreferenceManager
                 .getDefaultSharedPreferences(context).getBoolean(PREF_SETUP_COMPLETE, false);
         boolean setupDone = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(

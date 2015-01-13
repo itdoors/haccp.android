@@ -21,7 +21,9 @@ public class HaccpDatabase extends SQLiteOpenHelper {
         String USER = "CREATE TABLE user (" +
                 " _id       integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE," +
                 " username  varchar(250)," +
-                " email     varchar(250)" +
+                " email     varchar(250)," +
+                " small_avatar  varchar(250)," +
+                " big_avatar    varchar(250)" +
                 " );";
 
         String COMPANIES = "CREATE TABLE companies (" +

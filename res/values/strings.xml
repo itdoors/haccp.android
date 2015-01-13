@@ -23,6 +23,7 @@
     <string name="details">Details</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
     <string name="logout">Logout</string>
     <string name="continue_str">Continue</string>
     <string name="welcome">Welcome!</string>
@@ -78,7 +79,7 @@
     <string name="from">From</string>
     <string name="to">To</string>
     <string name="action">Action</string>
-    <string name="add_statistic_record">Add statistics record</string>
+    <string name="add_data_record">Add statistics record</string>
     <string name="all_items_downloaded">All items downloaded</string>
     <string name="deratisation">Deratisation</string>
     <string name="desinsectum">Desinsectum</string>
@@ -119,5 +120,10 @@
     
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+    
+    <string name="zero_to_all">to all</string>
+    <string name="zero_to_others">to others</string>
+    <string name="selected">%1$s selected</string>
+    
     
 </resources>

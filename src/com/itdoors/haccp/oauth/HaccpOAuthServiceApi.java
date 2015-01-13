@@ -50,10 +50,18 @@ public interface HaccpOAuthServiceApi {
         @SerializedName("email")
         private final String email;
 
-        public User(int id, String name, String email) {
+        @SerializedName("big_avatar")
+        private final String bigAvatar;
+
+        @SerializedName("small_avatar")
+        private final String smallAvatar;
+
+        public User(int id, String name, String email, String bigAvatar, String smallAvatar) {
             this.id = id;
             this.name = name;
             this.email = email;
+            this.bigAvatar = bigAvatar;
+            this.smallAvatar = smallAvatar;
         }
 
         public int getId() {
@@ -68,14 +76,25 @@ public interface HaccpOAuthServiceApi {
             return email;
         }
 
+        public String getBigAvatar() {
+            return bigAvatar;
+        }
+
+        public String getSmallAvatar() {
+            return smallAvatar;
+        }
+
         @Override
         public String toString() {
             return new StringBuilder()
                     .append("{")
-                    .append("id").append(":").append(id)
-                    .append("name").append(":").append(name)
-                    .append("email").append(":").append(email)
+                    .append("id").append(":").append(id).append(",\t")
+                    .append("name").append(":").append(name).append(",\t")
+                    .append("email").append(":").append(email).append(",\t")
+                    .append("bigAvatar").append(":").append(bigAvatar).append(",\t")
+                    .append("smallAvatar").append(":").append(smallAvatar).append(",\t")
                     .append("};")
+
                     .toString();
         }
 

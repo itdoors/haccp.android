@@ -1,15 +1,13 @@
 
 package com.itdoors.haccp;
 
-public class Global {
+public class Config {
 
-    private static String API_VERSION_CODE = "v1";
     public static String BASE_URL = "http://haccp-test.jelastic.neohost.net/";
-    // public static String BASE_URL = BASE_URL_OAUTH;
+    public static String API_VERSION_CODE = "v1";
     public static String API_URL = BASE_URL + "api/" + API_VERSION_CODE;
 
     public static boolean loggingEnabled = true;
-
     public static boolean debugAnalytics = true;
 
     public static String dateFormat = "yyyy-MM-dd";

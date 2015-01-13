@@ -19,13 +19,16 @@ import com.itdoors.haccp.Intents;
 import com.itdoors.haccp.R;
 import com.itdoors.haccp.model.CompanyObject;
 import com.itdoors.haccp.model.Contour;
+import com.itdoors.haccp.model.Plan;
 import com.itdoors.haccp.model.Point;
 import com.itdoors.haccp.ui.fragments.PointsSectionesListFragment;
+import com.itdoors.haccp.ui.interfaces.OnPlanPressedListener;
+import com.itdoors.haccp.ui.interfaces.OnPointPressedListener;
 import com.itdoors.haccp.utils.ApiLevel;
-import com.itdoors.haccp.utils.Logger;
 
 public class PointsListActivity extends SherlockFragmentActivity implements
-        PointsSectionesListFragment.OnPointPressedListener {
+        OnPointPressedListener,
+        OnPlanPressedListener {
 
     private static final String FRAGMENT_TAG = "com.itdoors.haccp.activities.PointsListActivity.FRAGMENT_TAG";
 
@@ -159,14 +162,22 @@ public class PointsListActivity extends SherlockFragmentActivity implements
 
     @Override
     public void onPointPressed(Point point) {
-        onPointPressed(point.getId());
+        onPointPressed(point.getUID());
     }
 
     @Override
     public void onPointPressed(String pointId) {
-        Logger.Logd(getClass(), "onPointPressed: point Id : " + pointId);
         Intent intent = PointDetailsActivity.newIntent(this, pointId);
         startActivity(intent);
     }
 
+    @Override
+    public void onPlanPressed(Plan plan) {
+        CompanyObject companyObject = (CompanyObject) getIntent().getExtras()
+                .getSerializable(Intents.CompanyObject.COMPANY_OBJECT);
+        Contour contour = (Contour) getIntent().getExtras().getSerializable(
+                Intents.Contour.CONTOUR);
+        Intent intent = PointsListInPlanActivity.newIntent(this, plan, companyObject, contour);
+        startActivity(intent);
+    }
 }

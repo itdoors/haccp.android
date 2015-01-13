@@ -1,39 +1,59 @@
+
 package com.itdoors.haccp.model;
 
 import java.io.Serializable;
 
-public class Owner implements Serializable{
+public class Owner implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 5483579510148941314L;
 
-	private int id;
-	private String name;
-	
-	public Owner(int id, String name) {
-		this.id = id;
-		this.name = name;
-	}
-	public int getId() {
-		return id;
-	}
-	public String getName() {
-		return name;
-	}
-	
-	@Override
-	public int hashCode() {
-		return 31 * (31 + Integer.valueOf(id).hashCode()) + name.hashCode();
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if(this == o) return true;
-		if(!(o instanceof Owner)) return false;
-		Owner ow = (Owner)o;
-		return ow.id == id && 
-			   ow.name == name; 
-	}
+    private final int id;
+    private final String name;
+
+    public Owner(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + id;
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Owner other = (Owner) obj;
+        if (id != other.id)
+            return false;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Owner [id=" + id + ", name=" + name + "]";
+    }
+
 }

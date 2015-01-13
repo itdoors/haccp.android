@@ -6,45 +6,87 @@ import java.util.Date;
 
 public class Point implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2009424751322523255L;
 
-    private String uid;
-    private int number;
-    private Date installationDate;
-    private Plan plan;
-    private Group group;
-    private Contour contour;
-    private PointStatus status;
+    private final String uid;
+    private final String number;
+    private final Date installationDate;
+    private final Plan plan;
+    private final Group group;
+    private final Contour contour;
+    private final PointStatus status;
 
-    private Owner owner;
+    private final Owner owner;
 
-    public Point(String id, int number, Date inDate, Plan plan, Group group, Contour contour) {
-        this(id, number, inDate, plan, group, contour, null, null);
+    public static class Builder {
+
+        private final String uid;
+
+        private String number;
+        private Date installationDate;
+        private Plan plan;
+        private Group group;
+        private Contour contour;
+        private PointStatus status;
+        private Owner owner;
+
+        public Builder(String uid) {
+            this.uid = uid;
+        }
+
+        public Builder number(String number) {
+            this.number = number;
+            return this;
+        }
+
+        public Builder installationDate(Date installationDate) {
+            this.installationDate = installationDate;
+            return this;
+        }
+
+        public Builder plan(Plan plan) {
+            this.plan = plan;
+            return this;
+        }
+
+        public Builder group(Group group) {
+            this.group = group;
+            return this;
+        }
+
+        public Builder contour(Contour contour) {
+            this.contour = contour;
+            return this;
+        }
+
+        public Builder status(PointStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder owner(Owner owner) {
+            this.owner = owner;
+            return this;
+        }
+
+        public Point build() {
+            return new Point(this);
+        }
     }
 
-    public Point(String id, int number, Date inDate, Plan plan, Group group, Contour contour,
-            PointStatus status) {
-        this(id, number, inDate, plan, group, contour, status, null);
-    }
-
-    public Point(String id, int number, Date inDate, Plan plan, Group group, Contour contour,
-            PointStatus status, Owner owner) {
-        this.uid = id;
-        this.number = number;
-        this.installationDate = inDate;
-        this.plan = plan;
-        this.group = group;
-        this.contour = contour;
-        this.owner = owner;
-        this.status = status;
+    private Point(Builder builder) {
+        this.uid = builder.uid;
+        this.number = builder.number;
+        this.installationDate = builder.installationDate;
+        this.plan = builder.plan;
+        this.group = builder.group;
+        this.contour = builder.contour;
+        this.status = builder.status;
+        this.owner = builder.owner;
     }
 
     public Contour getContour() {
         return contour;
-    }
-
-    public void setOwner(Owner owner) {
-        this.owner = owner;
     }
 
     public Owner getOwner() {
@@ -55,7 +97,7 @@ public class Point implements Serializable {
         return group;
     }
 
-    public String getId() {
+    public String getUID() {
         return uid;
     }
 
@@ -63,7 +105,7 @@ public class Point implements Serializable {
         return installationDate;
     }
 
-    public int getNumber() {
+    public String getNumber() {
         return number;
     }
 
@@ -75,67 +117,79 @@ public class Point implements Serializable {
         return status;
     }
 
-    public void setStatus(PointStatus status) {
-        this.status = status;
-    }
-
     @Override
     public int hashCode() {
-
-        int prime = 31;
-        int hash = 1;
-
-        hash = prime * hash + Integer.valueOf(uid).hashCode();
-        hash = prime * hash + Integer.valueOf(number).hashCode();
-        hash = prime * hash + (installationDate == null ? 0 : installationDate.hashCode());
-        hash = prime * hash + (group == null ? 0 : group.hashCode());
-        hash = prime * hash + (plan == null ? 0 : plan.hashCode());
-        hash = prime * hash + (contour == null ? 0 : contour.hashCode());
-        hash = prime * hash + (status == null ? 0 : status.hashCode());
-        hash = prime * hash + (owner == null ? 0 : owner.hashCode());
-
-        return hash;
-
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((contour == null) ? 0 : contour.hashCode());
+        result = prime * result + ((group == null) ? 0 : group.hashCode());
+        result = prime * result + ((installationDate == null) ? 0 : installationDate.hashCode());
+        result = prime * result + ((number == null) ? 0 : number.hashCode());
+        result = prime * result + ((owner == null) ? 0 : owner.hashCode());
+        result = prime * result + ((plan == null) ? 0 : plan.hashCode());
+        result = prime * result + ((status == null) ? 0 : status.hashCode());
+        result = prime * result + ((uid == null) ? 0 : uid.hashCode());
+        return result;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
+    public boolean equals(Object obj) {
+        if (this == obj)
             return true;
-        if (!(o instanceof Group))
+        if (obj == null)
             return false;
-        Point cp = (Point) o;
-        return cp.uid == uid
-                &&
-                cp.number == number
-                &&
-                (plan == null ? cp.plan == null : plan.equals(cp.plan))
-                &&
-                (group == null ? cp.group == null : group.equals(cp.group))
-                &&
-                (installationDate == null ? cp.installationDate == null : installationDate
-                        .equals(cp.installationDate)) &&
-                (contour == null ? cp.contour == null : contour.equals(cp.contour)) &&
-                (status == null ? cp.status == null : status.equals(cp.status)) &&
-                (owner == null ? cp.owner == null : owner.equals(cp.owner));
+        if (getClass() != obj.getClass())
+            return false;
+        Point other = (Point) obj;
+        if (contour == null) {
+            if (other.contour != null)
+                return false;
+        } else if (!contour.equals(other.contour))
+            return false;
+        if (group == null) {
+            if (other.group != null)
+                return false;
+        } else if (!group.equals(other.group))
+            return false;
+        if (installationDate == null) {
+            if (other.installationDate != null)
+                return false;
+        } else if (!installationDate.equals(other.installationDate))
+            return false;
+
+        if (number == null) {
+            if (other.number != null)
+                return false;
+        } else if (!number.equals(other.number))
+            return false;
+        if (owner == null) {
+            if (other.owner != null)
+                return false;
+        } else if (!owner.equals(other.owner))
+            return false;
+        if (plan == null) {
+            if (other.plan != null)
+                return false;
+        } else if (!plan.equals(other.plan))
+            return false;
+        if (status == null) {
+            if (other.status != null)
+                return false;
+        } else if (!status.equals(other.status))
+            return false;
+        if (uid == null) {
+            if (other.uid != null)
+                return false;
+        } else if (!uid.equals(other.uid))
+            return false;
+        return true;
     }
 
     @Override
     public String toString() {
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        sb.append("id = " + uid + ", ");
-        sb.append("number = " + number + ", ");
-        sb.append("installationDate = "
-                + (installationDate == null ? "null" : installationDate.toString()) + ", ");
-        sb.append("plan = " + (plan == null ? "null" : plan.toString()) + ", ");
-        sb.append("group = " + (group == null ? "null" : group.toString()) + ", ");
-        sb.append("contour = " + (contour == null ? "null" : contour.toString()) + ", ");
-        sb.append("status = " + (status == null ? "null" : status.toString()) + ", ");
-        sb.append("owner = " + (owner == null ? "null" : owner.toString()) + ", ");
-        sb.append("]");
-        return sb.toString();
-
+        return "Point [uid=" + uid + ", number=" + number + ", installationDate="
+                + installationDate + ", plan=" + plan + ", group=" + group + ", contour=" + contour
+                + ", status=" + status + ", owner=" + owner + "]";
     }
+
 }

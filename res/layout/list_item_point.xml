@@ -10,6 +10,7 @@
     >
 
     <TextView 
+        android:id="@+id/point_item_name_str"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/point_number"

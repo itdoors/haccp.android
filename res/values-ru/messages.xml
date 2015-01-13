@@ -31,5 +31,9 @@
     <string name="instruction_using_flashlight">Фонарик в сканнере можно включить и выключить при помощи кнопок громкости</string>
     <string name="instruction_do_not_off_sync">Не отключайте синхронизацию на сматрфоне</string>
     <string name="instruction_turn_gps_on">Включите GPS</string>
+    <string name="confirm_action">Подтвердите действие</string>
+     
+    <string name="conrifmation_for_zero_to_all_msg"> Установить значение 0 для всех точек %1$s в контуре %2$s ?</string>
+    <string name="conrifmation_for_zero_to_others_msg"> Установить значение 0 для всех точек %1$s в контуре %2$s кроме: %3$s ?</string>
     
 </resources>

@@ -16,7 +16,7 @@ public class HaccpOAuthService {
         if (service == null) {
 
             RestAdapter restAdapter = new RestAdapter.Builder()
-                    .setEndpoint(com.itdoors.haccp.Global.BASE_URL)
+                    .setEndpoint(com.itdoors.haccp.Config.BASE_URL)
                     .setLogLevel(LogLevel.FULL)
                     .build();
 

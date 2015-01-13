@@ -1,4 +1,4 @@
-package com.itdoors.haccp.ui.fragments;
+package com.itdoors.haccp.ui.fragments.dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

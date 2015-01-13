@@ -29,7 +29,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.itdoors.haccp.Global;
+import com.itdoors.haccp.Config;
 import com.itdoors.haccp.Intents;
 import com.itdoors.haccp.R;
 import com.itdoors.haccp.model.StatististicsItemStatus;
@@ -252,7 +252,7 @@ public class StatisticsOfflineFragment extends SwipeRefreshListFragment implemen
                 unitStr = unit == null ? "%" : unit;
                 valueStr = Integer.toString(value) + unitStr;
                 whoSetStr = ""; // "Михайличенко";
-                dateStr = date == null ? "-" : new SimpleDateFormat(Global.usualDateFromat).format(
+                dateStr = date == null ? "-" : new SimpleDateFormat(Config.usualDateFromat).format(
                         date).toString();
 
             } catch (Exception e) {

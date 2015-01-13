@@ -8,7 +8,7 @@ import roboguice.util.temp.Ln;
 
 import android.util.Log;
 
-import com.itdoors.haccp.Global;
+import com.itdoors.haccp.Config;
 import com.octo.android.robospice.retrofit.RetrofitGsonSpiceService;
 
 public class MySpiceService extends RetrofitGsonSpiceService{
@@ -22,7 +22,7 @@ public class MySpiceService extends RetrofitGsonSpiceService{
 	
 	@Override
 	protected String getServerUrl() {
-		return Global.BASE_URL;
+		return Config.BASE_URL;
 	}
 	
 	@Override

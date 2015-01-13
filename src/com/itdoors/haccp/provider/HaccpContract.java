@@ -18,6 +18,9 @@ public final class HaccpContract {
         public static final String NAME = "username";
         public static final String EMAIL = "email";
 
+        public static final String BIG_AVATAR = "big_avatar";
+        public static final String SMALL_AVATAR = "small_avatar";
+
     }
 
     public static interface CompaniesColumns {
@@ -374,7 +377,7 @@ public final class HaccpContract {
         public static final String POISON_NAME_PROJECTION = "poison_name";
         public static final String POISON_ACTIVE_SUBSTANCE_PROJECTION = "poison_active_substance";
 
-        public static Uri builduriForCompanyObjectInContour(int companyObjectId, int contourId) {
+        public static Uri buildUriForCompanyObjectInContour(int companyObjectId, int contourId) {
             return BASE_CONTENT_URI
                     .buildUpon()
                     .appendPath("company_objects")
@@ -385,8 +388,26 @@ public final class HaccpContract {
                     .build();
         }
 
+        public static Uri buidUriForCompanyObjectInContourInPlan(int companyObjectId,
+                int contourId, int planId) {
+            return BASE_CONTENT_URI
+                    .buildUpon()
+                    .appendPath("company_objects")
+                    .appendPath(String.valueOf(companyObjectId))
+                    .appendPath("contours")
+                    .appendPath(String.valueOf(contourId))
+                    .appendPath("plans")
+                    .appendPath(String.valueOf(planId))
+                    .appendPath("points")
+                    .build();
+        }
+
         public static String getCompanyObjectId(Uri uri) {
             return uri.getPathSegments().get(1);
+        }
+
+        public static String getPlanId(Uri uri) {
+            return uri.getPathSegments().get(5);
         }
 
         public static String getContourId(Uri uri) {
@@ -398,7 +419,7 @@ public final class HaccpContract {
         }
 
         public static Uri buildSearchUri(int companyObjectId, int contourId, String query) {
-            return builduriForCompanyObjectInContour(companyObjectId, contourId)
+            return buildUriForCompanyObjectInContour(companyObjectId, contourId)
 
                     .buildUpon()
                     .appendPath(PATH_SEARCH)

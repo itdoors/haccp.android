@@ -30,4 +30,10 @@
     <string name="instruction_using_flashlight">The flashlight can be switched on and off using the volume buttons</string>
     <string name="instruction_do_not_off_sync">Do not off the synchronization on smartphone</string>
     <string name="instruction_turn_gps_on">Turn GPS on</string>
+    <string name="confirm_action">Confirm action</string>
+ 
+    <string name="conrifmation_for_zero_to_all_msg"> Set 0 value to all points of %1$s in %2$s?</string>
+    <string name="conrifmation_for_zero_to_others_msg"> Set 0 value to all points of %1$s in %2$s except: %3$s ?</string>
+    
+
 </resources>

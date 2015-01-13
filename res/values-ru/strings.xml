@@ -20,7 +20,8 @@
     <string name="share">Share</string>
     <string name="details">Детали</string>
     <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
+    <string name="cancel">Отмена</string>
+    <string name="confirm">Подтвердить</string>
     <string name="logout">Logout</string>
     <string name="continue_str">Continue</string>
     <string name="welcome">Welcome!</string>
@@ -74,7 +75,7 @@
     <string name="from">С</string>
     <string name="to">По</string>
     <string name="action">Действие</string>
-    <string name="add_statistic_record">Добавить запись</string>
+    <string name="add_data_record">Добавить запись</string>
     <string name="all_items_downloaded">Все элементы загружены</string>
     <string name="deratisation">Дератизация</string>
     <string name="desinsectum">Дезинсекция</string>
@@ -112,6 +113,10 @@
     <string name="pref_item_site">Сайт:</string>
     <string name="pref_item_version">Версия:</string>
  
-
+	<string name="zero_to_all">Всем</string>
+    <string name="zero_to_others">Кроме</string>
+    <string name="selected">%1$s выбрано</string>
+    
+    
 
 </resources>

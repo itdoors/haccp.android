@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:id="@+id/add_st_done_holder"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:layout_alignParentBottom="true"
+android:background="@drawable/abs__ab_bottom_transparent_light_holo" >
+	<Button
+     android:id="@+id/add_st_done_btn"
+     android:layout_width="360dp"
+     android:layout_height="wrap_content"
+     android:layout_centerInParent="true"
+     android:layout_marginLeft="30dp"
+     android:layout_marginRight="30dp"
+     android:layout_marginTop="20dp"
+     android:text="@string/add"
+     android:textSize="20sp" />
+</RelativeLayout>

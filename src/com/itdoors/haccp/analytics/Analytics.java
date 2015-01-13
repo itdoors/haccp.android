@@ -9,7 +9,7 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Logger.LogLevel;
 import com.google.android.gms.analytics.Tracker;
-import com.itdoors.haccp.Global;
+import com.itdoors.haccp.Config;
 import com.itdoors.haccp.R;
 import com.itdoors.haccp.utils.Logger;
 
@@ -50,7 +50,7 @@ public final class Analytics {
 
     private void setup() {
 
-        if (Global.debugAnalytics) {
+        if (Config.debugAnalytics) {
 
             GoogleAnalytics analytics = GoogleAnalytics.getInstance(mContext);
             analytics.getLogger().setLogLevel(LogLevel.VERBOSE);
@@ -70,7 +70,7 @@ public final class Analytics {
                         .setLabel(label)
                         .setValue(value)
                         .build());
-        if (Global.debugAnalytics) {
+        if (Config.debugAnalytics) {
             Logger.Logv(TAG, "GA: sending event\n\tcategory = '" + category + "'" + "\n\taction ='"
                     + action + "'" + "\n\tlabel ='" + label + "'" + "\n\tvalue = " + value);
         }
@@ -100,7 +100,7 @@ public final class Analytics {
                         .build()
                 );
 
-        if (Global.debugAnalytics) {
+        if (Config.debugAnalytics) {
             Logger.Logv(TAG, "GA: sending exception \n\tdescrition = '" + description + "'"
                     + "\n\fatal ='" + fatal);
         }

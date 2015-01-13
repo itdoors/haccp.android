@@ -2,7 +2,7 @@ package com.itdoors.haccp.rest;
 
 import java.util.Calendar;
 
-import com.itdoors.haccp.Global;
+import com.itdoors.haccp.Config;
 import com.itdoors.haccp.sync.SyncAdapter;
 import com.itdoors.haccp.utils.CalendarUtils;
 
@@ -136,9 +136,9 @@ public class QueryTransactionInfo {
                 long cutoffMillis;
      
                 prefs = context.getSharedPreferences( 
-                		Global.REST_PREFS, 0 );
+                		Config.REST_PREFS, 0 );
                  
-                dlMillis = prefs.getLong( Global.PREFERENCES_DOWNLOAD_DATE, 0 );
+                dlMillis = prefs.getLong( Config.PREFERENCES_DOWNLOAD_DATE, 0 );
                 cutoffMillis = CalendarUtils.addToCurrent( Calendar.HOUR_OF_DAY, -1 ).getTime();
                  
                 if ( dlMillis <= cutoffMillis ) {

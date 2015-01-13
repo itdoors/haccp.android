@@ -35,7 +35,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.commonsware.cwac.pager.PageDescriptor;
 import com.commonsware.cwac.pager.SimplePageDescriptor;
 import com.commonsware.cwac.pager.v4.ArrayPagerAdapter;
-import com.itdoors.haccp.Global;
+import com.itdoors.haccp.Config;
 import com.itdoors.haccp.Intents;
 import com.itdoors.haccp.R;
 import com.itdoors.haccp.model.rest.retrofit.MoreStatistics;
@@ -46,8 +46,8 @@ import com.itdoors.haccp.ui.fragments.AttributesFragment;
 import com.itdoors.haccp.ui.fragments.StatisticsOfflineFragment;
 import com.itdoors.haccp.ui.fragments.StatisticsOnlineFragment;
 import com.itdoors.haccp.ui.fragments.StatisticsOnlineFragment.MODE;
+import com.itdoors.haccp.ui.fragments.dialogs.TimeRangeDialogFragment;
 import com.itdoors.haccp.ui.fragments.SwipeRefreshListFragment;
-import com.itdoors.haccp.ui.fragments.TimeRangeDialogFragment;
 import com.itdoors.haccp.ui.interfaces.OnContextMenuItemPressedListener;
 import com.itdoors.haccp.ui.interfaces.OnLongStatisticsItemPressedListener;
 import com.itdoors.haccp.ui.interfaces.OnTimeRangeChooseListener;
@@ -420,7 +420,7 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
             case R.id.cp_bp_add_item:
 
                 String pointId = getIntent().getExtras().getString(Intents.Point.UID);
-                Intent intent = new Intent(this, AddStatisticsActivity.class);
+                Intent intent = new Intent(this, AddStatisticsAndChangeStatusActivity.class);
                 intent.putExtra(Intents.Point.UID, pointId);
                 startActivity(intent);
                 return true;
@@ -645,9 +645,9 @@ public class PointDetailsActivity extends SherlockFragmentActivity implements
                 fromUnixTimeStamp = Long.toString(fromDate.getTime() / 1000);
                 toUnixTimeStamp = Long.toString(toDate.getTime() / 1000);
 
-                String fromTimeStampStr = new SimpleDateFormat(Global.usualDateFromat).format(
+                String fromTimeStampStr = new SimpleDateFormat(Config.usualDateFromat).format(
                         new Date(Long.valueOf(fromUnixTimeStamp) * 1000)).toString();
-                String toTimeStampStr = new SimpleDateFormat(Global.usualDateFromat).format(
+                String toTimeStampStr = new SimpleDateFormat(Config.usualDateFromat).format(
                         new Date(Long.valueOf(toUnixTimeStamp) * 1000)).toString();
                 String toastMess = getString(R.string.from) + " : " + fromTimeStampStr + " , "
                         + getString(R.string.to) + " : " + toTimeStampStr;

@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.itdoors.haccp.Global;
+import com.itdoors.haccp.Config;
 import com.itdoors.haccp.Intents;
 import com.itdoors.haccp.R;
 import com.itdoors.haccp.provider.HaccpContract;
@@ -151,7 +151,7 @@ public class AttributesFragment extends Fragment implements LoaderCallbacks<Curs
 
     @SuppressLint("SimpleDateFormat")
     private static String fomatDateEmpty(Date date, String replacement) {
-        return date == null ? replacement : new SimpleDateFormat(Global.usualDateFromat)
+        return date == null ? replacement : new SimpleDateFormat(Config.usualDateFromat)
                 .format(date).toString();
     }
 
